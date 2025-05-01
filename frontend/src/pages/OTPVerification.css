@@ -1,0 +1,119 @@
+/* Import base styles from ForgotPassword.css */
+@import './ForgotPassword.css';
+
+/* OTP specific styles */
+.otp-container {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.otp-input {
+  width: 54px;
+  height: 54px;
+  border: 1px solid #E5E5E5;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 500;
+  text-align: center;
+  background-color: #F8F9FE;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-color: #6B4EFF;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(107, 78, 255, 0.1);
+}
+
+.resend-container {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 14px;
+  color: #666666;
+}
+
+.resend-link {
+  background: none;
+  border: none;
+  color: #6B4EFF;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.resend-link:hover {
+  color: #5B3FEF;
+  text-decoration: underline;
+}
+
+/* Mobile Responsive styles */
+@media (max-width: 768px) {
+  .otp-container {
+    gap: 10px;
+  }
+
+  .otp-input {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .resend-container {
+    font-size: 13px;
+  }
+
+  .resend-link {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .otp-container {
+    gap: 8px;
+    padding: 0;
+  }
+
+  .otp-input {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .otp-container {
+    gap: 6px;
+  }
+
+  .otp-input {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+}
+
+/* Handle landscape orientation */
+@media (max-height: 480px) and (orientation: landscape) {
+  .otp-container {
+    margin-bottom: 1rem;
+  }
+
+  .otp-input {
+    width: 40px;
+    height: 40px;
+  }
+
+  .resend-container {
+    margin-top: 1rem;
+  }
+} 
