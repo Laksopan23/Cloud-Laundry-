@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
-import ForgotPassword from "./forgotpassword";
+import ForgotPassword from "./pages/forgotpassword";
 
 function App() {
   return (
