@@ -2,7 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+
 const emailRoutes = require('./routes/emailRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+
+
 
 dotenv.config();
 
@@ -20,8 +24,14 @@ mongoose.connect(process.env.MONGO_URI, {
   console.error('❌ MongoDB connection error:', err);
 });
 
+
 // Routes
 app.use('/api/email', emailRoutes);
+app.use('/api/orders', orderRoutes);
+
+
+
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
