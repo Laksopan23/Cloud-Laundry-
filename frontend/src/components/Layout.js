@@ -109,47 +109,49 @@ const App = ({ children }) => {
       )}
 
       <Layout style={{ marginLeft: !isMobile ? (collapsed ? 80 : 225) : 0 }}>
-        {!isMobile && (
-          <Header
-            style={{
-              position: "fixed",
-              top: 0,
-              left: collapsed ? 80 : 225,
-              width: `calc(100% - ${collapsed ? 80 : 225}px)`,
-              height: "64px",
-              backgroundColor: "#5e208e",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              zIndex: 5,
-            }}
-          >
-            <div
-              style={{
-                flex: 1,
-                minWidth: 0,
-                display: "flex",
-                justifyContent: "flex-end",
-              }}
-            >
+        <Header
+          style={{
+            position: "fixed",
+            top: 0,
+            left: !isMobile ? (collapsed ? 80 : 225) : 0,
+            width: !isMobile
+              ? `calc(100% - ${collapsed ? 80 : 225}px)`
+              : "100%",
+            height: "64px",
+            backgroundColor: isMobile ? "#ffffff" : "#5e208e",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: isMobile ? "center" : "space-between",
+            padding: "0 16px",
+            zIndex: 5,
+          }}
+        >
+          {isMobile && (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <img src={imageSrc} alt="Logo" style={{ height: "120px" }} />
+            </div>
+          )}
+
+          {!isMobile && (
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft:1000 }}>
               {headerIteam.map((item) => (
                 <Button
                   key={item.key}
                   type="text"
                   icon={item.icon}
-                  style={{ color: "black", fontSize: "20px" }}
+                  style={{ color: "white", fontSize: "18px" }}
                   onClick={() => handleHeaderClick(item.key)}
                 >
                   {item.text}
                 </Button>
               ))}
             </div>
-          </Header>
-        )}
+          )}
+        </Header>
 
         <Content
           style={{
-            marginTop: isMobile ? 0 : 64,
+            marginTop: 64,
             padding: 24,
           }}
         >
