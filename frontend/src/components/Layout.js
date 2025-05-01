@@ -13,7 +13,7 @@ const { useBreakpoint } = Grid;
 
 const SiderItems = [
   { key: "dashboard", icon: <HomeOutlined />, label: "Dashboard" },
-  { key: "categories", icon: <HomeOutlined />, label: "Category" },
+  { key: "invoice", icon: <HomeOutlined />, label: "Invoice" },
   { key: "shorts", icon: <HomeOutlined />, label: "Shorts" },
   { key: "timer", icon: <HomeOutlined />, label: "Cart" },
   { key: "addpro", icon: <HomeOutlined />, label: "Add Products" },
@@ -58,8 +58,8 @@ const App = ({ children }) => {
       case "dashboard":
         navigate("/");
         break;
-      case "categories":
-        navigate("/category");
+      case "invoice":
+        navigate("/invoice");
         break;
       case "shorts":
         navigate("/shorts");
