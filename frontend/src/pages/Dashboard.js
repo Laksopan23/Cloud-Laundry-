@@ -25,118 +25,190 @@ function Dashboard() {
 
   return (
     <Layout>
-      <div style={{ padding: 20 }}>
-        {/* Header */}
+      <style>
+        {`
+          @media (min-width: 992px) {
+            .dashboard-container {
+              display: flex;
+              gap: 20px;
+              align-items: flex-start;
+            }
+            .left-panel {
+              width: 65%;
+            }
+            .right-panel {
+              width: 35%;
+            }
+            .stat-card-container {
+              flex-wrap: nowrap;
+              justify-content: space-between;
+            }
+            .stat-card {
+              width: 180px;
+            }
+          }
+
+          @media (max-width: 991px) {
+            .stat-card-container {
+              flex-wrap: wrap;
+              justify-content: center;
+            }
+            .stat-card {
+              width: 48%;
+            }
+          }
+        `}
+      </style>
+
+      <div style={{ padding: 10 }}>
         <h2 style={{ fontWeight: 'bold', textAlign: 'center' }}>Dashboard</h2>
 
-        {/* Stat Cards */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 20,
-            justifyContent: 'center',
-            marginBottom: 30,
-          }}
-        >
-          <StatCard
-            icon={<BarChartOutlined />}
-            title="Total Profit"
-            value="$1k"
-            change="+8% from yesterday"
-            bgColor="#ffe6eb"
-            iconBg="#ff4d6d"
-          />
-          <StatCard
-            icon={<FileTextOutlined />}
-            title="Total Order"
-            value="300"
-            change="+5% from yesterday"
-            bgColor="#fff3da"
-            iconBg="#ff9966"
-          />
-          <StatCard
-            icon={<CheckCircleFilled />}
-            title="Orders Done"
-            value="5"
-            change="+1.2% from yesterday"
-            bgColor="#e8fff0"
-            iconBg="#00c853"
-          />
-          <StatCard
-            icon={<UserAddOutlined />}
-            title="New Customers"
-            value="8"
-            change="0.5% from yesterday"
-            bgColor="#f3e8ff"
-            iconBg="#b388ff"
-          />
-        </div>
+        <div className="dashboard-container">
+          {/* LEFT PANEL */}
+          <div className="left-panel">
+            <h3 style={{ fontWeight: 'bold', textAlign: 'Left', marginBottom: 20 }}>
+              Today's Orders
+            </h3>
 
-        {/* Top Services */}
-        <h3 style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 20 }}>Top Services</h3>
-        <div>
-          {orders.map((order, index) => (
-            <div key={index} style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '500' }}>
-                <span>{order.name}</span>
-                <span style={{ border: `1px solid ${getColor(order.name)}`, padding: '2px 8px', borderRadius: 12, color: getColor(order.name), fontSize: 12 }}>
-                  {order.popularity}%
-                </span>
-              </div>
-              <Progress
-                percent={order.popularity}
-                strokeColor={getColor(order.name)}
-                showInfo={false}
+            {/* Stat Cards */}
+            <div
+              className="stat-card-container"
+              style={{
+                display: 'flex',
+                gap: 20,
+                marginBottom: 30,
+              }}
+            >
+              <StatCard
+                icon={<BarChartOutlined />}
+                title="Total Profit"
+                value="$1k"
+                change="+8% from yesterday"
+                bgColor="#ffe6eb"
+                iconBg="#ff4d6d"
+              />
+              <StatCard
+                icon={<FileTextOutlined />}
+                title="Total Order"
+                value="300"
+                change="+5% from yesterday"
+                bgColor="#fff3da"
+                iconBg="#ff9966"
+              />
+              <StatCard
+                icon={<CheckCircleFilled />}
+                title="Orders Done"
+                value="5"
+                change="+1.2% from yesterday"
+                bgColor="#e8fff0"
+                iconBg="#00c853"
+              />
+              <StatCard
+                icon={<UserAddOutlined />}
+                title="New Customers"
+                value="8"
+                change="0.5% from yesterday"
+                bgColor="#f3e8ff"
+                iconBg="#b388ff"
               />
             </div>
-          ))}
-        </div>
 
-        {/* Notifications */}
-        <div style={{ marginTop: 40 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ fontWeight: 'bold' }}>Notifications</h3>
-            <Button type="link" style={{ padding: 0 }}>View All</Button>
-          </div>
-          <div>
-            {notifications.map((notif) => (
-              <Card key={notif.id} size="small" style={{ marginBottom: 10, border: '1px solid #eee', backgroundColor: '#f9f9f9' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FileTextOutlined style={{ marginRight: 10, color: '#7e57c2' }} />
-                  {notif.message}
+            {/* Top Services */}
+            <h3 style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 20 }}>
+              Top Services
+            </h3>
+            <div>
+              {orders.map((order, index) => (
+                <div key={index} style={{ marginBottom: 20 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontWeight: '500',
+                    }}
+                  >
+                    <span>{order.name}</span>
+                    <span
+                      style={{
+                        border: `1px solid ${getColor(order.name)}`,
+                        padding: '2px 8px',
+                        borderRadius: 12,
+                        color: getColor(order.name),
+                        fontSize: 12,
+                      }}
+                    >
+                      {order.popularity}%
+                    </span>
+                  </div>
+                  <Progress
+                    percent={order.popularity}
+                    strokeColor={getColor(order.name)}
+                    showInfo={false}
+                  />
                 </div>
-              </Card>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Calendar at bottom */}
-        <div style={{ marginTop: 40 }}>
-          <Calendar
-            fullscreen={false}
-            headerRender={({ value, onChange }) => {
-              const start = 0;
-              const end = 12;
-              const monthOptions = [];
+          {/* RIGHT PANEL */}
+          <div className="right-panel" style={{ marginTop: 40 }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <h3 style={{ fontWeight: 'bold' }}>Notifications</h3>
+              <Button type="link" style={{ padding: 0 }}>
+                View All
+              </Button>
+            </div>
+            <div>
+              {notifications.map((notif) => (
+                <Card
+                  key={notif.id}
+                  size="small"
+                  style={{
+                    marginBottom: 10,
+                    border: '1px solid #eee',
+                    backgroundColor: '#f9f9f9',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <FileTextOutlined style={{ marginRight: 10, color: '#7e57c2' }} />
+                    {notif.message}
+                  </div>
+                </Card>
+              ))}
+            </div>
 
-              for (let i = start; i < end; i++) {
-                monthOptions.push(
-                  <option key={i} value={i}>
-                    {value.clone().month(i).format('MMMM')}
-                  </option>
-                );
-              }
-
-              return (
-                <div style={{ padding: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Button onClick={() => onChange(value.clone().subtract(1, 'month'))}>{'<'}</Button>
-                  <h3 style={{ margin: 0 }}>{value.format('MMMM')}</h3>
-                  <Button onClick={() => onChange(value.clone().add(1, 'month'))}>{'>'}</Button>
-                </div>
-              );
-            }}
-          />
+            <div style={{ marginTop: 40 }}>
+              <Calendar
+                fullscreen={false}
+                headerRender={({ value, onChange }) => {
+                  return (
+                    <div
+                      style={{
+                        padding: 10,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Button onClick={() => onChange(value.clone().subtract(1, 'month'))}>
+                        {'<'}
+                      </Button>
+                      <h3 style={{ margin: 0 }}>{value.format('MMMM')}</h3>
+                      <Button onClick={() => onChange(value.clone().add(1, 'month'))}>
+                        {'>'}
+                      </Button>
+                    </div>
+                  );
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
@@ -146,15 +218,13 @@ function Dashboard() {
 function StatCard({ icon, title, value, change, bgColor, iconBg }) {
   return (
     <div
+      className="stat-card"
       style={{
         backgroundColor: bgColor,
         borderRadius: 15,
         padding: 20,
-        width: 150,
         textAlign: 'center',
-        flexGrow: 1,
-        flexBasis: '40%',
-        minWidth: 140,
+        flexShrink: 0,
       }}
     >
       <div
@@ -180,17 +250,16 @@ function StatCard({ icon, title, value, change, bgColor, iconBg }) {
   );
 }
 
-// Helper for different progress bar colors
 function getColor(name) {
   switch (name) {
     case 'Laundry Services':
-      return '#1e88e5'; // blue
+      return '#1e88e5';
     case 'Curtains Cleaning':
-      return '#00c853'; // green
+      return '#00c853';
     case 'Sofa/Carpet/Mattress Cleaning':
-      return '#b388ff'; // purple
+      return '#b388ff';
     case 'House Deep Cleaning':
-      return '#ff9100'; // orange
+      return '#ff9100';
     default:
       return '#000';
   }
