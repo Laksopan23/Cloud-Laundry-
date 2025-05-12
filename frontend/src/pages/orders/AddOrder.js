@@ -1,10 +1,13 @@
+// LaundryForm.js
 import React, { useState } from 'react';
 import { Input, DatePicker, TimePicker, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, ProfileOutlined, ShoppingCartOutlined, CarOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
+import AddItemModal from './models/AddItemsModel'; // adjust path as needed
 
+// Note: Image imports are placeholders; update to correct images
 import Laundry from '../../images/4.png';
 import Curtains from '../../images/4.png';
 import Sofa from '../../images/4.png';
@@ -31,25 +34,60 @@ export default function LaundryForm() {
     pickupPersonPhone: '',
   });
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [itemDetails, setItemDetails] = useState({ customItems: [] }); // Custom items from modal
+
+  const handleAddItem = (data) => {
+    setItemDetails(prevDetails => ({
+      customItems: data.customItems, // updating customItems
+    }));
+    message.success('Items added!');
+  };
+
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async () => {
     try {
+      // Map customItems to backend's expected items format
+      const formattedItems = itemDetails.customItems.map((item) => ({
+        itemName: item.items,
+        quantity: item.qty,
+        price: item.price,
+      }));
+
       const response = await axios.post('http://localhost:5000/api/orders', {
         ...formData,
         date: formData.date ? formData.date.toISOString() : null,
         expectedDeliveryDate: formData.expectedDeliveryDate ? formData.expectedDeliveryDate.toISOString() : null,
         time: formData.time ? formData.time.format('HH:mm') : null,
+        items: formattedItems, // Send only formatted items
       });
 
-      const savedOrder = response.data;
       message.success('Order saved successfully!');
-      // Optionally: Reset form or show modal with invoice
+      // Reset form and state
+      setFormData({
+        customerName: '',
+        customerAddress1: '',
+        customerAddress2: '',
+        customerPhone: '',
+        selectedService: '',
+        date: null,
+        expectedDeliveryDate: null,
+        time: null,
+        pickupFee: '',
+        pickupDiscount: '',
+        note: '',
+        pickupPersonName: '',
+        pickupPersonPhone: '',
+      });
+      setSelectedService(null);
+      setItemDetails({ customItems: [] });
     } catch (error) {
       console.error(error);
-      message.error('Failed to submit order');
+      const errorMessage = error.response?.data?.message || 'Failed to submit order';
+      message.error(errorMessage);
     }
   };
 
@@ -191,8 +229,20 @@ export default function LaundryForm() {
               />
             </div>
           </div>
-          <Button style={{ marginTop: 20, backgroundColor: '#6c2bd9', color: '#fff' }}>Add Items</Button>
+          <Button
+            style={{ marginTop: 20, backgroundColor: '#6c2bd9', color: '#fff' }}
+            onClick={() => setIsModalVisible(true)}
+          >
+            Add Items
+          </Button>
         </Card>
+
+        <AddItemModal
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onAddItem={handleAddItem}
+          width={800}
+        />
 
         {/* Pickup Details */}
         <Card

@@ -1,29 +1,37 @@
 const Order = require('../models/OrderModel');
 
-
+// Generate a random 6-digit invoice number
 function generateInvoiceNumber() {
-    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number as string
-  }
-  
-  async function getUniqueInvoiceNumber() {
-    let unique = false;
-    let invoiceNumber;
-    while (!unique) {
-      invoiceNumber = generateInvoiceNumber();
-      const existingOrder = await Order.findOne({ invoiceNumber });
-      if (!existingOrder) {
-        unique = true;
-      }
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+// Ensure the invoice number is unique
+async function getUniqueInvoiceNumber() {
+  let unique = false;
+  let invoiceNumber;
+  while (!unique) {
+    invoiceNumber = generateInvoiceNumber();
+    const existingOrder = await Order.findOne({ invoiceNumber });
+    if (!existingOrder) {
+      unique = true;
     }
-    return invoiceNumber;
   }
+  return invoiceNumber;
+}
 
-
+// Create Order
 exports.createOrder = async (req, res) => {
   try {
     console.log('Received Order:', req.body);
+
+    // Optional: Validate items array
+    if (!req.body.items || !Array.isArray(req.body.items) || req.body.items.length === 0) {
+      return res.status(400).json({ message: 'Items are required and must be a non-empty array' });
+    }
+
     const invoiceNumber = await getUniqueInvoiceNumber();
     const order = new Order({ ...req.body, invoiceNumber });
+
     await order.save();
     res.status(201).json(order);
   } catch (error) {
@@ -31,6 +39,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Get All Orders
 exports.getOrders = async (req, res) => {
   try {
     const orders = await Order.find();
