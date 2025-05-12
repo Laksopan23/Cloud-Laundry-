@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
 
+const itemSchema = new mongoose.Schema({
+  itemName: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true }
+});
+
 const orderSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
   customerAddress1: { type: String, required: true },
-  customerAddress2: { type: String},
+  customerAddress2: { type: String },
   customerPhone: { type: String, required: true },
   selectedService: { type: String, required: true },
   invoiceNumber: { type: String, required: true, unique: true },
@@ -15,6 +21,8 @@ const orderSchema = new mongoose.Schema({
   note: { type: String },
   pickupPersonName: { type: String, required: true },
   pickupPersonPhone: { type: String, required: true },
+  status: { type: String, required: true, default: 'pending' },
+  items: [itemSchema], // ⬅️ Add this line
 }, {
   timestamps: true
 });
