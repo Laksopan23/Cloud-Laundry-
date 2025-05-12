@@ -1,9 +1,29 @@
 const Order = require('../models/OrderModel');
 
+
+function generateInvoiceNumber() {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit number as string
+  }
+  
+  async function getUniqueInvoiceNumber() {
+    let unique = false;
+    let invoiceNumber;
+    while (!unique) {
+      invoiceNumber = generateInvoiceNumber();
+      const existingOrder = await Order.findOne({ invoiceNumber });
+      if (!existingOrder) {
+        unique = true;
+      }
+    }
+    return invoiceNumber;
+  }
+
+
 exports.createOrder = async (req, res) => {
   try {
     console.log('Received Order:', req.body);
-    const order = new Order(req.body);
+    const invoiceNumber = await getUniqueInvoiceNumber();
+    const order = new Order({ ...req.body, invoiceNumber });
     await order.save();
     res.status(201).json(order);
   } catch (error) {

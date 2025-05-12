@@ -3,13 +3,12 @@ import { Input, DatePicker, TimePicker, Button, Card, Typography, message } from
 import { UserOutlined, ProfileOutlined, ShoppingCartOutlined, CarOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import Layout from '../../components/Layout';
 
-import Layout from '../components/Layout';
-
-import Laundry from '../images/4.png';
-import Curtains from '../images/4.png';
-import Sofa from '../images/4.png';
-import House from '../images/4.png';
+import Laundry from '../../images/4.png';
+import Curtains from '../../images/4.png';
+import Sofa from '../../images/4.png';
+import House from '../../images/4.png';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -38,13 +37,16 @@ export default function LaundryForm() {
 
   const handleSubmit = async () => {
     try {
-      await axios.post('http://localhost:5000/api/orders', {
+      const response = await axios.post('http://localhost:5000/api/orders', {
         ...formData,
         date: formData.date ? formData.date.toISOString() : null,
         expectedDeliveryDate: formData.expectedDeliveryDate ? formData.expectedDeliveryDate.toISOString() : null,
         time: formData.time ? formData.time.format('HH:mm') : null,
       });
-      message.success('Order submitted successfully!');
+
+      const savedOrder = response.data;
+      message.success('Order saved successfully!');
+      // Optionally: Reset form or show modal with invoice
     } catch (error) {
       console.error(error);
       message.error('Failed to submit order');
@@ -247,7 +249,7 @@ export default function LaundryForm() {
             style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
             onClick={handleSubmit}
           >
-            Generate Invoice
+            Save
           </Button>
         </div>
       </div>

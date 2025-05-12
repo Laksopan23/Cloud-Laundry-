@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
   customerAddress2: { type: String},
   customerPhone: { type: String, required: true },
   selectedService: { type: String, required: true },
-  invoiceNumber: { type: String, default: () => `INV-${Date.now()}`, required: true },
+  invoiceNumber: { type: String, required: true, unique: true },
   date: { type: Date, required: true },
   expectedDeliveryDate: { type: Date, required: true },
   time: { type: String, required: true },
