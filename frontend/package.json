@@ -14,6 +14,7 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^5.24.9",
     "axios": "^1.9.0",
+    "html2pdf.js": "^0.10.3",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "jspdf-font": "^1.0.7",
