@@ -3,6 +3,7 @@ import { Table, Card, Typography, message, Spin, Button, Space } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
+import { generateInvoicePDF } from './Invoice/InvoicePDF';
 
 const { Title } = Typography;
 
@@ -27,13 +28,17 @@ export default function AllOrders() {
   }, []);
 
   const handleView = (record) => {
-    // Replace this with real view logic
     message.info(`Viewing order ${record.invoiceNumber}`);
   };
 
   const handleDownload = (record) => {
-    // Replace this with real download logic (e.g., generate PDF)
-    message.info(`Downloading invoice ${record.invoiceNumber}`);
+    try {
+      generateInvoicePDF(record);
+      message.success(`Downloaded invoice ${record.invoiceNumber}`);
+    } catch (error) {
+      message.error('Failed to generate PDF');
+      console.error(error);
+    }
   };
 
   const columns = [
@@ -92,12 +97,8 @@ export default function AllOrders() {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button  onClick={() => handleView(record)}>
-            View
-          </Button>
-          <Button onClick={() => handleDownload(record)}>
-            Download
-          </Button>
+          <Button onClick={() => handleView(record)}>View</Button>
+          <Button onClick={() => handleDownload(record)}>Download</Button>
         </Space>
       ),
     },
@@ -105,11 +106,10 @@ export default function AllOrders() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '20px' }}>
+      <div style={{ maxWidth: 1500, margin: '0 auto', padding: '20px' }}>
         <Card
           title={<Title level={4}>All Orders</Title>}
           style={{ borderTop: '5px solid #6c2bd9' }}
-          eidt
         >
           {loading ? (
             <div style={{ textAlign: 'center' }}>
