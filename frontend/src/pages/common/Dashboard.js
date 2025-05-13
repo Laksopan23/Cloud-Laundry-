@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Progress, Calendar } from 'antd';
 import {
   BarChartOutlined,
@@ -6,15 +6,16 @@ import {
   CheckCircleFilled,
   UserAddOutlined,
 } from '@ant-design/icons';
-import Layout from '../components/Layout';
+import Layout from '../../components/Layout';
 
 function Dashboard() {
-  const orders = [
-    { name: 'Laundry Services', popularity: 45 },
-    { name: 'Curtains Cleaning', popularity: 29 },
-    { name: 'Sofa/Carpet/Mattress Cleaning', popularity: 18 },
-    { name: 'House Deep Cleaning', popularity: 25 },
-  ];
+  const [ordersData, setOrdersData] = useState([]);
+  const [analytics, setAnalytics] = useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+    ordersPerService: {},
+    statusBreakdown: {},
+  });
 
   const notifications = [
     { id: 1, message: 'Invoice #123545 is pending' },
@@ -22,6 +23,44 @@ function Dashboard() {
     { id: 3, message: 'Invoice #123547 is pending' },
     { id: 4, message: 'Invoice #123548 is pending' },
   ];
+
+  useEffect(() => {
+    fetch('http://localhost:5000/api/orders')
+      .then((res) => res.json())
+      .then((data) => {
+        setOrdersData(data);
+        calculateAnalytics(data);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch orders:', err);
+      });
+  }, []);
+
+  const calculateAnalytics = (orders) => {
+    let totalOrders = orders.length;
+    let totalRevenue = 0;
+    let ordersPerService = {};
+    let statusBreakdown = {};
+
+    orders.forEach((order) => {
+      order.items.forEach(item => {
+        totalRevenue += item.quantity * item.price;
+      });
+
+      const service = order.selectedService;
+      ordersPerService[service] = (ordersPerService[service] || 0) + 1;
+
+      const status = order.status;
+      statusBreakdown[status] = (statusBreakdown[status] || 0) + 1;
+    });
+
+    setAnalytics({
+      totalOrders,
+      totalRevenue,
+      ordersPerService,
+      statusBreakdown,
+    });
+  };
 
   return (
     <Layout>
@@ -81,16 +120,16 @@ function Dashboard() {
             >
               <StatCard
                 icon={<BarChartOutlined />}
-                title="Total Profit"
-                value="$1k"
+                title="Total Revenue"
+                value={`$${analytics.totalRevenue.toFixed(2)}`}
                 change="+8% from yesterday"
                 bgColor="#ffe6eb"
                 iconBg="#ff4d6d"
               />
               <StatCard
                 icon={<FileTextOutlined />}
-                title="Total Order"
-                value="300"
+                title="Total Orders"
+                value={analytics.totalOrders.toString()}
                 change="+5% from yesterday"
                 bgColor="#fff3da"
                 iconBg="#ff9966"
@@ -118,7 +157,7 @@ function Dashboard() {
               Top Services
             </h3>
             <div>
-              {orders.map((order, index) => (
+              {Object.entries(analytics.ordersPerService).map(([service, count], index) => (
                 <div key={index} style={{ marginBottom: 20 }}>
                   <div
                     style={{
@@ -127,22 +166,22 @@ function Dashboard() {
                       fontWeight: '500',
                     }}
                   >
-                    <span>{order.name}</span>
+                    <span>{service}</span>
                     <span
                       style={{
-                        border: `1px solid ${getColor(order.name)}`,
+                        border: `1px solid ${getColor(service)}`,
                         padding: '2px 8px',
                         borderRadius: 12,
-                        color: getColor(order.name),
+                        color: getColor(service),
                         fontSize: 12,
                       }}
                     >
-                      {order.popularity}%
+                      {count} orders
                     </span>
                   </div>
                   <Progress
-                    percent={order.popularity}
-                    strokeColor={getColor(order.name)}
+                    percent={(count / analytics.totalOrders) * 100}
+                    strokeColor={getColor(service)}
                     showInfo={false}
                   />
                 </div>
@@ -183,6 +222,17 @@ function Dashboard() {
               ))}
             </div>
 
+            {/* Optional: Status Breakdown */}
+            <div style={{ marginTop: 30 }}>
+              <h3 style={{ fontWeight: 'bold' }}>Status Breakdown</h3>
+              {Object.entries(analytics.statusBreakdown).map(([status, count]) => (
+                <div key={status} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span>{status}</span>
+                  <span>{count}</span>
+                </div>
+              ))}
+            </div>
+
             <div style={{ marginTop: 40 }}>
               <Calendar
                 fullscreen={false}
@@ -214,6 +264,8 @@ function Dashboard() {
     </Layout>
   );
 }
+
+// --- Helper components and functions remain unchanged ---
 
 function StatCard({ icon, title, value, change, bgColor, iconBg }) {
   return (
@@ -261,7 +313,7 @@ function getColor(name) {
     case 'House Deep Cleaning':
       return '#ff9100';
     default:
-      return '#000';
+      return '#7c4dff';
   }
 }
 

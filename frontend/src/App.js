@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/common/Dashboard';
+import Das from './pages/common/dash';
 import ForgotPassword from "./pages/forgotpassword";
 import Invoice from './pages/orders/AddOrder';
 import ViewOrders from './pages/orders/ViewOrders';
@@ -10,6 +11,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/das" element={<Das/>} />
         <Route path="/pass" element={<ForgotPassword />} />
         <Route path="/invoice" element={<Invoice />} />
         <Route path="/orders" element={<ViewOrders />} />
