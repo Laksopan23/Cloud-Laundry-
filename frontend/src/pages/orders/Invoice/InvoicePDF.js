@@ -9,9 +9,8 @@ export const generateInvoicePDF = (record) => {
       <!-- Watermark -->
       <img src="${logo}" style="position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); opacity: 0.08; z-index: 0; width: 70%; pointer-events: none;" />
 
-      <!-- Content Wrapper for Sticky Footer -->
-      <div style="flex: 1; display: flex; flex-direction: column; z-index: 1;">
-
+      <!-- Content Wrapper with Flex -->
+      <div style="flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 80px; min-height: calc(100vh - 80px);">
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 24px 24px 0 24px;">
           <div style="display: flex; align-items: center;">
@@ -24,7 +23,7 @@ export const generateInvoicePDF = (record) => {
             <h1 style="color: #5628C3; margin: 0; font-size: 24px; font-weight: 700;">CLOUD LAUNDRY.LK</h1>
             <p style="margin: 0; font-size: 13px;">504 weliwita Rd, Malabe</p>
             <p style="margin: 0; font-size: 13px;">IN: ${record.invoiceNumber}</p>
-            <p style="margin: 0; font-size: 13px;">Date: ${dayjs(record.date).format('DD MMM YYYY, h:mm A')}</p>
+            <p style="margin: 0; font-size: 13px;">Date: ${dayjs().format('DD MMMM YYYY, hh:mm A')}</p>
           </div>
         </div>
 
@@ -44,7 +43,7 @@ export const generateInvoicePDF = (record) => {
         <div style="padding: 24px; padding-bottom: 0;">
           <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px;">
             <thead>
-              <tr style="background: #7C3AED; color: #fff; border-radius: 8px;">
+              <tr style="background: #5628C3; color: #fff; border-radius: 8px;">
                 <th style="padding: 12px 8px; border-top-left-radius: 8px;">#</th>
                 <th style="padding: 12px 8px;">SERVICE DESCRIPTION</th>
                 <th style="padding: 12px 8px;">WEIGHT/UNIT</th>
@@ -78,7 +77,7 @@ export const generateInvoicePDF = (record) => {
           </div>
         </div>
         <div style="display: flex; justify-content: flex-end; padding: 0 24px; margin-top: 8px;">
-          <div style="background: #7C3AED; color: #fff; border-radius: 24px; padding: 12px 32px; font-size: 20px; font-weight: 700;">TOTAL : Rs ${record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0).toFixed(2)}</div>
+          <div style="background: #5628C3; color: #fff; border-radius: 24px; padding: 12px 32px; font-size: 20px; font-weight: 700;">TOTAL : Rs ${record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0).toFixed(2)}</div>
         </div>
 
         <!-- Notes -->
@@ -97,25 +96,24 @@ export const generateInvoicePDF = (record) => {
           <div style="font-size: 15px; font-weight: 600; margin-bottom: 8px;">Please make the payment using one of the following methods:</div>
           <div style="display: flex; border-top: 1px solid #bbb; border-bottom: 1px solid #bbb;">
             <div style="flex: 1; padding: 12px 8px; border-right: 1px solid #bbb;">
-              <span style="color: #7C3AED; font-weight: 700;">1. Bank Transfer</span><br/>
-              Account Name: [Your Account Name]<br/>
-              Account Number: [Your Account Number]<br/>
-              Bank Name: [Bank Name]<br/>
-              Branch: [Branch Name, if needed]<br/>
-              SWIFT/IFSC Code: [If applicable]
+              <span style="color: #5628C3; font-weight: 700;">1. Bank Transfer</span><br/>
+              Account Name: Your Account Name<br/>
+              Account Number: Your Account Number<br/>
+              Bank Name: Bank Name<br/>
+              Branch: Branch Name, if needed<br/>
+              SWIFT/IFSC Code: If applicable
             </div>
             <div style="flex: 1; padding: 12px 8px;">
-              <span style="color: #7C3AED; font-weight: 700;">2. Cash Payment</span><br/>
+              <span style="color: #5628C3; font-weight: 700;">2. Cash Payment</span><br/>
               You may also make your payment in cash.
             </div>
           </div>
           <div style="text-align: center; font-size: 15px; font-weight: 600; margin-top: 12px;">We truly appreciate your support!</div>
         </div>
-
       </div>
 
-      <!-- Footer -->
-      <div style="background: #7C3AED; color: #fff; padding: 16px 0 8px 0; text-align: center;">
+      <!-- Footer (Sticky at Bottom) -->
+      <div style="background: #5628C3; color: #fff; padding: 16px 0 8px 0; text-align: center; flex-shrink: 0; width: 100%;">
         <div style="display: flex; justify-content: center; align-items: center; gap: 32px; font-size: 15px; margin-bottom: 4px;">
           <span>www.cloudlaundry.lk</span>
           <span>•</span>
