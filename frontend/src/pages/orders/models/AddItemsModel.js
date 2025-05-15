@@ -54,12 +54,111 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     },
   ];
 
+  const curtainsCleaningOptions = [
+    {
+      value: 'Dry cleaning and pressing',
+      label: 'Dry cleaning and pressing',
+      price: 500,
+      description: 'Professional dry cleaning and pressing for curtains',
+    },
+    {
+      value: 'Laundry and pressing',
+      label: 'Laundry and pressing',
+      price: 400,
+      description: 'Laundry and pressing service for washable curtains',
+    },
+    {
+      value: 'Curtain Premium service package',
+      label: 'Curtain Premium service package',
+      price: 1000,
+      description: 'Comprehensive cleaning, pressing, and care for premium curtains',
+    },
+    {
+      value: 'Curtain Removal',
+      label: 'Curtain Removal',
+      price: 200,
+      description: 'Professional removal of curtains for cleaning or replacement',
+    },
+    {
+      value: 'Curtain Installation',
+      label: 'Curtain Installation',
+      price: 200,
+      description: 'Professional installation of curtains after cleaning or replacement',
+    },
+  ];
+
+  const sofaCarpetCleaningOptions = [
+    {
+      value: 'Shampoo Vacuum cleaning',
+      label: 'Shampoo Vacuum cleaning',
+      price: 800,
+      description: 'Deep shampoo and vacuum cleaning for upholstery and carpets',
+    },
+    {
+      value: 'Sofa',
+      label: 'Sofa Cleaning',
+      price: 1000,
+      description: 'Professional cleaning for sofas, including stain removal',
+    },
+    {
+      value: 'Mattress Cleaning with Steam',
+      label: 'Mattress Cleaning with Steam',
+      price: 1200,
+      description: 'Steam cleaning for mattresses to remove dirt and allergens',
+    },
+    {
+      value: 'Carpet Cleaning',
+      label: 'Carpet Cleaning',
+      price: 900,
+      description: 'Deep cleaning for carpets, including stain and odor removal',
+    },
+  ];
+
+  const houseDeepCleaningOptions = [
+    {
+      value: 'House deep cleaning',
+      label: 'House deep cleaning',
+      price: 5000,
+      description: 'Comprehensive deep cleaning for the entire house',
+    },
+    {
+      value: 'General Cleaning',
+      label: 'General Cleaning',
+      price: 2000,
+      description: 'Standard cleaning for homes, including dusting and vacuuming',
+    },
+    {
+      value: 'Commercial Cleaning',
+      label: 'Commercial Cleaning',
+      price: 8000,
+      description: 'Deep cleaning services for commercial spaces',
+    },
+    {
+      value: 'Floor Cleaning',
+      label: 'Floor Cleaning',
+      price: 1500,
+      description: 'Specialized cleaning for all types of flooring',
+    },
+    {
+      value: 'Floor - Cut and Polish',
+      label: 'Floor - Cut and Polish',
+      price: 2500,
+      description: 'Floor cutting and polishing for a shiny, restored finish',
+    },
+  ];
+
+  const serviceOptions = {
+    Laundry: laundryOptions,
+    'Curtains Cleaning': curtainsCleaningOptions,
+    'Sofa, Carpet & Interior Cleaning': sofaCarpetCleaningOptions,
+    'House Deep Cleaning': houseDeepCleaningOptions,
+  };
+
   const handleFieldChange = (key, field, value) => {
     setCustomItemsData((prev) => {
       const newData = prev.map((item) =>
         item.key === key ? { ...item, [field]: value } : item
       );
-     // console.log('Updated item field:', key, field, value);
       return newData;
     });
   };
@@ -67,11 +166,14 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
   const handleSaveEdit = (key) => {
     const item = customItemsData.find((i) => i.key === key);
     if (!item || !item.items || item.qty <= 0 || item.price < 0) {
-      message.error('Please fill in valid item name, quantity and price.');
+      message.error('Please select a valid item, quantity, and price.');
+      return;
+    }
+    if (serviceOptions[selectedService] && !serviceOptions[selectedService].some((opt) => opt.value === item.items)) {
+      message.error('Please select an item from the dropdown.');
       return;
     }
     setEditingKey('');
-   // console.log('Saved item:', item);
   };
 
   const handleAddRow = () => {
@@ -85,49 +187,42 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     };
     setCustomItemsData((prev) => [...prev, newItem]);
     setEditingKey(newKey);
-   // console.log('Added new item row:', newItem);
   };
 
-const handleSaveAll = () => {
-  if (editingKey) {
-    message.warning('Please save the currently editing row first.');
-    return;
-  }
-  const isValid = customItemsData.every(
-    (item) => item.items.trim() && item.qty > 0 && item.price >= 0
-  );
-  if (!isValid) {
-    message.error('Please check all fields before saving.');
-    return;
-  }
+  const handleSaveAll = () => {
+    if (editingKey) {
+      message.warning('Please save the currently editing row first.');
+      return;
+    }
+    const isValid = customItemsData.every(
+      (item) => item.items.trim() && item.qty > 0 && item.price >= 0
+    );
+    if (!isValid) {
+      message.error('Please check all fields before saving.');
+      return;
+    }
 
-  onAddItem({ customItems: customItemsData });
-  setCustomItemsData([]); // clear after save
-  setEditingKey('');
-  onClose(); // close modal via parent
-};
-
-
-const handleClose = () => {
-  if (customItemsData.length > 0) {
-    Modal.confirm({
-      title: 'Discard unsaved changes?',
-      onOk: () => {
-        setCustomItemsData([]);
-        setEditingKey('');
-        onClose();  // this will update parent state to false
-      },
-      onCancel: () => {
-        // do nothing, modal remains open
-      },
-    });
-  } else {
+    onAddItem({ customItems: customItemsData });
+    setCustomItemsData([]);
+    setEditingKey('');
     onClose();
-  }
-};
+  };
 
-
-
+  const handleClose = () => {
+    if (customItemsData.length > 0) {
+      Modal.confirm({
+        title: 'Discard unsaved changes?',
+        onOk: () => {
+          setCustomItemsData([]);
+          setEditingKey('');
+          onClose();
+        },
+        onCancel: () => {},
+      });
+    } else {
+      onClose();
+    }
+  };
 
   const columns = [
     {
@@ -137,20 +232,21 @@ const handleClose = () => {
       width: 250,
       render: (text, record) => {
         const editable = isEditing(record);
-        if (editable && selectedService === 'Laundry') {
+        const options = serviceOptions[selectedService] || [];
+        if (editable && options.length > 0) {
           return (
             <Select
               value={record.items}
               style={{ width: '100%' }}
-              placeholder="Select item"
+              placeholder={`Select ${selectedService} item`}
               onChange={(value) => {
-                const selected = laundryOptions.find((opt) => opt.value === value);
+                const selected = options.find((opt) => opt.value === value);
                 handleFieldChange(record.key, 'items', value);
                 handleFieldChange(record.key, 'description', selected?.description || '');
                 handleFieldChange(record.key, 'price', selected?.price || 0);
               }}
             >
-              {laundryOptions.map((opt) => (
+              {options.map((opt) => (
                 <Option key={opt.value} value={opt.value}>
                   {opt.label}
                 </Option>

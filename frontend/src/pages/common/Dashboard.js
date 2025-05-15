@@ -25,6 +25,12 @@ function Dashboard() {
   ];
 
   useEffect(() => {
+      
+  const username = localStorage.getItem('username');
+  if (username) {
+    console.log('Logged in as:', username);
+  }
+
     fetch('http://localhost:5000/api/orders')
       .then((res) => res.json())
       .then((data) => {

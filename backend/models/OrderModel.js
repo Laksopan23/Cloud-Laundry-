@@ -22,7 +22,9 @@ const orderSchema = new mongoose.Schema({
   pickupPersonName: { type: String, required: true },
   pickupPersonPhone: { type: String, required: true },
   status: { type: String, required: true, default: 'pending' },
+  employee: { type: String },
   items: [itemSchema], // ⬅️ Add this line
+
 }, {
   timestamps: true
 });
