@@ -18,19 +18,18 @@ const handleLogin = async (e) => {
   e.preventDefault();
   try {
     const res = await axios.post('http://localhost:5000/api/employees/login', credentials);
+    const { username, role } = res.data;
 
-    // Check if admin credentials
-    const isAdmin = credentials.username === 'admin' && credentials.password === 'admin';
-    
-    localStorage.setItem('username', credentials.username);
-    localStorage.setItem('role', isAdmin ? 'admin' : 'employee');
+    localStorage.setItem('username', username);
+    localStorage.setItem('role', role);
 
-    alert(isAdmin ? 'Admin login successful' : 'Login successful');
+    alert(role === 'admin' ? 'Admin login successful' : 'Login successful');
     navigate('/');
   } catch (err) {
     alert('Login failed: ' + (err.response?.data?.message || err.message));
   }
 };
+
 
 
   return (

@@ -21,14 +21,18 @@ exports.signupEmployee = async (req, res) => {
 exports.loginEmployee = async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const employee = await Employee.findOne({ username });
+
     if (!employee) return res.status(404).json({ message: 'User not found' });
 
     const isMatch = await employee.comparePassword(password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({
+      message: 'Login successful',
+      username: employee.username,
+      role: employee.role
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
