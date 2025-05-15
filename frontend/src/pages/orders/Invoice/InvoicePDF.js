@@ -73,7 +73,7 @@ export const generateInvoicePDF = (record) => {
           </div>
           <div style="text-align: right;">
             <div style="font-size: 15px; font-weight: 600;">${record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0).toFixed(2)}</div>
-            <div style="font-size: 15px;">0.00</div>
+            <div style="font-size: 15px;">-${Number(record.pickupDiscount).toFixed(2)}</div>
           </div>
         </div>
         <div style="display: flex; justify-content: flex-end; padding: 0 24px; margin-top: 8px;">
@@ -83,7 +83,7 @@ export const generateInvoicePDF = (record) => {
         <!-- Notes -->
         <div style="padding: 24px; padding-bottom: 0;">
           <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">NOTES:</div>
-          <div style="font-size: 13px;">Curtains - Premium Service Package (Pickup, delivery, cleaning, pressing, and installation)</div>
+          <div style="font-size: 13px;">${record.note}</div>
         </div>
 
         <!-- Thank You -->

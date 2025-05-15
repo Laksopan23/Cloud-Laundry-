@@ -48,3 +48,23 @@ exports.getOrders = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch orders', error });
   }
 };
+
+
+
+// Update Order Status
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update order status', error });
+  }
+};

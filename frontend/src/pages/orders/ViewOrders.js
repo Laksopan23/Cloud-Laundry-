@@ -1,16 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Card, Typography, message, Spin, Button, Space } from 'antd';
+import {
+  Table,
+  Card,
+  Typography,
+  message,
+  Spin,
+  Button,
+  Space,
+  Select,
+} from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
 import { generateInvoicePDF } from './Invoice/InvoicePDF';
 
 const { Title } = Typography;
+const { Option } = Select;
 
 export default function AllOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const role = localStorage.getItem('role');
+  const isAdmin = role === 'admin';
+
+  // Fetch all orders
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -27,10 +41,13 @@ export default function AllOrders() {
     fetchOrders();
   }, []);
 
+  // Handle view
   const handleView = (record) => {
     message.info(`Viewing order ${record.invoiceNumber}`);
+    // Implement modal or page view if needed
   };
 
+  // Handle PDF download
   const handleDownload = (record) => {
     try {
       generateInvoicePDF(record);
@@ -41,6 +58,20 @@ export default function AllOrders() {
     }
   };
 
+  // Handle status change
+  const handleStatusChange = async (record, newStatus) => {
+    try {
+      await axios.put(`http://localhost:5000/api/orders/${record._id}`, {
+        status: newStatus,
+      });
+      message.success(`Status updated to ${newStatus}`);
+      fetchOrders(); // Refresh list
+    } catch (error) {
+      message.error('Failed to update status');
+    }
+  };
+
+  // Columns for the table
   const columns = [
     {
       title: 'Invoice #',
@@ -78,19 +109,41 @@ export default function AllOrders() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status) => (
-        <Button
-          style={{
-            color: status === 'Finished' ? '#52c41a' : '#ff4d4f',
-            borderColor: status === 'Finished' ? '#52c41a' : '#ff4d4f',
-            borderRadius: 4,
-            padding: '0 10px',
-          }}
-          disabled
-        >
-          {status}
-        </Button>
-      ),
+      render: (status, record) => {
+        const colorMap = {
+          Pending: '#faad14',
+          Completed: '#52c41a',
+          Cancelled: '#ff4d4f',
+        };
+
+        return isAdmin ? (
+          <Select
+            value={status}
+            onChange={(value) => handleStatusChange(record, value)}
+            style={{
+              width: 130,
+              color: colorMap[status],
+              borderColor: colorMap[status],
+            }}
+          >
+            <Option value="Pending">Pending</Option>
+            <Option value="Completed">Completed</Option>
+            <Option value="Cancelled">Cancelled</Option>
+          </Select>
+        ) : (
+          <Button
+            style={{
+              color: colorMap[status],
+              borderColor: colorMap[status],
+              borderRadius: 4,
+              padding: '0 10px',
+            }}
+            disabled
+          >
+            {status}
+          </Button>
+        );
+      },
     },
     {
       title: 'Actions',
@@ -119,7 +172,7 @@ export default function AllOrders() {
             <Table
               dataSource={orders}
               columns={columns}
-              rowKey="invoiceNumber"
+              rowKey="_id"
               pagination={{ pageSize: 10 }}
             />
           )}
