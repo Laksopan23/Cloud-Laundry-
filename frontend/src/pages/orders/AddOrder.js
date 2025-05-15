@@ -1,4 +1,3 @@
-// LaundryForm.js
 import React, { useState } from 'react';
 import { Input, DatePicker, TimePicker, Button, Card, Typography, message } from 'antd';
 import { UserOutlined, ProfileOutlined, ShoppingCartOutlined, CarOutlined } from '@ant-design/icons';
@@ -49,6 +48,42 @@ export default function LaundryForm() {
   };
 
   const handleSubmit = async () => {
+    console.log('handleSubmit triggered');
+    console.log('Form Data before validation:', formData);
+    console.log('Item Details:', itemDetails);
+
+    const requiredFields = ['customerName', 'customerPhone', 'selectedService', 'date', 'time'];
+
+    // Check required fields presence (also verify date and time types)
+    const isValid = requiredFields.every((field) => {
+      const val = formData[field];
+      if (val === null || val === '') {
+        return false;
+      }
+      return true;
+    }) && itemDetails.customItems.length > 0;
+
+    if (!isValid) {
+      message.error('Please fill all required fields and add at least one item.');
+      return;
+    }
+
+    // Validate expectedDeliveryDate > date if both are set
+    try {
+      if (
+        formData.expectedDeliveryDate &&
+        formData.date &&
+        formData.expectedDeliveryDate.isBefore(formData.date)
+      ) {
+        message.error('Expected delivery date must be after the order date.');
+        return;
+      }
+    } catch (error) {
+      console.error('Date comparison error:', error);
+      message.error('Invalid date values.');
+      return;
+    }
+
     try {
       // Map customItems to backend's expected items format
       const formattedItems = itemDetails.customItems.map((item) => ({
@@ -57,6 +92,14 @@ export default function LaundryForm() {
         price: item.price,
       }));
 
+      console.log('Sending data to server:', {
+        ...formData,
+        date: formData.date ? formData.date.toISOString() : null,
+        expectedDeliveryDate: formData.expectedDeliveryDate ? formData.expectedDeliveryDate.toISOString() : null,
+        time: formData.time ? formData.time.format('HH:mm') : null,
+        items: formattedItems,
+      });
+
       const response = await axios.post('http://localhost:5000/api/orders', {
         ...formData,
         date: formData.date ? formData.date.toISOString() : null,
@@ -64,6 +107,8 @@ export default function LaundryForm() {
         time: formData.time ? formData.time.format('HH:mm') : null,
         items: formattedItems, // Send only formatted items
       });
+
+      console.log('Server response:', response.data);
 
       message.success('Order saved successfully!');
       // Reset form and state
@@ -85,8 +130,8 @@ export default function LaundryForm() {
       setSelectedService(null);
       setItemDetails({ customItems: [] });
     } catch (error) {
-      console.error(error);
-      const errorMessage = error.response?.data?.message || 'Failed to submit order';
+      console.error('Submit error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to submit order';
       message.error(errorMessage);
     }
   };
@@ -241,7 +286,7 @@ export default function LaundryForm() {
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
           onAddItem={handleAddItem}
-          width={800}
+          selectedService={selectedService}
         />
 
         {/* Pickup Details */}
@@ -299,7 +344,7 @@ export default function LaundryForm() {
             style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
             onClick={handleSubmit}
           >
-            Save
+            Save Order
           </Button>
         </div>
       </div>
