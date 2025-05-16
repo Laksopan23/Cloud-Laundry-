@@ -8,6 +8,7 @@ const orderRoutes = require('./routes/orderRoutes');
 
 //mock
 const employeeRoutes = require('./routes/employeeRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 
 
@@ -34,6 +35,7 @@ app.use('/api/orders', orderRoutes);
 
 //mock
 app.use('/api/employees', employeeRoutes);
+app.use('/api/users', userRoutes);
 
 
 

@@ -1,4 +1,16 @@
+const bcrypt = require('bcryptjs');
 const Employee = require('../models/empUser');
+const User = require('../models/UserModel');
+
+const jwt = require('jsonwebtoken');
+
+// Generate JWT
+const generateToken = (user) => {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: '1d',
+  });
+};
+
 
 // Signup Controller
 exports.signupEmployee = async (req, res) => {
@@ -11,29 +23,47 @@ exports.signupEmployee = async (req, res) => {
     const employee = new Employee({ name, email, username, password });
     await employee.save();
 
-    res.status(201).json({ message: 'Signup successful' });
+    const token = generateToken(user);
+    res.status(201).json({ message: 'Signup successful', token, role: user.role });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
+
+
 // Login Controller
 exports.loginEmployee = async (req, res) => {
+  const { username, password } = req.body;
+
   try {
-    const { username, password } = req.body;
-    const employee = await Employee.findOne({ username });
+    let user;
 
-    if (!employee) return res.status(404).json({ message: 'User not found' });
+    // Check if it's the admin login
+    if (username === 'admin') {
+      user = await User.findOne({ username });
+    } else {
+      user = await Employee.findOne({ username });
+    }
 
-    const isMatch = await employee.comparePassword(password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    res.status(200).json({
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+    
+    const token = generateToken(user);
+
+    return res.status(200).json({
       message: 'Login successful',
-      username: employee.username,
-      role: employee.role
+      username: user.username,
+      token,
+      role: user.role || 'employee' // default role for Employee schema
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };

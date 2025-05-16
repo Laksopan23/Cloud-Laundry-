@@ -295,7 +295,7 @@ function Dashboard() {
               ))}
             </div>
 
-            {/* Status Breakdown */}
+            {/* Status Breakdown 
             <div style={{ marginTop: 30 }}>
               <h3 style={{ fontWeight: 'bold' }}>Status Breakdown</h3>
               {Object.entries(analytics.statusBreakdown).map(([status, count]) => (
@@ -305,6 +305,8 @@ function Dashboard() {
                 </div>
               ))}
             </div>
+
+            */}
 
             <div style={{ marginTop: 40 }}>
               <Calendar
