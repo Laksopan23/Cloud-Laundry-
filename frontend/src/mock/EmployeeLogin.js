@@ -23,8 +23,14 @@ const handleLogin = async (e) => {
     localStorage.setItem('username', username);
     localStorage.setItem('role', role);
 
-    alert(role === 'admin' ? 'Admin login successful' : 'Login successful');
-    navigate('/');
+    //alert(role === 'admin' ? 'Admin login successful' : 'Login successful');
+    if (role== 'admin'){
+       navigate('/admin');
+    }
+    else{
+       navigate('/');
+    }
+
   } catch (err) {
     alert('Login failed: ' + (err.response?.data?.message || err.message));
   }

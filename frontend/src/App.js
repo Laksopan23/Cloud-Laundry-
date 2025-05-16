@@ -11,6 +11,12 @@ import Signup from './pages/SignupInitial';
 import Mos from './mock/EmployeeSignup';
 import Mol from './mock/EmployeeLogin';
 
+
+//Admin
+import AllEmp from './admin/allEmployee';
+import AdminDashboard from './admin/Dashboard';
+
+
 function App() {
   // ProtectedRoute defined inside App.js
   const ProtectedRoute = ({ children }) => {
@@ -26,6 +32,13 @@ function App() {
         <Route path="/mos" element={<Mos />} />
         <Route path="/pass" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
+
+
+        {/* Admin routes */}
+        <Route path="/all" element={<AllEmp />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+
+
 
         {/* Protected routes */}
         <Route

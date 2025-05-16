@@ -1,28 +1,33 @@
 const bcrypt = require('bcryptjs');
-const Employee = require('../models/empUser');
+const { Employee, generateEmployeeId } = require('../models/empUser');
 const User = require('../models/UserModel');
-
 const jwt = require('jsonwebtoken');
 
 // Generate JWT
 const generateToken = (user) => {
-  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: user._id, role: user.role, employeeId: user.employeeId }, process.env.JWT_SECRET, {
     expiresIn: '1d',
   });
 };
-
 
 // Signup Controller
 exports.signupEmployee = async (req, res) => {
   try {
     const { name, email, username, password } = req.body;
 
-    // Check if username is already taken
-    const existingUser = await Employee.findOne({ username });
-    if (existingUser) return res.status(400).json({ message: 'Username already taken' });
+    // Check if username or email is already taken
+    const existingUser = await Employee.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: existingUser.username === username ? 'Username already taken' : 'Email already in use' 
+      });
+    }
+
+    // Generate unique employeeId
+    const employeeId = await generateEmployeeId();
 
     // Create new employee
-    const employee = new Employee({ name, email, username, password });
+    const employee = new Employee({ name, email, username, password, employeeId });
     await employee.save();
 
     // Generate token using the employee object
@@ -32,14 +37,14 @@ exports.signupEmployee = async (req, res) => {
     res.status(201).json({ 
       message: 'Signup successful', 
       token, 
-      role: employee.role || 'employee' // Default to 'employee' if role is undefined
+      employeeId: employee.employeeId,
+      role: employee.role
     });
   } catch (err) {
-    console.error('Signup error:', err); // Log error for debugging
+    console.error('Signup error:', err);
     res.status(500).json({ message: 'Server error during signup' });
   }
 };
-
 
 // Login Controller
 exports.loginEmployee = async (req, res) => {
@@ -69,19 +74,19 @@ exports.loginEmployee = async (req, res) => {
     return res.status(200).json({
       message: 'Login successful',
       username: user.username,
+      employeeId: user.employeeId || null, // Admin may not have employeeId
       token,
-      role: user.role || 'employee' // default role for Employee schema
+      role: user.role || 'employee'
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
-
 // Check Username Availability
 exports.checkUsernameAvailability = async (req, res) => {
   try {
-    const { username } = req.query; // Get username from query parameter
+    const { username } = req.query;
     if (!username) {
       return res.status(400).json({ message: 'Username is required' });
     }
@@ -95,5 +100,16 @@ exports.checkUsernameAvailability = async (req, res) => {
   } catch (err) {
     console.error('Username check error:', err);
     res.status(500).json({ message: 'Server error during username check' });
+  }
+};
+
+// Get All Employees
+exports.getAllEmployees = async (req, res) => {
+  try {
+    const employees = await Employee.find().select('-password'); // Exclude password
+    res.status(200).json(employees);
+  } catch (err) {
+    console.error('Error fetching employees:', err);
+    res.status(500).json({ message: 'Server error while fetching employees' });
   }
 };

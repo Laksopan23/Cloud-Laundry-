@@ -8,7 +8,7 @@ import {
   DollarOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import Layout from '../../components/Layout';
+import Layout from '../components/Layout';
 
 function Dashboard() {
   const [ordersData, setOrdersData] = useState([]);
@@ -25,12 +25,6 @@ function Dashboard() {
   const [totalRevenue, setTotalRevenue] = useState(0); // New state for total revenue
   const [totalCustomers, setTotalCustomers] = useState(0); // New state for total customers
 
-  const notifications = [
-    { id: 1, message: 'Invoice #123545 is pending' },
-    { id: 2, message: 'Invoice #123546 is pending' },
-    { id: 3, message: 'Invoice #123547 is pending' },
-    { id: 4, message: 'Invoice #123548 is pending' },
-  ];
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -226,10 +220,10 @@ function Dashboard() {
             </div>
 
             {/* Top Services */}
-            <h3 style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 20 }}>
+            <h3 style={{ fontWeight: 'bold', marginBottom: 20, marginLeft:"250px",marginTop:"75px" }}>
               Top Services
             </h3>
-            <div>
+            <div style={{  width:'580px'}}>
               {Object.entries(analytics.ordersPerService).map(([service, count], index) => (
                 <div key={index} style={{ marginBottom: 20 }}>
                   <div
@@ -262,78 +256,7 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* RIGHT PANEL */}
-          <div className="right-panel" style={{ marginTop: 40 }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <h3 style={{ fontWeight: 'bold' }}>Notifications</h3>
-              <Button type="link" style={{ padding: 0 }}>
-                View All
-              </Button>
-            </div>
-            <div>
-              {notifications.map((notif) => (
-                <Card
-                  key={notif.id}
-                  size="small"
-                  style={{
-                    marginBottom: 10,
-                    border: '1px solid #eee',
-                    backgroundColor: '#f9f9f9',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FileTextOutlined style={{ marginRight: 10, color: '#7e57c2' }} />
-                    {notif.message}
-                  </div>
-                </Card>
-              ))}
-            </div>
 
-            {/* Status Breakdown 
-            <div style={{ marginTop: 30 }}>
-              <h3 style={{ fontWeight: 'bold' }}>Status Breakdown</h3>
-              {Object.entries(analytics.statusBreakdown).map(([status, count]) => (
-                <div key={status} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span>{status}</span>
-                  <span>{count}</span>
-                </div>
-              ))}
-            </div>
-
-            */}
-
-            <div style={{ marginTop: 40 }}>
-              <Calendar
-                fullscreen={false}
-                headerRender={({ value, onChange }) => {
-                  return (
-                    <div
-                      style={{
-                        padding: 10,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Button onClick={() => onChange(value.clone().subtract(1, 'month'))}>
-                        {'<'}
-                      </Button>
-                      <h3 style={{ margin: 0 }}>{value.format('MMMM')}</h3> {/* Fixed syntax error */}
-                      <Button onClick={() => onChange(value.clone().add(1, 'month'))}>
-                        {'>'}
-                      </Button>
-                    </div>
-                  );
-                }}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </Layout>
