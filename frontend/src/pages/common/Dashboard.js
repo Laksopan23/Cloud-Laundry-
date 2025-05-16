@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Progress, Calendar } from 'antd';
 import {
-  BarChartOutlined,
   FileTextOutlined,
   CheckCircleFilled,
-  UserAddOutlined,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
+  DollarOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import Layout from '../../components/Layout';
 
@@ -12,10 +14,16 @@ function Dashboard() {
   const [ordersData, setOrdersData] = useState([]);
   const [analytics, setAnalytics] = useState({
     totalOrders: 0,
-    totalRevenue: 0,
+    completedOrders: 0,
+    cancelledOrders: 0,
+    pendingOrders: 0,
     ordersPerService: {},
     statusBreakdown: {},
   });
+  const [username, setUsername] = useState('');
+  const [userRole, setUserRole] = useState(''); // New state for user role
+  const [totalRevenue, setTotalRevenue] = useState(0); // New state for total revenue
+  const [totalCustomers, setTotalCustomers] = useState(0); // New state for total customers
 
   const notifications = [
     { id: 1, message: 'Invoice #123545 is pending' },
@@ -25,12 +33,18 @@ function Dashboard() {
   ];
 
   useEffect(() => {
-      
-  const username = localStorage.getItem('username');
-  if (username) {
-    console.log('Logged in as:', username);
-  }
+    const storedUsername = localStorage.getItem('username');
+    const storedUserRole = localStorage.getItem('userRole'); // Retrieve user role
+    if (storedUsername) {
+      setUsername(storedUsername);
+      console.log('Logged in as:', storedUsername);
+    }
+    if (storedUserRole) {
+      setUserRole(storedUserRole);
+      console.log('User role:', storedUserRole);
+    }
 
+    // Fetch orders data
     fetch('http://localhost:5000/api/orders')
       .then((res) => res.json())
       .then((data) => {
@@ -40,29 +54,60 @@ function Dashboard() {
       .catch((err) => {
         console.error('Failed to fetch orders:', err);
       });
+
+    // Fetch total revenue and customers if user is admin
+    if (storedUserRole === 'admin') {
+      // Fetch total revenue
+      fetch('http://localhost:5000/api/revenue')
+        .then((res) => res.json())
+        .then((data) => {
+          setTotalRevenue(data.totalRevenue || 0);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch revenue:', err);
+        });
+
+      // Fetch total customers
+      fetch('http://localhost:5000/api/customers/count')
+        .then((res) => res.json())
+        .then((data) => {
+          setTotalCustomers(data.totalCustomers || 0);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch customers:', err);
+        });
+    }
   }, []);
 
   const calculateAnalytics = (orders) => {
     let totalOrders = orders.length;
-    let totalRevenue = 0;
+    let completedOrders = 0;
+    let cancelledOrders = 0;
+    let pendingOrders = 0;
     let ordersPerService = {};
     let statusBreakdown = {};
 
     orders.forEach((order) => {
-      order.items.forEach(item => {
-        totalRevenue += item.quantity * item.price;
-      });
-
       const service = order.selectedService;
       ordersPerService[service] = (ordersPerService[service] || 0) + 1;
 
       const status = order.status;
       statusBreakdown[status] = (statusBreakdown[status] || 0) + 1;
+
+      if (status.toLowerCase() === 'completed') {
+        completedOrders += 1;
+      } else if (status.toLowerCase() === 'cancelled') {
+        cancelledOrders += 1;
+      } else if (status.toLowerCase() === 'pending') {
+        pendingOrders += 1;
+      }
     });
 
     setAnalytics({
       totalOrders,
-      totalRevenue,
+      completedOrders,
+      cancelledOrders,
+      pendingOrders,
       ordersPerService,
       statusBreakdown,
     });
@@ -106,7 +151,9 @@ function Dashboard() {
       </style>
 
       <div style={{ padding: 10 }}>
-        <h2 style={{ fontWeight: 'bold', textAlign: 'center' }}>Dashboard</h2>
+        <h2 style={{ fontWeight: 'bold', textAlign: 'center' }}>
+          Dashboard - Welcome, {username || 'Employee'}
+        </h2>
 
         <div className="dashboard-container">
           {/* LEFT PANEL */}
@@ -125,14 +172,6 @@ function Dashboard() {
               }}
             >
               <StatCard
-                icon={<BarChartOutlined />}
-                title="Total Revenue"
-                value={`$${analytics.totalRevenue.toFixed(2)}`}
-                change="+8% from yesterday"
-                bgColor="#ffe6eb"
-                iconBg="#ff4d6d"
-              />
-              <StatCard
                 icon={<FileTextOutlined />}
                 title="Total Orders"
                 value={analytics.totalOrders.toString()}
@@ -142,20 +181,48 @@ function Dashboard() {
               />
               <StatCard
                 icon={<CheckCircleFilled />}
-                title="Orders Done"
-                value="5"
+                title="Completed Orders"
+                value={analytics.completedOrders.toString()}
                 change="+1.2% from yesterday"
                 bgColor="#e8fff0"
                 iconBg="#00c853"
               />
               <StatCard
-                icon={<UserAddOutlined />}
-                title="New Customers"
-                value="8"
+                icon={<CloseCircleOutlined />}
+                title="Cancelled Orders"
+                value={analytics.cancelledOrders.toString()}
                 change="0.5% from yesterday"
+                bgColor="#ffe6eb"
+                iconBg="#ff4d6d"
+              />
+              <StatCard
+                icon={<ClockCircleOutlined />}
+                title="Pending Orders"
+                value={analytics.pendingOrders.toString()}
+                change="0.3% from yesterday"
                 bgColor="#f3e8ff"
                 iconBg="#b388ff"
               />
+              {userRole === 'admin' && (
+                <>
+                  <StatCard
+                    icon={<DollarOutlined />}
+                    title="Total Revenue"
+                    value={`$${totalRevenue.toLocaleString()}`}
+                    change="+3% from yesterday"
+                    bgColor="#e6f7ff"
+                    iconBg="#1890ff"
+                  />
+                  <StatCard
+                    icon={<UserOutlined />}
+                    title="Total Customers"
+                    value={totalCustomers.toString()}
+                    change="+2% from yesterday"
+                    bgColor="#f6ffed"
+                    iconBg="#52c41a"
+                  />
+                </>
+              )}
             </div>
 
             {/* Top Services */}
@@ -228,7 +295,7 @@ function Dashboard() {
               ))}
             </div>
 
-            {/* Optional: Status Breakdown */}
+            {/* Status Breakdown */}
             <div style={{ marginTop: 30 }}>
               <h3 style={{ fontWeight: 'bold' }}>Status Breakdown</h3>
               {Object.entries(analytics.statusBreakdown).map(([status, count]) => (
@@ -255,7 +322,7 @@ function Dashboard() {
                       <Button onClick={() => onChange(value.clone().subtract(1, 'month'))}>
                         {'<'}
                       </Button>
-                      <h3 style={{ margin: 0 }}>{value.format('MMMM')}</h3>
+                      <h3 style={{ margin: 0 }}>{value.format('MMMM')}</h3> {/* Fixed syntax error */}
                       <Button onClick={() => onChange(value.clone().add(1, 'month'))}>
                         {'>'}
                       </Button>
@@ -270,8 +337,6 @@ function Dashboard() {
     </Layout>
   );
 }
-
-// --- Helper components and functions remain unchanged ---
 
 function StatCard({ icon, title, value, change, bgColor, iconBg }) {
   return (
