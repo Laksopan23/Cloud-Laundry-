@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import { Layout, Menu, Button, FloatButton, Grid } from "antd";
 import { useNavigate } from "react-router-dom";
+import useLogout from "../mock/logout"; // Import the logout hook
 import imageSrc from "../images/logo.png";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -22,11 +23,12 @@ const SiderItems = [
 
 const headerIteam = [
   { key: "1", text: "profile", icon: <UserSwitchOutlined /> },
-  { key: "2", text: "Login", icon: <LogoutOutlined /> },
+  { key: "2", text: "Logout", icon: <LogoutOutlined /> }, // Updated text to "Logout"
 ];
 
 const App = ({ children }) => {
   const navigate = useNavigate();
+  const logout = useLogout(); // Use the logout hook
   const [collapsed, setCollapsed] = useState(false);
   const [isBackTopVisible, setIsBackTopVisible] = useState(false);
   const screens = useBreakpoint();
@@ -47,9 +49,7 @@ const App = ({ children }) => {
     if (key === "1") {
       navigate("/seller");
     } else if (key === "2") {
-      localStorage.setItem("authToken", null);
-      localStorage.setItem("loggedInUserType", null);
-      navigate("/login");
+      logout(); // Call the logout function
     }
   };
 
@@ -133,7 +133,7 @@ const App = ({ children }) => {
           )}
 
           {!isMobile && (
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft:1000 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: 1000 }}>
               {headerIteam.map((item) => (
                 <Button
                   key={item.key}
