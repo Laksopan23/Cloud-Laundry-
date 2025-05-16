@@ -17,19 +17,28 @@ exports.signupEmployee = async (req, res) => {
   try {
     const { name, email, username, password } = req.body;
 
+    // Check if username is already taken
     const existingUser = await Employee.findOne({ username });
     if (existingUser) return res.status(400).json({ message: 'Username already taken' });
 
+    // Create new employee
     const employee = new Employee({ name, email, username, password });
     await employee.save();
 
-    const token = generateToken(user);
-    res.status(201).json({ message: 'Signup successful', token, role: user.role });
+    // Generate token using the employee object
+    const token = generateToken(employee);
+
+    // Send response
+    res.status(201).json({ 
+      message: 'Signup successful', 
+      token, 
+      role: employee.role || 'employee' // Default to 'employee' if role is undefined
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Signup error:', err); // Log error for debugging
+    res.status(500).json({ message: 'Server error during signup' });
   }
 };
-
 
 
 // Login Controller
@@ -65,5 +74,26 @@ exports.loginEmployee = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
+  }
+};
+
+
+// Check Username Availability
+exports.checkUsernameAvailability = async (req, res) => {
+  try {
+    const { username } = req.query; // Get username from query parameter
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' });
+    }
+
+    const existingUser = await Employee.findOne({ username });
+    if (existingUser) {
+      return res.status(200).json({ available: false, message: 'Username already taken' });
+    }
+
+    return res.status(200).json({ available: true, message: 'Username is available' });
+  } catch (err) {
+    console.error('Username check error:', err);
+    res.status(500).json({ message: 'Server error during username check' });
   }
 };

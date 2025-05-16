@@ -5,14 +5,12 @@ import laundry from '../../../images/laundry.png';
 
 export const generateInvoicePDF = (record) => {
   const invoiceHTML = `
-    <div style="font-family: 'Poppins', sans-serif; max-width: 900px; margin: 0 auto; background: #fff; position: relative; overflow: hidden; display: flex; flex-direction: column; min-height: 100vh;">
-      <!-- Watermark -->
-      <img src="${logo}" style="position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); opacity: 0.08; z-index: 0; width: 70%; pointer-events: none;" />
+    <div style="font-family: 'Poppins', sans-serif; width: 794px; height: 1122px; margin: 0 auto; background: #fff; display: flex; flex-direction: column;">
 
-      <!-- Content Wrapper with Flex -->
-      <div style="flex: 1 0 auto; display: flex; flex-direction: column; padding-bottom: 80px; min-height: calc(100vh - 80px);">
+      <!-- Main Content -->
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 24px;">
         <!-- Header -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 24px 24px 0 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
           <div style="display: flex; align-items: center;">
             <img src="${logo}" alt="Logo" style="height: 60px; margin-right: 12px;" />
             <div>
@@ -27,23 +25,27 @@ export const generateInvoicePDF = (record) => {
           </div>
         </div>
 
+        <!-- Watermark -->
+        <img src="${logo}" style="position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%); opacity: 0.08; z-index: 0; width: 70%; pointer-events: none;" />
+
         <!-- Invoice To & Illustration -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 0 24px; margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 16px;">
           <div>
             <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">INVOICE TO</div>
             <div style="font-size: 14px; font-weight: 600; text-transform: uppercase;">${record.customerName}</div>
             <div style="font-size: 13px;">${record.customerID || ''}</div>
             <div style="font-size: 13px;">${record.customerPhone}</div>
-            <div style="font-size: 13px;">${record.customerAddress1}</div>
+            <div style="font-size: 13px;">${record.Addressline1}</div>
+            <div style="font-size: 13px;">${record.Addressline2}</div>
           </div>
           <img src="${laundry}" alt="Bucket" style="height: 80px; margin-left: 24px;" />
         </div>
 
         <!-- Table -->
-        <div style="padding: 24px; padding-bottom: 0;">
+        <div style="margin-top: 24px;">
           <table style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px;">
             <thead>
-              <tr style="background: #5628C3; color: #fff; border-radius: 8px;">
+              <tr style="background: #5628C3; color: #fff;">
                 <th style="padding: 12px 8px; border-top-left-radius: 8px;">#</th>
                 <th style="padding: 12px 8px;">SERVICE DESCRIPTION</th>
                 <th style="padding: 12px 8px;">WEIGHT/UNIT</th>
@@ -66,7 +68,7 @@ export const generateInvoicePDF = (record) => {
         </div>
 
         <!-- Totals -->
-        <div style="display: flex; justify-content: space-between; padding: 0 24px; margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between; margin-top: 16px;">
           <div>
             <div style="font-size: 15px; font-weight: 600;">SUB TOTAL</div>
             <div style="font-size: 15px;">Discount</div>
@@ -76,12 +78,16 @@ export const generateInvoicePDF = (record) => {
             <div style="font-size: 15px;">-${Number(record.pickupDiscount).toFixed(2)}</div>
           </div>
         </div>
-        <div style="display: flex; justify-content: flex-end; padding: 0 24px; margin-top: 8px;">
-          <div style="background: #5628C3; color: #fff; border-radius: 24px; padding: 12px 32px; font-size: 20px; font-weight: 700;">TOTAL : Rs ${record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0).toFixed(2)}</div>
+
+        <!-- Total Box -->
+        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+          <div style="background: #5628C3; color: #fff; border-radius: 24px; padding: 12px 32px; font-size: 20px; font-weight: 700;">
+            TOTAL : Rs ${(record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0) - Number(record.pickupDiscount)).toFixed(2)}
+          </div>
         </div>
 
         <!-- Notes -->
-        <div style="padding: 24px; padding-bottom: 0;">
+        <div style="margin-top: 16px;">
           <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">NOTES:</div>
           <div style="font-size: 13px;">${record.note}</div>
         </div>
@@ -92,7 +98,7 @@ export const generateInvoicePDF = (record) => {
         </div>
 
         <!-- Payment Methods -->
-        <div style="padding: 0 24px; margin-bottom: 24px;">
+        <div>
           <div style="font-size: 15px; font-weight: 600; margin-bottom: 8px;">Please make the payment using one of the following methods:</div>
           <div style="display: flex; border-top: 1px solid #bbb; border-bottom: 1px solid #bbb;">
             <div style="flex: 1; padding: 12px 8px; border-right: 1px solid #bbb;">
@@ -112,8 +118,8 @@ export const generateInvoicePDF = (record) => {
         </div>
       </div>
 
-      <!-- Footer (Sticky at Bottom) -->
-      <div style="background: #5628C3; color: #fff; padding: 16px 0 8px 0; text-align: center; flex-shrink: 0; width: 100%;">
+      <!-- Footer -->
+      <div style="background: #5628C3; color: #fff; padding: 16px 0 8px 0; text-align: center;">
         <div style="display: flex; justify-content: center; align-items: center; gap: 32px; font-size: 15px; margin-bottom: 4px;">
           <span>www.cloudlaundry.lk</span>
           <span>•</span>
@@ -121,8 +127,8 @@ export const generateInvoicePDF = (record) => {
           <span>•</span>
           <span>hello@cloudlaundry.lk</span>
         </div>
-        <div style="font-size: 13px; color: #fff; margin-top: 4px;">- - Your Curtains Deserve The Best - -</div>
-        <div style="font-size: 10px; color: #fff; margin-top: 2px;">CLOUD LAUNDRY.LK & CLEANERS (PVT) LTD.</div>
+        <div style="font-size: 13px;">- - Your Curtains Deserve The Best - -</div>
+        <div style="font-size: 10px;">CLOUD LAUNDRY.LK & CLEANERS (PVT) LTD.</div>
       </div>
     </div>
   `;
@@ -132,7 +138,7 @@ export const generateInvoicePDF = (record) => {
     filename: `invoice_${record.invoiceNumber}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    jsPDF: { unit: 'px', format: [794, 1122], orientation: 'portrait' }
   };
 
   html2pdf().set(opt).from(invoiceHTML).save();

@@ -19,8 +19,8 @@ export default function LaundryForm() {
   const [selectedService, setSelectedService] = useState(null);
   const [formData, setFormData] = useState({
     customerName: '',
-    customerAddress1: '',
-    customerAddress2: '',
+    Addressline1: '',
+    Addressline2: '',
     customerPhone: '',
     selectedService: '',
     date: null,
@@ -114,8 +114,8 @@ export default function LaundryForm() {
       // Reset form and state
       setFormData({
         customerName: '',
-        customerAddress1: '',
-        customerAddress2: '',
+        Addressline1: '',
+        Addressline2: '',
         customerPhone: '',
         selectedService: '',
         date: null,
@@ -159,14 +159,17 @@ export default function LaundryForm() {
                 placeholder="Customer Name"
                 value={formData.customerName}
                 onChange={(e) => handleChange('customerName', e.target.value)}
+                style={{ height: '32px' }} // Adjust height here
               />
             </div>
             <div style={{ flex: 1 }}>
-              <Title level={5}>Customer Address 1</Title>
+              <Title level={5}>Address Line 1</Title>
               <Input
-                placeholder="Customer Address 1"
-                value={formData.customerAddress1}
-                onChange={(e) => handleChange('customerAddress1', e.target.value)}
+                placeholder="Address Line 1"
+                value={formData.Addressline1}
+                onChange={(e) => handleChange('Addressline1', e.target.value)}
+                style={{ height: '32px' }} // Adjust height here
+
               />
             </div>
           </div>
@@ -178,14 +181,16 @@ export default function LaundryForm() {
                 placeholder="Customer Phone"
                 value={formData.customerPhone}
                 onChange={(e) => handleChange('customerPhone', e.target.value)}
+                style={{ height: '32px' }} // Adjust height here
               />
             </div>
             <div style={{ flex: 1 }}>
-              <Title level={5}>Customer Address 2</Title>
+              <Title level={5}>Address Line 2</Title>
               <Input
-                placeholder="Customer Address 2"
-                value={formData.customerAddress2}
-                onChange={(e) => handleChange('customerAddress2', e.target.value)}
+                placeholder="Address Line 2"
+                value={formData.Addressline2}
+                onChange={(e) => handleChange('Addressline2', e.target.value)}
+                style={{ height: '32px' }} // Adjust height here
               />
             </div>
           </div>
@@ -242,7 +247,7 @@ export default function LaundryForm() {
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
               <Title level={5}>Invoice Number</Title>
-              <Input placeholder="Auto-generated" value="Auto-generated" disabled />
+              <Input style={{ height: '32px' }} placeholder="Auto-generated" value="Auto-generated" disabled />
             </div>
             <div style={{ flex: 1 }}>
               <Title level={5}>Date</Title>
@@ -274,12 +279,14 @@ export default function LaundryForm() {
               />
             </div>
           </div>
-          <Button
-            style={{ marginTop: 20, backgroundColor: '#6c2bd9', color: '#fff' }}
-            onClick={() => setIsModalVisible(true)}
-          >
-            Add Items
-          </Button>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+            <Button
+              style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
+              onClick={() => setIsModalVisible(true)}
+            >
+              Add Items
+            </Button>
+          </div>
         </Card>
 
         <AddItemModal
@@ -302,12 +309,14 @@ export default function LaundryForm() {
                 placeholder="Pickup & Delivery Fee"
                 value={formData.pickupFee}
                 onChange={(e) => handleChange('pickupFee', e.target.value)}
+                style={{ height: '32px' }}
               />
               <Title level={5}>Pickup & Delivery Discount</Title>
               <Input
                 placeholder="Pickup & Delivery Discount"
                 value={formData.pickupDiscount}
                 onChange={(e) => handleChange('pickupDiscount', e.target.value)}
+                style={{ height: '32px' }}
               />
               <Title level={5}>Note</Title>
               <TextArea
@@ -327,12 +336,14 @@ export default function LaundryForm() {
                   placeholder="Pickup Person Name"
                   value={formData.pickupPersonName}
                   onChange={(e) => handleChange('pickupPersonName', e.target.value)}
+                  style={{ height: '32px' }}
                 />
                 <Title level={5}>Pickup Person Phone</Title>
                 <Input
                   placeholder="Pickup Person Phone"
                   value={formData.pickupPersonPhone}
                   onChange={(e) => handleChange('pickupPersonPhone', e.target.value)}
+                  style={{ height: '32px' }}
                 />
               </Card>
             </div>

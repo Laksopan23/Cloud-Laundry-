@@ -16,8 +16,8 @@ export const generatePDF = (order) => {
     head: [['Field', 'Value']],
     body: [
       ['Customer Name', order.customerName],
-      ['Customer Address 1', order.customerAddress1],
-      ['Customer Address 2', order.customerAddress2 || ''],
+      ['Customer Address 1', order.Addressline1],
+      ['Customer Address 2', order.Addressline2 || ''],
       ['Customer Phone', order.customerPhone],
       ['Selected Service', order.selectedService],
       ['Expected Delivery Date', new Date(order.expectedDeliveryDate).toLocaleDateString()],
