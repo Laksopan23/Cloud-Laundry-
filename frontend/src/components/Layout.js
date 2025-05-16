@@ -21,18 +21,36 @@ const SiderItems = [
   { key: "addLay", icon: <HomeOutlined />, label: "Home Layouts" },
 ];
 
+const adminItems = [
+  { key: "dashboard", icon: <HomeOutlined />, label: "Dashboard" },
+  { key: "invoice", icon: <HomeOutlined />, label: "Invoice" },
+  { key: "orders", icon: <HomeOutlined />, label: "Orders" },
+  { key: "allEmp", icon: <HomeOutlined />, label: "All Employees" },
+];
+
 const headerIteam = [
   { key: "1", text: "profile", icon: <UserSwitchOutlined /> },
-  { key: "2", text: "Logout", icon: <LogoutOutlined /> }, // Updated text to "Logout"
+  { key: "2", text: "Logout", icon: <LogoutOutlined /> },
 ];
 
 const App = ({ children }) => {
   const navigate = useNavigate();
-  const logout = useLogout(); // Use the logout hook
+  const logout = useLogout();
   const [collapsed, setCollapsed] = useState(false);
   const [isBackTopVisible, setIsBackTopVisible] = useState(false);
+  const [username, setUsername] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const screens = useBreakpoint();
   const isMobile = !screens.md;
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    const storedUserRole = localStorage.getItem("role");
+    if (storedUsername) setUsername(storedUsername);
+    if (storedUserRole) setUserRole(storedUserRole);
+  }, []);
+
+  const menuItems = userRole === "admin" ? adminItems : SiderItems;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,17 +58,13 @@ const App = ({ children }) => {
         document.documentElement.scrollTop || document.body.scrollTop;
       setIsBackTopVisible(scrollTop > 0);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleHeaderClick = (key) => {
-    if (key === "1") {
-      navigate("/seller");
-    } else if (key === "2") {
-      logout(); // Call the logout function
-    }
+    if (key === "1") navigate("/seller");
+    else if (key === "2") logout();
   };
 
   const handleMenuClick = (item) => {
@@ -72,6 +86,9 @@ const App = ({ children }) => {
         break;
       case "addLay":
         navigate("/add");
+        break;
+      case "allEmp":
+        navigate("/admin/employees");
         break;
       default:
         break;
@@ -102,7 +119,7 @@ const App = ({ children }) => {
           <Menu
             theme="light"
             mode="inline"
-            items={SiderItems}
+            items={menuItems}
             onClick={handleMenuClick}
           />
         </Sider>
@@ -131,7 +148,6 @@ const App = ({ children }) => {
               <img src={imageSrc} alt="Logo" style={{ height: "120px" }} />
             </div>
           )}
-
           {!isMobile && (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginLeft: 1000 }}>
               {headerIteam.map((item) => (

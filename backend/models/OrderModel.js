@@ -8,8 +8,8 @@ const itemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
-  customerAddress1: { type: String, required: true },
-  customerAddress2: { type: String },
+  Addressline1: { type: String, required: true },
+  Addressline2: { type: String, required: true },
   customerPhone: { type: String, required: true },
   selectedService: { type: String, required: true },
   invoiceNumber: { type: String, required: true, unique: true },
@@ -24,6 +24,8 @@ const orderSchema = new mongoose.Schema({
   status: { type: String, required: true, default: 'pending' },
   employee: { type: String },
   items: [itemSchema], // ⬅️ Add this line
+  total: { type: Number },
+
 
 }, {
   timestamps: true
