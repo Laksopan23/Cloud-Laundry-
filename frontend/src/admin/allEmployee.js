@@ -40,13 +40,45 @@ const EmployeesList = () => {
 
   return (
     <Layout>
-      <div style={{
-        padding: '30px',
-        maxWidth: '1200px',
-        margin: '0 auto',
-        backgroundColor: '#f5f5f5',
-        minHeight: '100vh'
-      }}>
+      <style>
+        {`
+          .employees-container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+          }
+
+          .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            justify-items: center;
+          }
+
+          .employee-card {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+          }
+
+          @media (max-width: 768px) {
+            .employees-container {
+              max-width: 100%; /* Ensure container doesn't exceed viewport width */
+              padding: 15px; /* Reduce padding for mobile */
+            }
+
+            .employees-grid {
+              grid-template-columns: minmax(0, 300px); /* Single centered column */
+              justify-items: center; /* Center the card in the grid */
+              justify-content: center; /* Center the grid itself in the container */
+            }
+          }
+        `}
+      </style>
+
+      <div className="employees-container">
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -54,15 +86,16 @@ const EmployeesList = () => {
           marginBottom: '20px'
         }}>
           <h1 style={{ fontSize: '24px', margin: 0 }}>Employees Directory</h1>
-          <Button type="primary" onClick={fetchEmployees}>Refresh</Button>
         </div>
 
         <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '20px' }}>
           <Search
             placeholder="Search by name"
             allowClear
-            onSearch={value => setSearchQuery(value)}
+            onChange={e => setSearchQuery(e.target.value)} // Update searchQuery as user types
+            onSearch={value => setSearchQuery(value)} // Still handle search button/Enter key
             style={{ width: 300 }}
+            value={searchQuery} // Bind the input value to searchQuery state
           />
           <Select
             placeholder="Filter by role"
@@ -76,22 +109,18 @@ const EmployeesList = () => {
           </Select>
         </div>
 
-        {loading ? (
+        {loading ? ( 
           <Spin tip="Loading employees..." />
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '20px'
-          }}>
+          <div className="employees-grid">
             {filteredEmployees.map(emp => (
               <Card
                 key={emp._id}
                 hoverable
-                style={{ borderRadius: '8px' }}
+                className="employee-card"
                 title={
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar style={{ backgroundColor: '#1890ff', marginRight: 8 }}>
+                    <Avatar style={{ backgroundColor: '#5e208e', marginRight: 8 }}>
                       {emp.name?.charAt(0).toUpperCase()}
                     </Avatar>
                     <span>{emp.name}</span>

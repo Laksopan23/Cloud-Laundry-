@@ -27,7 +27,6 @@ export default function AllOrders() {
   const role = localStorage.getItem('role');
   const isAdmin = role === 'admin';
 
-  // Fetch all orders
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -44,58 +43,61 @@ export default function AllOrders() {
     fetchOrders();
   }, []);
 
-  // Handle view
   const handleView = (record) => {
     setSelectedOrder(record);
     setViewModalVisible(true);
   };
 
-  // Handle PDF download
   const handleDownload = (record) => {
     try {
       generateInvoicePDF(record);
       message.success(`Downloaded invoice ${record.invoiceNumber}`);
     } catch (error) {
       message.error('Failed to generate PDF');
-      console.error(error);
     }
   };
 
-  // Handle status change
   const handleStatusChange = async (record, newStatus) => {
     try {
       await axios.put(`http://localhost:5000/api/orders/${record._id}`, {
         status: newStatus,
       });
       message.success(`Status updated to ${newStatus}`);
-      fetchOrders(); // Refresh list
+      fetchOrders();
     } catch (error) {
       message.error('Failed to update status');
     }
   };
 
-  // Columns for the table
+  const handlePaymentChange = async (record, newStatus) => {
+    try {
+      await axios.put(`http://localhost:5000/api/orders/${record._id}`, {
+        paymentStatus: newStatus,
+      });
+      message.success(`Payment status updated to ${newStatus}`);
+      fetchOrders();
+    } catch (error) {
+      message.error('Failed to update payment status');
+    }
+  };
+
+  const colorMapStatus = {
+    Pending: '#faad14',
+    Completed: '#52c41a',
+    Cancelled: '#ff4d4f',
+  };
+
+  const colorMapPayment = {
+    'not paid': '#faad14',
+    paid: '#52c41a',
+    refunded: '#1890ff',
+  };
+
   const columns = [
-    {
-      title: 'Invoice #',
-      dataIndex: 'invoiceNumber',
-      key: 'invoiceNumber',
-    },
-    {
-      title: 'Customer',
-      dataIndex: 'customerName',
-      key: 'customerName',
-    },
-    {
-      title: 'Service',
-      dataIndex: 'selectedService',
-      key: 'selectedService',
-    },
-    {
-      title: 'Phone',
-      dataIndex: 'customerPhone',
-      key: 'customerPhone',
-    },
+    { title: 'Invoice #', dataIndex: 'invoiceNumber', key: 'invoiceNumber' },
+    { title: 'Customer', dataIndex: 'customerName', key: 'customerName' },
+    { title: 'Service', dataIndex: 'selectedService', key: 'selectedService' },
+    { title: 'Phone', dataIndex: 'customerPhone', key: 'customerPhone' },
     {
       title: 'Date',
       dataIndex: 'date',
@@ -112,21 +114,15 @@ export default function AllOrders() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status, record) => {
-        const colorMap = {
-          Pending: '#faad14',
-          Completed: '#52c41a',
-          Cancelled: '#ff4d4f',
-        };
-
-        return isAdmin ? (
+      render: (status, record) =>
+        isAdmin ? (
           <Select
             value={status}
             onChange={(value) => handleStatusChange(record, value)}
             style={{
               width: 130,
-              color: colorMap[status],
-              borderColor: colorMap[status],
+              color: colorMapStatus[status],
+              borderColor: colorMapStatus[status],
             }}
           >
             <Option value="Pending">Pending</Option>
@@ -136,8 +132,8 @@ export default function AllOrders() {
         ) : (
           <Button
             style={{
-              color: colorMap[status],
-              borderColor: colorMap[status],
+              color: colorMapStatus[status],
+              borderColor: colorMapStatus[status],
               borderRadius: 4,
               padding: '0 10px',
             }}
@@ -145,40 +141,21 @@ export default function AllOrders() {
           >
             {status}
           </Button>
-        );
-      },
+        ),
     },
     {
       title: 'Payment',
       dataIndex: 'paymentStatus',
       key: 'paymentStatus',
-      render: (status, record) => {
-        const colorMap = {
-          'not paid': '#faad14',
-          paid: '#52c41a',
-          refunded: '#1890ff',
-        };
-
-        return isAdmin ? (
+      render: (status, record) =>
+        isAdmin ? (
           <Select
             value={status}
-            onChange={(value) =>
-              axios
-                .put(`http://localhost:5000/api/orders/${record._id}`, {
-                  paymentStatus: value,
-                })
-                .then(() => {
-                  message.success(`Payment status updated to ${value}`);
-                  fetchOrders();
-                })
-                .catch(() => {
-                  message.error('Failed to update payment status');
-                })
-            }
+            onChange={(value) => handlePaymentChange(record, value)}
             style={{
               width: 130,
-              color: colorMap[status],
-              borderColor: colorMap[status],
+              color: colorMapPayment[status],
+              borderColor: colorMapPayment[status],
             }}
           >
             <Option value="not paid">Not Paid</Option>
@@ -188,8 +165,8 @@ export default function AllOrders() {
         ) : (
           <Button
             style={{
-              color: colorMap[status],
-              borderColor: colorMap[status],
+              color: colorMapPayment[status],
+              borderColor: colorMapPayment[status],
               borderRadius: 4,
               padding: '0 10px',
             }}
@@ -197,8 +174,7 @@ export default function AllOrders() {
           >
             {status}
           </Button>
-        );
-      },
+        ),
     },
     {
       title: 'Actions',
@@ -214,7 +190,70 @@ export default function AllOrders() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: 1500, margin: '0 auto', padding: '20px' }}>
+        <style>
+          {`
+            .mobile-cards {
+              display: none;
+            }
+
+            @media (max-width: 767px) {
+              .desktop-table {
+                display: none;
+              }
+
+              .mobile-cards {
+                display: block;
+                width: 100%;
+              }
+
+              .mobile-cards .ant-card {
+                width: 100%;
+                margin: 0 auto 16px;
+                padding: 0;
+              }
+
+              .mobile-cards .ant-card-body {
+                padding: 10px;
+                font-size: 9px;
+              }
+
+              .mobile-cards .ant-card-body p {
+                font-size: 9px;
+                margin-bottom: 6px;
+              }
+
+              .mobile-cards strong {
+                font-size: 9px;
+              }
+
+              .mobile-cards,
+              .mobile-cards .ant-btn {
+                width: 100% !important;
+                font-size: 9px !important;
+              }
+              .mobile-cards .ant-select {
+                width: 100% !important;
+                font-size: 6px !important;
+              }
+
+              .mobile-cards .ant-select .ant-select-selector {
+                font-size: 8px !important;
+                height: 22px !important;
+                padding: 0 4px !important;
+              }
+
+              .mobile-cards .ant-select .ant-select-selection-item {
+                font-size: 8px !important;
+                line-height: 14px !important;
+              }
+
+              .mobile-cards .ant-select .ant-select-arrow {
+                font-size: 8px !important;
+              }
+            }
+          `}
+        </style>
+      <div style={{ maxWidth: 1500, margin: '0 auto' }}>
         <Card
           title={<Title level={4}>All Orders</Title>}
           style={{ borderTop: '5px solid #6c2bd9' }}
@@ -224,16 +263,83 @@ export default function AllOrders() {
               <Spin size="large" />
             </div>
           ) : (
-            <Table
-              dataSource={orders}
-              columns={columns}
-              rowKey="_id"
-              pagination={{ pageSize: 10 }}
-            />
+            <>
+              <div className="desktop-table">
+                <Table
+                  dataSource={orders}
+                  columns={columns}
+                  rowKey="_id"
+                  pagination={{ pageSize: 10 }}
+                />
+              </div>
+
+              <div className="mobile-cards">
+                {orders.map((order) => (
+                  <Card
+                    key={order._id}
+                    style={{ marginBottom: 16 }}
+                    title={`Invoice #${order.invoiceNumber}`}
+                  >
+                    <p><strong>Customer:</strong> {order.customerName}</p>
+                    <p><strong>Phone:</strong> {order.customerPhone}</p>
+                    <p><strong>Service:</strong> {order.selectedService}</p>
+                    <p><strong>Date:</strong> {dayjs(order.date).format('YYYY-MM-DD')}</p>
+                    <p><strong>Delivery:</strong> {dayjs(order.expectedDeliveryDate).format('YYYY-MM-DD')}</p>
+                    <p>
+                      <strong>Status:</strong>{' '}
+                      {isAdmin ? (
+                        <Select
+                          value={order.status}
+                          onChange={(value) => handleStatusChange(order, value)}
+                          size="small"
+                          style={{ width: '100%' }}
+                        >
+                          <Option value="Pending">Pending</Option>
+                          <Option value="Completed">Completed</Option>
+                          <Option value="Cancelled">Cancelled</Option>
+                        </Select>
+                      ) : (
+                        <span>{order.status}</span>
+                      )}
+                    </p>
+                    <p>
+                      <strong>Payment:</strong>{' '}
+                      {isAdmin ? (
+                        <Select
+                          value={order.paymentStatus}
+                          onChange={(value) => handlePaymentChange(order, value)}
+                          size="small"
+                          style={{ width: '100%' }}
+                        >
+                          <Option value="not paid">Not Paid</Option>
+                          <Option value="paid">Paid</Option>
+                          <Option value="refunded">Refunded</Option>
+                        </Select>
+                      ) : (
+                        <span>{order.paymentStatus}</span>
+                      )}
+                    </p>
+                    <Button
+                      style={{ marginTop: 8 }}
+                      block
+                      onClick={() => handleView(order)}
+                    >
+                      View Details
+                    </Button>
+                    <Button
+                      style={{ marginTop: 8, backgroundColor:'#5e208e', color:'white' }}
+                      block
+                      onClick={() => handleDownload(order)}
+                    >
+                      Download
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            </>
           )}
         </Card>
 
-        {/* Modal for viewing order details */}
         <Modal
           title={`Order Details - ${selectedOrder?.invoiceNumber}`}
           open={viewModalVisible}
@@ -253,7 +359,6 @@ export default function AllOrders() {
               <p><strong>Delivery:</strong> {dayjs(selectedOrder.expectedDeliveryDate).format('YYYY-MM-DD')}</p>
               <p><strong>Status:</strong> {selectedOrder.status}</p>
               <p><strong>Payment Status:</strong> {selectedOrder.paymentStatus}</p>
-              {/* Add more details here if needed */}
             </div>
           )}
         </Modal>
