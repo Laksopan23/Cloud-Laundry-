@@ -113,3 +113,21 @@ exports.getAllEmployees = async (req, res) => {
     res.status(500).json({ message: 'Server error while fetching employees' });
   }
 };
+
+
+// Get Employee by Username
+exports.getEmployeeByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const employee = await Employee.findOne({ username }).select('-password');
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.status(200).json(employee);
+  } catch (err) {
+    console.error('Error fetching employee:', err);
+    res.status(500).json({ message: 'Server error while fetching employee' });
+  }
+};

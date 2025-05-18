@@ -7,10 +7,10 @@ import Layout from '../../components/Layout';
 import AddItemModal from './models/AddItemsModel'; // adjust path as needed
 
 // Note: Image imports are placeholders; update to correct images
-import Laundry from '../../images/4.png';
-import Curtains from '../../images/4.png';
-import Sofa from '../../images/4.png';
-import House from '../../images/4.png';
+import Laundry from '../../images/laundry.png';
+import Curtains from '../../images/curtins.png';
+import Sofa from '../../images/sofa.png';
+import House from '../../images/house.png';
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -148,9 +148,10 @@ export default function LaundryForm() {
       <div style={{ maxWidth: 900, margin: '0 auto' }}>
         {/* Personal Details */}
         <Card
-          title={<span><UserOutlined /> Personal Details</span>}
+          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
+          <UserOutlined /> Personal Details</span>}
           size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
+          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
         >
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
@@ -198,9 +199,10 @@ export default function LaundryForm() {
 
         {/* Service Type */}
         <Card
-          title={<span><ProfileOutlined /> Service Type</span>}
+          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
+            <ProfileOutlined /> Service Type</span>}
           size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
+          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 20 }}>
             {services.map((service, index) => {
@@ -230,7 +232,7 @@ export default function LaundryForm() {
                   onMouseEnter={e => e.currentTarget.style.border = '2px solid #6c2bd9'}
                   onMouseLeave={e => e.currentTarget.style.border = isSelected ? '2px solid #6c2bd9' : '1px solid #ccc'}
                 >
-                  <img src={service.img} alt={service.name} style={{ width: 60, height: 60, marginBottom: 10 }} />
+                  <img src={service.img} alt={service.name} style={{ width: 75, height: 75, marginBottom: 10 }} />
                   <div>{service.name}</div>
                 </div>
               );
@@ -240,9 +242,10 @@ export default function LaundryForm() {
 
         {/* Order Details */}
         <Card
-          title={<span><ShoppingCartOutlined /> Order Details</span>}
+          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
+          <ShoppingCartOutlined /> Order Details</span>}
           size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
+          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
         >
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
@@ -298,9 +301,10 @@ export default function LaundryForm() {
 
         {/* Pickup Details */}
         <Card
-          title={<span><CarOutlined /> Pickup Details</span>}
+          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
+          <CarOutlined /> Pickup Details</span>}
           size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
+          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
         >
           <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
@@ -330,6 +334,7 @@ export default function LaundryForm() {
               <Card
                 title={<span style={{ fontWeight: 'bold', color: '#6c2bd9' }}>Delivery Person</span>}
                 size="small"
+                style={{padding:"20px"}}
               >
                 <Title level={5}>Pickup Person Name</Title>
                 <Input

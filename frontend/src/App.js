@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/forgotpassword";
 import Invoice from './pages/orders/AddOrder';
 import ViewOrders from './pages/orders/ViewOrders';
 import Signup from './pages/SignupInitial';
+import Profile from './pages/profile/profile';
 
 // mock
 import Mos from './mock/EmployeeSignup';
@@ -70,6 +71,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ViewOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/prof"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

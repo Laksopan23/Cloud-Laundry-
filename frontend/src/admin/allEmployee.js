@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, message } from 'antd';
 import axios from 'axios';
+import Layout from '../components/Layout'
+
 
 const EmployeesList = () => {
   const [employees, setEmployees] = useState([]);
@@ -51,6 +53,8 @@ const EmployeesList = () => {
   ];
 
   return (
+        <Layout>
+
     <div style={{
       padding: '20px',
       maxWidth: '1200px',
@@ -101,6 +105,8 @@ const EmployeesList = () => {
         }}
       />
     </div>
+        </Layout>
+    
   );
 };
 
