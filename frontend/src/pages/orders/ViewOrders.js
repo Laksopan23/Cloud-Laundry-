@@ -8,6 +8,7 @@ import {
   Button,
   Space,
   Select,
+  Modal,
 } from 'antd';
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -20,6 +21,8 @@ const { Option } = Select;
 export default function AllOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const role = localStorage.getItem('role');
   const isAdmin = role === 'admin';
@@ -43,8 +46,8 @@ export default function AllOrders() {
 
   // Handle view
   const handleView = (record) => {
-    message.info(`Viewing order ${record.invoiceNumber}`);
-    // Implement modal or page view if needed
+    setSelectedOrder(record);
+    setViewModalVisible(true);
   };
 
   // Handle PDF download
@@ -146,6 +149,58 @@ export default function AllOrders() {
       },
     },
     {
+      title: 'Payment',
+      dataIndex: 'paymentStatus',
+      key: 'paymentStatus',
+      render: (status, record) => {
+        const colorMap = {
+          'not paid': '#faad14',
+          paid: '#52c41a',
+          refunded: '#1890ff',
+        };
+
+        return isAdmin ? (
+          <Select
+            value={status}
+            onChange={(value) =>
+              axios
+                .put(`http://localhost:5000/api/orders/${record._id}`, {
+                  paymentStatus: value,
+                })
+                .then(() => {
+                  message.success(`Payment status updated to ${value}`);
+                  fetchOrders();
+                })
+                .catch(() => {
+                  message.error('Failed to update payment status');
+                })
+            }
+            style={{
+              width: 130,
+              color: colorMap[status],
+              borderColor: colorMap[status],
+            }}
+          >
+            <Option value="not paid">Not Paid</Option>
+            <Option value="paid">Paid</Option>
+            <Option value="refunded">Refunded</Option>
+          </Select>
+        ) : (
+          <Button
+            style={{
+              color: colorMap[status],
+              borderColor: colorMap[status],
+              borderRadius: 4,
+              padding: '0 10px',
+            }}
+            disabled
+          >
+            {status}
+          </Button>
+        );
+      },
+    },
+    {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
@@ -177,6 +232,31 @@ export default function AllOrders() {
             />
           )}
         </Card>
+
+        {/* Modal for viewing order details */}
+        <Modal
+          title={`Order Details - ${selectedOrder?.invoiceNumber}`}
+          open={viewModalVisible}
+          onCancel={() => setViewModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setViewModalVisible(false)}>
+              Close
+            </Button>,
+          ]}
+        >
+          {selectedOrder && (
+            <div>
+              <p><strong>Customer:</strong> {selectedOrder.customerName}</p>
+              <p><strong>Phone:</strong> {selectedOrder.customerPhone}</p>
+              <p><strong>Service:</strong> {selectedOrder.selectedService}</p>
+              <p><strong>Date:</strong> {dayjs(selectedOrder.date).format('YYYY-MM-DD')}</p>
+              <p><strong>Delivery:</strong> {dayjs(selectedOrder.expectedDeliveryDate).format('YYYY-MM-DD')}</p>
+              <p><strong>Status:</strong> {selectedOrder.status}</p>
+              <p><strong>Payment Status:</strong> {selectedOrder.paymentStatus}</p>
+              {/* Add more details here if needed */}
+            </div>
+          )}
+        </Modal>
       </div>
     </Layout>
   );

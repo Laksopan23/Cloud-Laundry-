@@ -51,13 +51,16 @@ exports.getOrders = async (req, res) => {
 
 
 
-// Update Order Status
-exports.updateOrderStatus = async (req, res) => {
+// Update Order Fields (Status & Payment Status)
+exports.updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const updateFields = {};
 
-    const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+    if (req.body.status) updateFields.status = req.body.status;
+    if (req.body.paymentStatus) updateFields.paymentStatus = req.body.paymentStatus;
+
+    const order = await Order.findByIdAndUpdate(id, updateFields, { new: true });
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -65,6 +68,6 @@ exports.updateOrderStatus = async (req, res) => {
 
     res.status(200).json(order);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update order status', error });
+    res.status(500).json({ message: 'Failed to update order', error });
   }
 };

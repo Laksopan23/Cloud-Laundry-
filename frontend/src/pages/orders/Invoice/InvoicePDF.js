@@ -1,7 +1,11 @@
 import html2pdf from 'html2pdf.js';
 import dayjs from 'dayjs';
 import logo from '../../../images/logo.png';
+
 import laundry from '../../../images/laundry.png';
+import Curtains from '../../../images/curtins.png';
+import Sofa from '../../../images/sofa.png';
+import House from '../../../images/house.png';
 
 export const generateInvoicePDF = (record) => {
   const invoiceHTML = `
@@ -11,12 +15,10 @@ export const generateInvoicePDF = (record) => {
       <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 24px;">
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div style="display: flex; align-items: center;">
-            <img src="${logo}" alt="Logo" style="height: 60px; margin-right: 12px;" />
-            <div>
-              <span style="font-size: 13px; color: #5628C3; font-weight: 600;">Cloud Laundry.lk</span>
-            </div>
+          <div style="flex: 1; position: relative;">
+            <img src="${logo}" alt="Logo" style="height: 150px; object-fit: contain; position: absolute; top: 0; left: 0;" />
           </div>
+
           <div style="text-align: right;">
             <h1 style="color: #5628C3; margin: 0; font-size: 24px; font-weight: 700;">CLOUD LAUNDRY.LK</h1>
             <p style="margin: 0; font-size: 13px;">504 weliwita Rd, Malabe</p>
@@ -38,7 +40,24 @@ export const generateInvoicePDF = (record) => {
             <div style="font-size: 13px;">${record.Addressline1}</div>
             <div style="font-size: 13px;">${record.Addressline2}</div>
           </div>
-          <img src="${laundry}" alt="Bucket" style="height: 80px; margin-left: 24px;" />
+            ${(() => {
+              let serviceImage = null;
+              switch (record.selectedService) {
+                case 'Curtains Cleaning':
+                  serviceImage = Curtains;
+                  break;
+                case 'Sofa, Carpet & Interior Cleaning':
+                  serviceImage = Sofa;
+                  break;
+                case 'House Deep Cleaning':
+                  serviceImage = House;
+                  break;
+                case 'Laundry':
+                default:
+                  serviceImage = laundry;
+              }
+              return `<img src="${serviceImage}" alt="${record.selectedService}" style="height: 150px; margin-left: 24px;" />`;
+            })()}
         </div>
 
         <!-- Table -->

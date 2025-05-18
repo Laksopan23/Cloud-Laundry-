@@ -25,6 +25,7 @@ const orderSchema = new mongoose.Schema({
   employee: { type: String },
   items: [itemSchema], // ⬅️ Add this line
   total: { type: Number },
+  paymentStatus: {type: String, required: true, default: 'not paid'}
 
 
 }, {
