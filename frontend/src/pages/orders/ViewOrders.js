@@ -9,7 +9,9 @@ import {
   Space,
   Select,
   Modal,
+  Descriptions, Divider
 } from 'antd';
+import { DownloadOutlined, EyeOutlined  } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
@@ -181,8 +183,8 @@ export default function AllOrders() {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button onClick={() => handleView(record)}>View</Button>
-          <Button onClick={() => handleDownload(record)}>Download</Button>
+          <Button onClick={() => handleView(record)}><EyeOutlined /></Button>
+          <Button onClick={() => handleDownload(record)}><DownloadOutlined/></Button>
         </Space>
       ),
     },
@@ -340,28 +342,116 @@ export default function AllOrders() {
           )}
         </Card>
 
-        <Modal
-          title={`Order Details - ${selectedOrder?.invoiceNumber}`}
-          open={viewModalVisible}
-          onCancel={() => setViewModalVisible(false)}
-          footer={[
-            <Button key="close" onClick={() => setViewModalVisible(false)}>
-              Close
-            </Button>,
+<Modal
+  title={
+    <div style={{ color: '#5e208e' }}>
+      Order Details - {selectedOrder?.invoiceNumber}
+    </div>
+  }
+  open={viewModalVisible}
+  onCancel={() => setViewModalVisible(false)}
+  footer={[
+    <Button key="close" onClick={() => setViewModalVisible(false)}>
+      Close
+    </Button>,
+  ]}
+  bodyStyle={{ backgroundColor: '#f0f2f5' }}
+    width={800} // Add this line to increase width
+
+>
+  {selectedOrder && (
+    <div>
+      <Descriptions
+        column={1}
+        bordered
+        size="small"
+        labelStyle={{ backgroundColor: '#d4beff', color: '#5e208e', fontWeight: 600 }}
+        contentStyle={{ backgroundColor: '#fff' }}
+      >
+        <Descriptions.Item label="Customer Name">
+          {selectedOrder.customerName}
+        </Descriptions.Item>
+        <Descriptions.Item label="Phone">
+          {selectedOrder.customerPhone}
+        </Descriptions.Item>
+        <Descriptions.Item label="Service">
+          {selectedOrder.selectedService}
+        </Descriptions.Item>
+        <Descriptions.Item label="Date">
+          {dayjs(selectedOrder.date).format('YYYY-MM-DD')}
+        </Descriptions.Item>
+        <Descriptions.Item label="Delivery Date">
+          {dayjs(selectedOrder.expectedDeliveryDate).format('YYYY-MM-DD')}
+        </Descriptions.Item>
+        <Descriptions.Item label="Time">
+          {selectedOrder.time}
+        </Descriptions.Item>
+        <Descriptions.Item label="Pickup Fee">
+          Rs.{selectedOrder.pickupFee}
+        </Descriptions.Item>
+        <Descriptions.Item label="Pickup Discount">
+          Rs.{selectedOrder.pickupDiscount}
+        </Descriptions.Item>
+        <Descriptions.Item label="Status">
+          {selectedOrder.status}
+        </Descriptions.Item>
+        <Descriptions.Item label="Payment Status">
+          {selectedOrder.paymentStatus}
+        </Descriptions.Item>
+        <Descriptions.Item label="Address Line 1">
+          {selectedOrder.Addressline1}
+        </Descriptions.Item>
+        <Descriptions.Item label="Address Line 2">
+          {selectedOrder.Addressline2}
+        </Descriptions.Item>
+        <Descriptions.Item label="Pickup Person Name">
+          {selectedOrder.pickupPersonName}
+        </Descriptions.Item>
+        <Descriptions.Item label="Pickup Person Phone">
+          {selectedOrder.pickupPersonPhone}
+        </Descriptions.Item>
+        <Descriptions.Item label="Employee">
+          {selectedOrder.employee || 'N/A'}
+        </Descriptions.Item>
+        <Descriptions.Item label="Note">
+          {selectedOrder.note || 'None'}
+        </Descriptions.Item>
+      </Descriptions>
+
+      <Divider style={{ borderColor: '#5e208e' }}>Items</Divider>
+
+      {selectedOrder.items?.length > 0 ? (
+        <Table
+          dataSource={selectedOrder.items}
+          rowKey={(item, index) => index}
+          pagination={false}
+          size="small"
+          bordered
+          style={{ marginTop: 16 }}
+          columns={[
+            { title: 'Item Name', dataIndex: 'itemName', key: 'itemName' },
+            { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
+            { title: 'Unit Price ', dataIndex: 'price', key: 'price' },
+            {
+              title: 'Total Price',
+              key: 'totalPrice',
+               render: (_, record) => `Rs.${record.quantity * record.price}`,
+             },          
           ]}
-        >
-          {selectedOrder && (
-            <div>
-              <p><strong>Customer:</strong> {selectedOrder.customerName}</p>
-              <p><strong>Phone:</strong> {selectedOrder.customerPhone}</p>
-              <p><strong>Service:</strong> {selectedOrder.selectedService}</p>
-              <p><strong>Date:</strong> {dayjs(selectedOrder.date).format('YYYY-MM-DD')}</p>
-              <p><strong>Delivery:</strong> {dayjs(selectedOrder.expectedDeliveryDate).format('YYYY-MM-DD')}</p>
-              <p><strong>Status:</strong> {selectedOrder.status}</p>
-              <p><strong>Payment Status:</strong> {selectedOrder.paymentStatus}</p>
-            </div>
-          )}
-        </Modal>
+        />
+      ) : (
+        <p style={{ marginTop: 16 }}>No items found.</p>
+      )}
+
+      <Divider style={{ borderColor: '#5e208e' }} />
+      <p style={{ textAlign: 'right', fontWeight: 600, color: '#5e208e' }}>
+        Total: Rs.{selectedOrder.total}
+      </p>
+    </div>
+  )}
+</Modal>
+
+
       </div>
     </Layout>
   );

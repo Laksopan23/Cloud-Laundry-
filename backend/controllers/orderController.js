@@ -29,15 +29,33 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: 'Items are required and must be a non-empty array' });
     }
 
+    // Generate unique invoice number
     const invoiceNumber = await getUniqueInvoiceNumber();
-    const order = new Order({ ...req.body, invoiceNumber });
 
+    // Calculate total
+    const total = req.body.items.reduce((acc, item) => {
+      const itemTotal = (item.price || 0) * (item.quantity || 0);
+      return acc + itemTotal;
+    }, 0);
+
+    // Prepare order data with calculated total and invoice number
+    const orderData = {
+      ...req.body,
+      invoiceNumber,
+      total
+    };
+
+    const order = new Order(orderData);
     await order.save();
+
     res.status(201).json(order);
+
   } catch (error) {
+    console.error('Error creating order:', error);
     res.status(500).json({ message: 'Failed to create order', error });
   }
 };
+
 
 // Get All Orders
 exports.getOrders = async (req, res) => {

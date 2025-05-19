@@ -30,9 +30,7 @@ const SiderItems = [
   { key: "/", icon: <HomeOutlined />, label: "Dashboard" },
   { key: "/invoice", icon: <FileTextOutlined />, label: "Invoice" },
   { key: "/orders", icon: <ShoppingCartOutlined />, label: "Orders" },
-  { key: "/timer", icon: <ClockCircleOutlined />, label: "Cart" },
-  { key: "/add-product", icon: <PlusSquareOutlined />, label: "Add Products" },
-  { key: "/add", icon: <LayoutOutlined />, label: "Home Layouts" },
+
 ];
 
 const adminItems = [
