@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 // Generate JWT
 const generateToken = (user) => {
   return jwt.sign({ id: user._id, role: user.role, employeeId: user.employeeId }, process.env.JWT_SECRET, {
-    expiresIn: '1d',
+    expiresIn: '1h',
   });
 };
 
@@ -129,5 +129,32 @@ exports.getEmployeeByUsername = async (req, res) => {
   } catch (err) {
     console.error('Error fetching employee:', err);
     res.status(500).json({ message: 'Server error while fetching employee' });
+  }
+};
+
+// Update Employee Profile (excluding restricted fields)
+exports.updateEmployeeProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const updateData = { ...req.body };
+
+    // Fields not allowed to update
+    const restrictedFields = ['username', 'email', 'name', 'employeeId', 'role'];
+    restrictedFields.forEach(field => delete updateData[field]);
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { username },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.status(200).json({ message: 'Profile updated successfully', employee: updatedEmployee });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ message: 'Server error while updating profile' });
   }
 };

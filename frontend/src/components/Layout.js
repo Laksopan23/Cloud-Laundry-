@@ -27,19 +27,17 @@ const { Header, Content, Footer, Sider } = Layout;
 const { useBreakpoint } = Grid;
 
 const SiderItems = [
-  { key: "dashboard", icon: <HomeOutlined />, label: "Dashboard" },
-  { key: "invoice", icon: <FileTextOutlined />, label: "Invoice" },
-  { key: "orders", icon: <ShoppingCartOutlined />, label: "Orders" },
-  { key: "timer", icon: <ClockCircleOutlined />, label: "Cart" },
-  { key: "addpro", icon: <PlusSquareOutlined />, label: "Add Products" },
-  { key: "addLay", icon: <LayoutOutlined />, label: "Home Layouts" },
+  { key: "/", icon: <HomeOutlined />, label: "Dashboard" },
+  { key: "/invoice", icon: <FileTextOutlined />, label: "Invoice" },
+  { key: "/orders", icon: <ShoppingCartOutlined />, label: "Orders" },
+
 ];
 
 const adminItems = [
-  { key: "dashboard", icon: <HomeOutlined />, label: "Dashboard" },
-  { key: "invoice", icon: <FileTextOutlined />, label: "Invoice" },
-  { key: "orders", icon: <ShoppingCartOutlined />, label: "Orders" },
-  { key: "allEmp", icon: <TeamOutlined />, label: "All Employees" },
+  { key: "/", icon: <HomeOutlined />, label: "Dashboard" },
+  { key: "/invoice", icon: <FileTextOutlined />, label: "Invoice" },
+  { key: "/orders", icon: <ShoppingCartOutlined />, label: "Orders" },
+  { key: "/all", icon: <TeamOutlined />, label: "All Employees" },
 ];
 
 const headerIteam = [
@@ -47,8 +45,8 @@ const headerIteam = [
   { key: "2", text: "Logout", icon: <LogoutOutlined /> },
 ];
 
-const shoutableBgColor = "#ff4d4f"; // bright red
-const shoutableHoverColor = "#ffa39e"; // light red/pink
+const shoutableBgColor = "#5e208e";
+const shoutableHoverColor = "#d4beff";
 
 const App = ({ children }) => {
   const navigate = useNavigate();
@@ -87,226 +85,205 @@ const App = ({ children }) => {
   };
 
   const handleMenuClick = (item) => {
-    switch (item.key) {
-      case "dashboard":
-        navigate("/");
-        break;
-      case "invoice":
-        navigate("/invoice");
-        break;
-      case "orders":
-        navigate("/orders");
-        break;
-      case "timer":
-        navigate("/timer");
-        break;
-      case "addpro":
-        navigate("/add-product");
-        break;
-      case "addLay":
-        navigate("/add");
-        break;
-      case "allEmp":
-        navigate("/all");
-        break;
-      default:
-        break;
-    }
+    navigate(item.key);
   };
 
-  // Custom style for Menu items to add shoutable background and hover colors
   const menuItemStyle = {
     margin: "6px 12px",
     borderRadius: 6,
   };
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      {/* Desktop Sidebar */}
-      {!isMobile && (
-        <Sider
-          collapsible
-          collapsed={collapsed}
-          onCollapse={setCollapsed}
-          width={225}
-          collapsedWidth={0}
-          style={{
-            backgroundColor: "#fff",
-            overflow: "hidden",
-            position: "fixed",
-            height: "100vh",
-            left: 0,
-            zIndex: 10,
-            boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div>
-            <img src={imageSrc} alt="Logo" style={{ width: "100%" }} />
-          </div>
-          <Menu
-            theme="light"
-            mode="inline"
-            items={menuItems}
-            onClick={handleMenuClick}
-            style={{ borderRight: 0 }}
-            // Use custom className to style items
-            // Override default ant design styles via CSS
-            // But here we use inline styles for each menu item via itemRender not available directly
-          >
-            {menuItems.map(({ key, icon, label }) => (
-              <Menu.Item
-                key={key}
-                icon={icon}
-                style={{
-                  ...menuItemStyle,
-                  backgroundColor:
-                    window.location.pathname.includes(key) ||
-                    (key === "dashboard" && window.location.pathname === "/")
-                      ? shoutableBgColor
-                      : "transparent",
-                  color:
-                    window.location.pathname.includes(key) ||
-                    (key === "dashboard" && window.location.pathname === "/")
-                      ? "#fff"
-                      : "inherit",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = shoutableHoverColor)
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    window.location.pathname.includes(key) ||
-                    (key === "dashboard" && window.location.pathname === "/")
-                      ? shoutableBgColor
-                      : "transparent")
-                }
-              >
-                {label}
-              </Menu.Item>
-            ))}
-          </Menu>
-        </Sider>
-      )}
-
-      {/* Mobile Drawer */}
-      {isMobile && (
-        <Drawer
-          title="Menu"
-          placement="left"
-          onClose={() => setShowDrawer(false)}
-          open={showDrawer}
-          bodyStyle={{ padding: 0 }}
-        >
-          <Menu
-            theme="light"
-            mode="inline"
-            items={menuItems}
-            onClick={(item) => {
-              handleMenuClick(item);
-              setShowDrawer(false);
+    <>
+      <style>
+        {`
+          .ant-layout-sider-trigger {
+            background-color:#5e208e !important;
+            color: #ffffff !important;
+          }
+          .ant-layout-sider-trigger:hover {
+            background-color: #d4beff !important;
+          }
+        `}
+      </style>
+      <Layout style={{ minHeight: "100vh" }}>
+        {!isMobile && (
+          <Sider
+            collapsible
+            collapsed={collapsed}
+            onCollapse={setCollapsed}
+            width={225}
+            collapsedWidth={80}
+            style={{
+              backgroundColor: "#fff",
+              overflow: "hidden",
+              position: "fixed",
+              height: "100vh",
+              left: 0,
+              zIndex: 10,
+              boxShadow: "2px 0 8px rgba(0,0,0,0.1)",
             }}
-            style={{ borderRight: 0 }}
           >
-            {menuItems.map(({ key, icon, label }) => (
-              <Menu.Item
-                key={key}
-                icon={icon}
-                style={{
-                  ...menuItemStyle,
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = shoutableHoverColor)
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "transparent")
-                }
-              >
-                {label}
-              </Menu.Item>
-            ))}
-          </Menu>
-        </Drawer>
-      )}
+            <div style={{ padding: "16px" }}>
+              <img src={imageSrc} alt="Logo" style={{ width: "100%" }} />
+            </div>
+            <Menu
+              theme="light"
+              mode="inline"
+              selectedKeys={[window.location.pathname]}
+              onClick={handleMenuClick}
+              style={{ borderRight: 0 }}
+            >
+              {menuItems.map(({ key, icon, label }) => (
+                <Menu.Item
+                  key={key}
+                  icon={icon}
+                  style={{
+                    ...menuItemStyle,
+                    backgroundColor:
+                      window.location.pathname === key
+                        ? shoutableBgColor
+                        : "transparent",
+                    color:
+                      window.location.pathname === key ? "#fff" : "inherit",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
+                    e.currentTarget.style.backgroundColor = shoutableHoverColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
+                    e.currentTarget.style.backgroundColor =
+                      window.location.pathname === key
+                        ? shoutableBgColor
+                        : "transparent";
+                  }}
+                >
+                  {label}
+                </Menu.Item>
+              ))}
+            </Menu>
+          </Sider>
+        )}
 
-      <Layout style={{ marginLeft: !isMobile ? (collapsed ? 80 : 225) : 0 }}>
-        <Header
-          style={{
-            position: "fixed",
-            top: 0,
-            left: !isMobile ? (collapsed ? 80 : 225) : 0,
-            width: !isMobile
-              ? `calc(100% - ${collapsed ? 80 : 225}px)`
-              : "100%",
-            height: "64px",
-            backgroundColor: isMobile ? "#ffffff" : "#5e208e",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "0 16px",
-            zIndex: 5,
-          }}
-        >
-          {/* Mobile Header */}
-          {isMobile ? (
-            <>
-              <Button
-                icon={<MenuOutlined />}
-                type="text"
-                onClick={() => setShowDrawer(true)}
-                style={{ position: "absolute", left: 16 }}
-              />
-              <img src={imageSrc} alt="Logo" style={{ height: "100px" }} />
-            </>
-          ) : (
+        {isMobile && (
+          <Drawer
+            title="Menu"
+            placement="left"
+            onClose={() => setShowDrawer(false)}
+            open={showDrawer}
+            bodyStyle={{ padding: 0 }}
+          >
+            <Menu
+              theme="light"
+              mode="inline"
+              selectedKeys={[window.location.pathname]}
+              onClick={(item) => {
+                handleMenuClick(item);
+                setShowDrawer(false);
+              }}
+              style={{ borderRight: 0 }}
+            >
+              {menuItems.map(({ key, icon, label }) => (
+                <Menu.Item
+                  key={key}
+                  icon={icon}
+                  style={menuItemStyle}
+                  onMouseEnter={(e) => {
+                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
+                    e.currentTarget.style.backgroundColor = shoutableHoverColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  {label}
+                </Menu.Item>
+              ))}
+            </Menu>
+          </Drawer>
+        )}
+
+        <Layout style={{ marginLeft: !isMobile ? (collapsed ? 80 : 225) : 0 }}>
+          <Header
+            style={{
+              position: "fixed",
+              top: 0,
+              left: !isMobile ? (collapsed ? 80 : 225) : 0,
+              width: !isMobile
+                ? `calc(100% - ${collapsed ? 80 : 225}px)`
+                : "100%",
+              height: "64px",
+              backgroundColor: isMobile ? "#ffffff" : "#5e208e",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 16px",
+              zIndex: 5,
+            }}
+          >
+            {isMobile ? (
+              <>
+                <Button
+                  icon={<MenuOutlined />}
+                  type="text"
+                  onClick={() => setShowDrawer(true)}
+                  style={{ position: "absolute", left: 16 }}
+                />
+                <img src={imageSrc} alt="Logo" style={{ height: "100px" }} />
+              </>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  marginLeft: "auto",
+                }}
+              >
+                {headerIteam.map((item) => (
+                  <Button
+                    key={item.key}
+                    type="text"
+                    icon={item.icon}
+                    style={{ color: "white", fontSize: "18px" }}
+                    onClick={() => handleHeaderClick(item.key)}
+                  >
+                    {item.text}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </Header>
+
+          <Content
+            style={{
+              marginTop: 64,
+              padding: 24,
+            }}
+          >
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginLeft: "auto",
+                padding: 0,
+                minHeight: 360,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
               }}
             >
-              {headerIteam.map((item) => (
-                <Button
-                  key={item.key}
-                  type="text"
-                  icon={item.icon}
-                  style={{ color: "white", fontSize: "18px" }}
-                  onClick={() => handleHeaderClick(item.key)}
-                >
-                  {item.text}
-                </Button>
-              ))}
+              {isBackTopVisible && (
+                <FloatButton.Group shape="circle" style={{ right: 24 }}>
+                  <FloatButton.BackTop visibilityHeight={0} />
+                </FloatButton.Group>
+              )}
+              {children}
             </div>
-          )}
-        </Header>
+          </Content>
 
-        <Content
-          style={{
-            marginTop: 64,
-            padding: 24,
-          }}
-        >
-          <div
-            style={{
-              padding: 0,
-              minHeight: 360,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            {isBackTopVisible && (
-              <FloatButton.Group shape="circle" style={{ right: 24 }}>
-                <FloatButton.BackTop visibilityHeight={0} />
-              </FloatButton.Group>
-            )}
-            {children}
-          </div>
-        </Content>
-
-        <Footer style={{ textAlign: "center" }} />
+          <Footer style={{ textAlign: "center" }} />
+        </Layout>
       </Layout>
-    </Layout>
+    </>
   );
 };
 

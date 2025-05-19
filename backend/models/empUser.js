@@ -9,27 +9,46 @@ const generateEmployeeId = async () => {
   while (!isUnique) {
     const randomNum = Math.floor(1000 + Math.random() * 9000); // Generate 4-digit number
     employeeId = `EM${randomNum}`;
-    
-    // Check if ID already exists
     const existingEmployee = await mongoose.model('Employee').findOne({ employeeId });
-    if (!existingEmployee) {
-      isUnique = true;
-    }
+    if (!existingEmployee) isUnique = true;
   }
 
   return employeeId;
 };
 
 const employeeSchema = new mongoose.Schema({
-  employeeId: { 
-    type: String, 
-    required: true, 
-    unique: true
-  },
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  username: { type: String, required: true, unique: true },
+  // Basic Information
+  employeeId: { type: String, required: true, unique: true },
+  name: { type: String, required: true }, // Full Name
+  email: { type: String, required: true, unique: true }, // Also used for login
+  phone: { type: String }, // Phone Number
+  dateOfBirth: { type: Date },
+  gender: { type: String, enum: ['Male', 'Female', 'Other'] },
+
+  // Identity & Verification
+  nationalId: { type: String }, // Aadhar/SSN/National ID
+  //profilePhoto: { type: String }, // URL to photo
+
+  // Employment Details
+  //jobTitle: { type: String }, // e.g., Pickup Agent, Manager
+  employmentType: { type: String, enum: ['Full-time', 'Part-time', 'Contract'] },
+  startDate: { type: Date },
+
+  // Contact & Address
+  currentAddress: { type: String },
+  emergencyContactName: { type: String },
+  emergencyContactNumber: { type: String },
+  emergencyContactRelation: { type: String },
+
+  // Login Credentials
+  username: { type: String, unique: true, sparse: true }, // Optional if email is used
   password: { type: String, required: true },
+
+  // Banking & Payment
+  bankName: { type: String },
+  accountNumber: { type: String },
+
+  // Role
   role: { type: String, enum: ['admin', 'employee'], default: 'employee' }
 });
 
@@ -45,7 +64,7 @@ employeeSchema.methods.comparePassword = function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-// Export the model and generateEmployeeId function
+// Export the model and generator
 module.exports = {
   Employee: mongoose.model('Employee', employeeSchema),
   generateEmployeeId

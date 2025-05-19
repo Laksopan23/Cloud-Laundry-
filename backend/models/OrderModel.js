@@ -26,8 +26,6 @@ const orderSchema = new mongoose.Schema({
   items: [itemSchema], // ⬅️ Add this line
   total: { type: Number },
   paymentStatus: {type: String, required: true, default: 'not paid'}
-
-
 }, {
   timestamps: true
 });
