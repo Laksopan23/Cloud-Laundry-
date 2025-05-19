@@ -113,7 +113,7 @@ const EmployeeSignup = () => {
     <div className="container">
       <div className="form-section">
         <img src={logo} alt="Cloud Laundry.lk" className="logo" />
-        <h1 className="title">EMPLOYEE SIGNUP</h1>
+        <h1 className="title">GET STARTED NOW</h1>
 
         <div className="form-box">
           <form onSubmit={handleSubmit}>

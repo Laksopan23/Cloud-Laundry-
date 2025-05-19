@@ -56,7 +56,7 @@ const EmployeeLogin = () => {
         maxWidth: '400px'
       }}>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '24px' }}>
-          Employee Login
+           Login
         </Title>
         <Form onFinish={handleLogin}>
           <Form.Item
