@@ -84,9 +84,18 @@ const App = ({ children }) => {
     else if (key === "2") logout();
   };
 
-  const handleMenuClick = (item) => {
+const handleMenuClick = (item) => {
+  if (item.key === "/") {
+    if (userRole === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  } else {
     navigate(item.key);
-  };
+  }
+};
+
 
   const menuItemStyle = {
     margin: "6px 12px",

@@ -15,7 +15,7 @@ import Mol from './mock/EmployeeLogin';
 
 //Admin
 import AllEmp from './admin/allEmployee';
-import AdminDashboard from './admin/Dashboard';
+import AdminDashboard from './admin/AdminDashboard';
 
 
 function App() {
@@ -51,10 +51,10 @@ function App() {
           }
         />
         <Route
-          path="/dash"
+          path="/admin"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

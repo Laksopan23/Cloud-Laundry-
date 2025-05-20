@@ -58,31 +58,31 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     {
       value: 'Dry cleaning and pressing',
       label: 'Dry cleaning and pressing',
-      price: 500,
+      price: 0,
       description: 'Professional dry cleaning and pressing for curtains',
     },
     {
       value: 'Laundry and pressing',
       label: 'Laundry and pressing',
-      price: 400,
+      price: 0,
       description: 'Laundry and pressing service for washable curtains',
     },
     {
       value: 'Curtain Premium service package',
       label: 'Curtain Premium service package',
-      price: 1000,
+      price: 0,
       description: 'Comprehensive cleaning, pressing, and care for premium curtains',
     },
     {
       value: 'Curtain Removal',
       label: 'Curtain Removal',
-      price: 200,
+      price: 0,
       description: 'Professional removal of curtains for cleaning or replacement',
     },
     {
       value: 'Curtain Installation',
       label: 'Curtain Installation',
-      price: 200,
+      price: 0,
       description: 'Professional installation of curtains after cleaning or replacement',
     },
   ];
@@ -91,25 +91,25 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     {
       value: 'Shampoo Vacuum cleaning',
       label: 'Shampoo Vacuum cleaning',
-      price: 800,
+      price: 0,
       description: 'Deep shampoo and vacuum cleaning for upholstery and carpets',
     },
     {
       value: 'Sofa',
       label: 'Sofa Cleaning',
-      price: 1000,
+      price: 0,
       description: 'Professional cleaning for sofas, including stain removal',
     },
     {
       value: 'Mattress Cleaning with Steam',
       label: 'Mattress Cleaning with Steam',
-      price: 1200,
+      price: 0,
       description: 'Steam cleaning for mattresses to remove dirt and allergens',
     },
     {
       value: 'Carpet Cleaning',
       label: 'Carpet Cleaning',
-      price: 900,
+      price: 0,
       description: 'Deep cleaning for carpets, including stain and odor removal',
     },
   ];
@@ -118,31 +118,31 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     {
       value: 'House deep cleaning',
       label: 'House deep cleaning',
-      price: 5000,
+      price: 0,
       description: 'Comprehensive deep cleaning for the entire house',
     },
     {
       value: 'General Cleaning',
       label: 'General Cleaning',
-      price: 2000,
+      price: 0,
       description: 'Standard cleaning for homes, including dusting and vacuuming',
     },
     {
       value: 'Commercial Cleaning',
       label: 'Commercial Cleaning',
-      price: 8000,
+      price: 0,
       description: 'Deep cleaning services for commercial spaces',
     },
     {
       value: 'Floor Cleaning',
       label: 'Floor Cleaning',
-      price: 1500,
+      price: 0,
       description: 'Specialized cleaning for all types of flooring',
     },
     {
       value: 'Floor - Cut and Polish',
       label: 'Floor - Cut and Polish',
-      price: 2500,
+      price: 0,
       description: 'Floor cutting and polishing for a shiny, restored finish',
     },
   ];
