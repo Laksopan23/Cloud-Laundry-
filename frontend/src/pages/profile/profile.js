@@ -10,6 +10,10 @@ import {
   Input,
   message,
   Space,
+  Upload,
+  Avatar,
+  Row,
+  Col,
 } from 'antd';
 import {
   EditOutlined,
@@ -19,6 +23,7 @@ import {
   IdcardOutlined,
   HomeOutlined,
   BankOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
 import Layout from '../../components/Layout';
@@ -29,6 +34,7 @@ const ProfilePage = () => {
   const [form] = Form.useForm();
   const [error, setError] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState(null);
 
   useEffect(() => {
     const username = localStorage.getItem('username');
@@ -38,6 +44,7 @@ const ProfilePage = () => {
         const res = await axios.get(`http://localhost:5000/api/employees/profile/${username}`);
         setEmployee(res.data);
         form.setFieldsValue(res.data);
+        setPhotoUrl(res.data.photoUrl);
       } catch (err) {
         setError(err.response?.data?.message || 'Error loading profile');
       } finally {
@@ -66,59 +73,60 @@ const ProfilePage = () => {
     }
   };
 
+  const handlePhotoUpload = (info) => {
+    if (info.file.status === 'done') {
+      const imageUrl = URL.createObjectURL(info.file.originFileObj);
+      setPhotoUrl(imageUrl);
+      message.success('Photo uploaded!');
+      // Optionally send to backend
+    }
+  };
+
   if (loading) return <Spin style={{ display: 'block', margin: '100px auto' }} />;
   if (error) return <Alert message={error} type="error" style={{ margin: 20 }} />;
 
   return (
     <Layout>
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
+      <div style={{ padding: 40 }}>
         <Card
-          title={
-            <Space>
-              <UserOutlined />
-              Employee Profile
-            </Space>
-          }
-          style={{
-            width: 600,
-            borderRadius: 12,
-            boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
-          }}
-          extra={
-            <Button icon={<EditOutlined />} onClick={() => setDrawerVisible(true)}>
-              Edit
-            </Button>
-          }
+          style={{ borderRadius: 12, boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
+          bodyStyle={{ padding: 30 }}
+          title={<Space><UserOutlined /> Employee Profile</Space>}
+          extra={<Button icon={<EditOutlined />} onClick={() => setDrawerVisible(true)}>Edit</Button>}
         >
-          <Descriptions bordered column={1} size="middle">
-            <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
-            <Descriptions.Item label="Email">
-              <MailOutlined /> {employee.email}
-            </Descriptions.Item>
-            <Descriptions.Item label="Username">{employee.username}</Descriptions.Item>
-            <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
-            <Descriptions.Item label="Role">{employee.role}</Descriptions.Item>
-            <Descriptions.Item label="Phone">
-              <PhoneOutlined /> {employee.phone}
-            </Descriptions.Item>
-            <Descriptions.Item label="DOB">{employee.dateOfBirth?.substring(0, 10)}</Descriptions.Item>
-            <Descriptions.Item label="Gender">{employee.gender}</Descriptions.Item>
-            <Descriptions.Item label="National ID">
-              <IdcardOutlined /> {employee.nationalId}
-            </Descriptions.Item>
-            <Descriptions.Item label="Employment Type">{employee.employmentType}</Descriptions.Item>
-            <Descriptions.Item label="Start Date">{employee.startDate?.substring(0, 10)}</Descriptions.Item>
-            <Descriptions.Item label="Address">
-              <HomeOutlined /> {employee.currentAddress}
-            </Descriptions.Item>
-            <Descriptions.Item label="Emergency Contact">
-              {employee.emergencyContactName} ({employee.emergencyContactRelation}) -{' '}
-              {employee.emergencyContactNumber}
-            </Descriptions.Item>
-            <Descriptions.Item label="Bank Info">
-              <BankOutlined /> {employee.bankName} - {employee.accountNumber}
-            </Descriptions.Item>
-          </Descriptions>
+          <Row gutter={32}>
+            <Col span={8} style={{ textAlign: 'center' }}>
+              <Avatar size={120} src={photoUrl} style={{ marginBottom: 16 }} />
+              <Upload
+                showUploadList={false}
+                customRequest={({ file, onSuccess }) => setTimeout(() => onSuccess('ok'), 0)}
+                onChange={handlePhotoUpload}
+              >
+                <Button icon={<UploadOutlined />}>Upload Photo</Button>
+              </Upload>
+            </Col>
+
+            <Col span={16}>
+              <Descriptions column={1} bordered size="middle">
+                <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
+                <Descriptions.Item label="Email"><MailOutlined /> {employee.email}</Descriptions.Item>
+                <Descriptions.Item label="Username">{employee.username}</Descriptions.Item>
+                <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
+                <Descriptions.Item label="Role">{employee.role}</Descriptions.Item>
+                <Descriptions.Item label="Phone"><PhoneOutlined /> {employee.phone}</Descriptions.Item>
+                <Descriptions.Item label="DOB">{employee.dateOfBirth?.substring(0, 10)}</Descriptions.Item>
+                <Descriptions.Item label="Gender">{employee.gender}</Descriptions.Item>
+                <Descriptions.Item label="National ID"><IdcardOutlined /> {employee.nationalId}</Descriptions.Item>
+                <Descriptions.Item label="Employment Type">{employee.employmentType}</Descriptions.Item>
+                <Descriptions.Item label="Start Date">{employee.startDate?.substring(0, 10)}</Descriptions.Item>
+                <Descriptions.Item label="Address"><HomeOutlined /> {employee.currentAddress}</Descriptions.Item>
+                <Descriptions.Item label="Emergency Contact">
+                  {employee.emergencyContactName} ({employee.emergencyContactRelation}) - {employee.emergencyContactNumber}
+                </Descriptions.Item>
+                <Descriptions.Item label="Bank Info"><BankOutlined /> {employee.bankName} - {employee.accountNumber}</Descriptions.Item>
+              </Descriptions>
+            </Col>
+          </Row>
         </Card>
       </div>
 
