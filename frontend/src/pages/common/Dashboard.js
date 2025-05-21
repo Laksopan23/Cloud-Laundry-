@@ -383,7 +383,7 @@ function getColor(name) {
       return '#00c853';
     case 'Sofa/Carpet/Mattress Cleaning':
       return '#b388ff';
-    case 'House Deep Cleaning':
+    case 'Domestic Cleaning':
       return '#ff9100';
     default:
       return '#7c4dff';

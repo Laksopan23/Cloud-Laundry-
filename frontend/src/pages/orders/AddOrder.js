@@ -140,7 +140,7 @@ export default function LaundryForm() {
     { name: 'Laundry', img: Laundry },
     { name: 'Curtains Cleaning', img: Curtains },
     { name: 'Sofa, Carpet & Interior Cleaning', img: Sofa },
-    { name: 'House Deep Cleaning', img: House }
+    { name: 'Domestic Cleaning', img: House }
   ];
 
   return (

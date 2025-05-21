@@ -107,7 +107,7 @@ export default function AllOrders() {
       render: (date) => dayjs(date).format('YYYY-MM-DD'),
     },
     {
-      title: 'Delivery',
+      title: 'Expected Delivery',
       dataIndex: 'expectedDeliveryDate',
       key: 'expectedDeliveryDate',
       render: (date) => dayjs(date).format('YYYY-MM-DD'),
