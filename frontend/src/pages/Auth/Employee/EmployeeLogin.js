@@ -28,7 +28,7 @@ const EmployeeLogin = () => {
       if (role === 'admin') {
         navigate('/admin');
       } else {
-        navigate('/');
+        navigate('/dash');
       }
     } catch (err) {
       alert('Login failed: ' + (err.response?.data?.message || err.message));
