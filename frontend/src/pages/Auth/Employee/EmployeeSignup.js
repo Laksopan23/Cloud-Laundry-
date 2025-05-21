@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import debounce from 'lodash.debounce'; // Optional: Use lodash.debounce
-import '../pages/styles/Signup.css';
-import logo from '../assets/logo.png';
-import googleIcon from '../assets/google-icon.png';
-import boyCharacter from '../assets/boy-character.png';
+import '../../styles/Signup.css';
+import logo from '../../../assets/logo.png';
+import googleIcon from '../../../assets/google-icon.png';
+import boyCharacter from '../../../assets/boy-character.png';
 
 const EmployeeSignup = () => {
   const [formData, setFormData] = useState({

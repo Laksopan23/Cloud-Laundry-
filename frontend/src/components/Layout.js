@@ -20,7 +20,7 @@ import {
   Drawer,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import useLogout from "../mock/logout";
+import useLogout from "../pages/Auth/logout";
 import imageSrc from "../images/logo.png";
 
 const { Header, Content, Footer, Sider } = Layout;

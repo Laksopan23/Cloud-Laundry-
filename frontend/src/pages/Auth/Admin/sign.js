@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Form, Input, Button, Select, Typography, Alert } from 'antd';
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const UserSignup = () => {
   const [formData, setFormData] = useState({
@@ -8,7 +12,7 @@ const UserSignup = () => {
     email: '',
     username: '',
     password: '',
-    role: 'employee',
+    role: 'admin',
     adminSecret: '',
   });
   const [error, setError] = useState('');
@@ -19,8 +23,12 @@ const UserSignup = () => {
     setError('');
   };
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+  const handleRoleChange = (value) => {
+    setFormData({ ...formData, role: value });
+    setError('');
+  };
+
+  const handleSignup = async () => {
     try {
       const payload = {
         name: formData.name,
@@ -30,7 +38,6 @@ const UserSignup = () => {
         role: formData.role,
       };
 
-      // Include adminSecret in headers if role is admin
       const headers = formData.role === 'admin' ? { 'x-admin-secret': formData.adminSecret } : {};
 
       const res = await axios.post(
@@ -51,109 +58,67 @@ const UserSignup = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSignup} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-4 text-center">User Signup</h2>
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Enter name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Enter email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-            Username
-          </label>
-          <input
-            type="text"
-            name="username"
-            id="username"
-            placeholder="Enter username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Enter password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-            Role
-          </label>
-          <select
-            name="role"
-            id="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        {formData.role === 'admin' && (
-          <div className="mb-4">
-            <label htmlFor="adminSecret" className="block text-sm font-medium text-gray-700">
-              Admin Secret
-            </label>
-            <input
-              type="password"
-              name="adminSecret"
-              id="adminSecret"
-              placeholder="Enter admin secret"
-              value={formData.adminSecret}
+    <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6' }}>
+      <div style={{ background: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 700 }}>
+        <Title level={2} style={{ textAlign: 'center', marginBottom: 24 }}>User Signup</Title>
+        {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+        <Form layout="vertical" onFinish={handleSignup}>
+          <Form.Item label="Name" required>
+            <Input
+              name="name"
+              placeholder="Enter name"
+              value={formData.name}
               onChange={handleChange}
-              required={formData.role === 'admin'}
-              className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-        )}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
-        >
-          Signup
-        </button>
-      </form>
+          </Form.Item>
+          <Form.Item label="Email" required>
+            <Input
+              name="email"
+              type="email"
+              placeholder="Enter email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </Form.Item>
+          <Form.Item label="Username" required>
+            <Input
+              name="username"
+              placeholder="Enter username"
+              value={formData.username}
+              onChange={handleChange}
+            />
+          </Form.Item>
+          <Form.Item label="Password" required>
+            <Input.Password
+              name="password"
+              placeholder="Enter password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+          </Form.Item>
+          <Form.Item label="Role" required>
+            <Select value={formData.role} onChange={handleRoleChange}>
+              <Option value="employee">Employee</Option>
+              <Option value="admin">Admin</Option>
+            </Select>
+          </Form.Item>
+          {formData.role === 'admin' && (
+            <Form.Item label="Admin Secret" required>
+              <Input.Password
+                name="adminSecret"
+                placeholder="Enter admin secret"
+                value={formData.adminSecret}
+                onChange={handleChange}
+              />
+            </Form.Item>
+          )}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Signup
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
     </div>
   );
 };
