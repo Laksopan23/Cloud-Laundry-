@@ -14,7 +14,7 @@ const useLogout = () => {
     alert('Logout successful');
 
     // Redirect to login page
-    navigate('/mol');
+    navigate('/');
   };
 
   return logout;
