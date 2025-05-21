@@ -70,6 +70,10 @@ const EmployeeLogin = () => {
               required
             />
 
+            <p className="forgot-password">
+              <Link to="/forgot-password">Forgot password?</Link>
+            </p>
+
             <div className="checkbox">
               <input type="checkbox" id="remember" />
               <label htmlFor="remember">Remember me</label>
