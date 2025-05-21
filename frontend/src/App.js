@@ -7,8 +7,6 @@ import Invoice from './pages/orders/AddOrder';
 import ViewOrders from './pages/orders/ViewOrders';
 
 import Profile from './pages/profile/profile';
-
-// mock
 import SignUp from './pages/Auth/Employee/EmployeeSignup';
 import Login from './pages/Auth/Employee/EmployeeLogin';
 
@@ -18,6 +16,9 @@ import AllEmp from './admin/allEmployee';
 import AdminDashboard from './admin/AdminDashboard';
 import AdminSignUp from './pages/Auth/Admin/sign';
 import AdminLogin from './pages/Auth/Admin/login';
+
+import Tail from './tail';
+
 
 function App() {
   // ProtectedRoute defined inside App.js
@@ -33,6 +34,9 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/pass" element={<ForgotPassword />} />
+
+        <Route path="/tail" element={<Tail />} />
+
 
 
         {/* Protected routes */}
