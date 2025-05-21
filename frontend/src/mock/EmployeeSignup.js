@@ -210,7 +210,7 @@ const EmployeeSignup = () => {
             </button>
 
             <p className="signin-text">
-              Have an account? <a href="#">Sign In</a>
+              Have an account? <a href="/">Sign In</a>
             </p>
           </form>
         </div>

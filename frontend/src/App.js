@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/forgotpassword";
 import Invoice from './pages/orders/AddOrder';
 import ViewOrders from './pages/orders/ViewOrders';
 import Signup from './pages/SignupInitial';
+import Signin from './pages/Signin';
 import Profile from './pages/profile/profile';
 
 // mock
@@ -29,10 +30,11 @@ function App() {
     <Router>
       <Routes>
         {/* Public routes */}
-        <Route path="/mol" element={<Mol />} />
+        <Route path="/" element={<Mol />} />
         <Route path="/mos" element={<Mos />} />
         <Route path="/pass" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/sign" element={<Signin />} />
 
 
         {/* Admin routes */}
@@ -43,7 +45,7 @@ function App() {
 
         {/* Protected routes */}
         <Route
-          path="/"
+          path="/dash"
           element={
             <ProtectedRoute>
               <Dashboard />
