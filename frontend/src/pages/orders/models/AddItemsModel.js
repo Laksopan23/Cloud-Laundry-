@@ -114,10 +114,10 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     },
   ];
 
-  const houseDeepCleaningOptions = [
+  const DomesticCleaningOptions = [
     {
-      value: 'House deep cleaning',
-      label: 'House deep cleaning',
+      value: 'Domestic Cleaning',
+      label: 'Domestic Cleaning',
       price: 0,
       description: 'Comprehensive deep cleaning for the entire house',
     },
@@ -151,7 +151,7 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     Laundry: laundryOptions,
     'Curtains Cleaning': curtainsCleaningOptions,
     'Sofa, Carpet & Interior Cleaning': sofaCarpetCleaningOptions,
-    'House Deep Cleaning': houseDeepCleaningOptions,
+    'Domestic Cleaning': DomesticCleaningOptions,
   };
 
   const handleFieldChange = (key, field, value) => {
@@ -281,7 +281,7 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
         ),
     },
     {
-      title: 'Qty',
+      title: 'Qty/Unit',
       dataIndex: 'qty',
       key: 'qty',
       width: 80,

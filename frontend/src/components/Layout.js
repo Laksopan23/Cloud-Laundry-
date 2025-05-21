@@ -89,7 +89,7 @@ const handleMenuClick = (item) => {
     if (userRole === "admin") {
       navigate("/admin");
     } else {
-      navigate("/");
+      navigate("/dash");
     }
   } else {
     navigate(item.key);

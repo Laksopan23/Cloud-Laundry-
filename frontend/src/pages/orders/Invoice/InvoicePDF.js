@@ -49,7 +49,7 @@ export const generateInvoicePDF = (record) => {
                 case 'Sofa, Carpet & Interior Cleaning':
                   serviceImage = Sofa;
                   break;
-                case 'House Deep Cleaning':
+                case 'Domestic Cleaning':
                   serviceImage = House;
                   break;
                 case 'Laundry':
@@ -122,11 +122,11 @@ export const generateInvoicePDF = (record) => {
           <div style="display: flex; border-top: 1px solid #bbb; border-bottom: 1px solid #bbb;">
             <div style="flex: 1; padding: 12px 8px; border-right: 1px solid #bbb;">
               <span style="color: #5628C3; font-weight: 700;">1. Bank Transfer</span><br/>
-              Account Name: Your Account Name<br/>
-              Account Number: Your Account Number<br/>
-              Bank Name: Bank Name<br/>
-              Branch: Branch Name, if needed<br/>
-              SWIFT/IFSC Code: If applicable
+              Account Name: CLOUD LAUNDRY.LK AND CLEANERS (PVT) LTD.<br/>
+              Account Number: 1000906392<br/>
+              Bank Name: Commercial Bank  <br/>
+              Branch:Malabe<br/>
+              
             </div>
             <div style="flex: 1; padding: 12px 8px;">
               <span style="color: #5628C3; font-weight: 700;">2. Cash Payment</span><br/>
