@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Typography, Space } from 'antd';
-
-const { Title } = Typography;
+import { useNavigate, Link } from 'react-router-dom';
+import '../../styles/Signup.css';
+import logo from '../../../assets/logo.png';
+import googleIcon from '../../../assets/google-icon.png';
+import boyCharacter from '../../../assets/boy-character.png';
 
 const EmployeeLogin = () => {
   const [credentials, setCredentials] = useState({
@@ -11,6 +12,7 @@ const EmployeeLogin = () => {
     password: ''
   });
 
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,6 +20,7 @@ const EmployeeLogin = () => {
   };
 
   const handleLogin = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/api/employees/login', credentials);
       const { username, role } = res.data;
@@ -28,90 +31,70 @@ const EmployeeLogin = () => {
       if (role === 'admin') {
         navigate('/admin');
       } else {
-        navigate('/dash');
+        navigate('/');
       }
     } catch (err) {
-      alert('Login failed: ' + (err.response?.data?.message || err.message));
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
-  const handleSignupNavigate = () => {
-    navigate('/mos');
-  };
-
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      background: '#f0f2f5'
-    }}>
-      <div style={{
-        background: '#fff',
-        padding: '40px',
-        borderRadius: '8px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: '400px'
-      }}>
-        <Title level={2} style={{ textAlign: 'center', marginBottom: '24px' }}>
-           Login
-        </Title>
-        <Form onFinish={handleLogin}>
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: 'Please input your username!' }]}
-          >
-            <Input
+    <div className="container">
+      <div className="form-section">
+        <img src={logo} alt="Cloud Laundry.lk" className="logo" />
+        <h1 className="title">SIGN IN TO YOUR ACCOUNT</h1>
+
+        <div className="form-box">
+          <form onSubmit={handleLogin}>
+            {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
+
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
               name="username"
-              placeholder="Username"
+              placeholder="Enter your username"
               value={credentials.username}
               onChange={handleChange}
-              style={{ height: '40px', fontSize: '16px' }}
+              required
             />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please input your password!' }]}
-          >
-            <Input.Password
+
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
               name="password"
-              placeholder="Password"
+              placeholder="Enter your password"
               value={credentials.password}
               onChange={handleChange}
-              style={{ height: '40px', fontSize: '16px' }}
+              required
             />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-              style={{
-                height: '40px',
-                fontSize: '16px',
-                background: '#1890ff',
-                borderColor: '#1890ff'
-              }}
-            >
-              Login
-            </Button>
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="link"
-              block
-              onClick={handleSignupNavigate}
-              style={{
-                fontSize: '16px',
-                color: '#1890ff'
-              }}
-            >
-              Don't have an account? Sign up
-            </Button>
-          </Form.Item>
-        </Form>
+
+            <div className="checkbox">
+              <input type="checkbox" id="remember" />
+              <label htmlFor="remember">Remember me</label>
+            </div>
+
+            <button type="submit" className="signin-btn">Sign In</button>
+
+            <div className="or-separator">
+              <hr /><span>OR</span><hr />
+            </div>
+
+            <button type="button" className="google-btn">
+              <img src={googleIcon} alt="Google Icon" />
+              Sign in with Google
+            </button>
+
+            <p className="signup-text">
+              Don't have an account? <Link to="/mos">Sign Up</Link>
+            </p>
+          </form>
+        </div>
+      </div>
+
+      <div className="image-section">
+        <img src={boyCharacter} alt="Boy" className="illustration" />
       </div>
     </div>
   );
