@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Typography, Alert } from 'antd';
-
-const { Title } = Typography;
 
 const UserLogin = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: '',
+  });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -15,7 +15,8 @@ const UserLogin = () => {
     setError('');
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post(`http://localhost:5000/api/users/login`, credentials);
       const { token, username, role } = res.data;
@@ -24,89 +25,58 @@ const UserLogin = () => {
       localStorage.setItem('username', username);
       localStorage.setItem('role', role);
 
-      navigate(role === 'admin' ? '/admin' : '/dash');
+      console.log('token', token)
+      console.log('username', username)
+      console.log('role', role)
+
+      navigate(role === 'admin' ? '/admin-dashboard' : '/employee-dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
     }
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f0f2f5',
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: '#ffffff',
-          padding: 24,
-          borderRadius: 8,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          width: '100%',
-          maxWidth: 400,
-        }}
-      >
-        <Title level={2} style={{ textAlign: 'center', marginBottom: 24 }}>
-          User Login
-        </Title>
-
-        {error && (
-          <Alert
-            message={error}
-            type="error"
-            showIcon
-            style={{ marginBottom: 16 }}
-          />
-        )}
-
-        <Form layout="vertical" onFinish={handleLogin}>
-          <Form.Item
-            label="Username"
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        <h2 className="text-2xl font-bold mb-4 text-center">User Login</h2>
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        <div className="mb-4">
+          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            Username
+          </label>
+          <input
+            type="text"
             name="username"
-            rules={[{ required: true, message: 'Please enter your username!' }]}
-          >
-            <Input
-              name="username"
-              placeholder="Enter username"
-              value={credentials.username}
-              onChange={handleChange}
-              style={{ padding: '10px' }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Password"
+            id="username"
+            placeholder="Enter username"
+            value={credentials.username}
+            onChange={handleChange}
+            required
+            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <input
+            type="password"
             name="password"
-            rules={[{ required: true, message: 'Please enter your password!' }]}
-          >
-            <Input.Password
-              name="password"
-              placeholder="Enter password"
-              value={credentials.password}
-              onChange={handleChange}
-              style={{ padding: '10px' }}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                width: '100%',
-                padding: '10px 0',
-                backgroundColor: '#1890ff',
-              }}
-            >
-              Login
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
+            id="password"
+            placeholder="Enter password"
+            value={credentials.password}
+            onChange={handleChange}
+            required
+            className="mt-1 p-2 w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+        >
+          Login
+        </button>
+      </form>
     </div>
   );
 };
