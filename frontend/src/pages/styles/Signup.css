@@ -156,9 +156,34 @@ input[type="password"]:hover {
   color: #825ee4;
   text-decoration: underline;
 }
+.signin-btn {
+ width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #5e72e4, #825ee4);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(94, 114, 228, 0.25);
+}
+
+.signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(94, 114, 228, 0.35);
+  background: linear-gradient(90deg, #4a5cd0, #7252d4);
+}
+
+.signin-btn-btn:active {
+  transform: translateY(1px);
+}
+
 
 .signup-btn {
-  width: 100%;
+ width: 100%;
   padding: 1rem;
   margin-top: 1rem;
   border: none;
