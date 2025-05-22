@@ -99,7 +99,7 @@ const EmployeeSignup = () => {
         password: formData.password,
       });
       alert('Signup successful');
-      navigate('/mol');
+      navigate('/');
     } catch (err) {
       alert('Signup failed: ' + err.response.data.message);
     }
