@@ -91,7 +91,7 @@ const EmployeeLogin = () => {
             </button>
 
             <p className="signup-text">
-              Don't have an account? <Link to="/mos">Sign Up</Link>
+              Don't have an account? <Link to="/SignUp">Sign Up</Link>
             </p>
           </form>
         </div>
