@@ -9,11 +9,11 @@ import {
   Form,
   Input,
   message,
-  Space,
   Upload,
   Avatar,
   Row,
   Col,
+  Tabs,
 } from 'antd';
 import {
   EditOutlined,
@@ -24,9 +24,18 @@ import {
   HomeOutlined,
   BankOutlined,
   UploadOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
 import Layout from '../../components/Layout';
+
+const { TabPane } = Tabs;
+
+const colors = {
+  primary: '#5e208e',
+  secondary: '#d4beff',
+  background: '#f0f2f5',
+};
 
 const ProfilePage = () => {
   const [employee, setEmployee] = useState(null);
@@ -78,109 +87,331 @@ const ProfilePage = () => {
       const imageUrl = URL.createObjectURL(info.file.originFileObj);
       setPhotoUrl(imageUrl);
       message.success('Photo uploaded!');
-      // Optionally send to backend
+      // Optionally send to backend here if needed
     }
   };
 
-  if (loading) return <Spin style={{ display: 'block', margin: '100px auto' }} />;
-  if (error) return <Alert message={error} type="error" style={{ margin: 20 }} />;
+  if (loading)
+    return (
+      <Spin size="large" className="block mx-auto mt-40" style={{ color: colors.primary }} />
+    );
+  if (error)
+    return (
+      <Alert
+        message={error}
+        type="error"
+        className="m-5"
+        style={{ backgroundColor: colors.secondary, borderColor: colors.primary }}
+      />
+    );
 
   return (
     <Layout>
-      <div style={{ padding: 40 }}>
+      <div
+        className="max-w-6xl mx-auto p-4 sm:p-10"
+        style={{ backgroundColor: colors.background, minHeight: '100vh', borderRadius: 12 }}
+      >
         <Card
-          style={{ borderRadius: 12, boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}
+          className="rounded-2xl shadow-2xl transition-transform hover:scale-[1.02]"
           bodyStyle={{ padding: 30 }}
-          title={<Space><UserOutlined /> Employee Profile</Space>}
-          extra={<Button icon={<EditOutlined />} onClick={() => setDrawerVisible(true)}>Edit</Button>}
+          style={{ borderColor: colors.primary }}
+          title={
+            <span
+              className="text-xl font-semibold flex items-center gap-2"
+              style={{ color: colors.primary }}
+            >
+              <UserOutlined style={{ color: colors.primary }} /> Employee Profile
+            </span>
+          }
+          extra={
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<EditOutlined />}
+              size="large"
+              onClick={() => setDrawerVisible(true)}
+              className="hidden sm:inline-flex"
+              aria-label="Edit Profile"
+              style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = colors.secondary)}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = colors.primary)}
+            />
+          }
         >
-          <Row gutter={32}>
-            <Col span={8} style={{ textAlign: 'center' }}>
-              <Avatar size={120} src={photoUrl} style={{ marginBottom: 16 }} />
-              <Upload
-                showUploadList={false}
-                customRequest={({ file, onSuccess }) => setTimeout(() => onSuccess('ok'), 0)}
-                onChange={handlePhotoUpload}
-              >
-                <Button icon={<UploadOutlined />}>Upload Photo</Button>
-              </Upload>
+          <Row gutter={[32, 32]} justify="center" align="middle">
+            {/* Avatar Section */}
+            <Col xs={24} sm={8} className="flex justify-center relative">
+              <div className="relative group">
+                <Avatar
+                  size={140}
+                  src={photoUrl}
+                  className="border-4 shadow-lg"
+                  alt="Profile Photo"
+                  style={{ borderColor: colors.primary }}
+                />
+                <Upload
+                  showUploadList={false}
+                  customRequest={({ file, onSuccess }) => setTimeout(() => onSuccess('ok'), 0)}
+                  onChange={handlePhotoUpload}
+                  className="absolute bottom-0 right-0 rounded-full p-2 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ backgroundColor: colors.primary, color: 'white' }}
+                  aria-label="Upload Profile Photo"
+                >
+                  <UploadOutlined />
+                </Upload>
+              </div>
             </Col>
 
-            <Col span={16}>
-              <Descriptions column={1} bordered size="middle">
-                <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
-                <Descriptions.Item label="Email"><MailOutlined /> {employee.email}</Descriptions.Item>
-                <Descriptions.Item label="Username">{employee.username}</Descriptions.Item>
-                <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
-                <Descriptions.Item label="Role">{employee.role}</Descriptions.Item>
-                <Descriptions.Item label="Phone"><PhoneOutlined /> {employee.phone}</Descriptions.Item>
-                <Descriptions.Item label="DOB">{employee.dateOfBirth?.substring(0, 10)}</Descriptions.Item>
-                <Descriptions.Item label="Gender">{employee.gender}</Descriptions.Item>
-                <Descriptions.Item label="National ID"><IdcardOutlined /> {employee.nationalId}</Descriptions.Item>
-                <Descriptions.Item label="Employment Type">{employee.employmentType}</Descriptions.Item>
-                <Descriptions.Item label="Start Date">{employee.startDate?.substring(0, 10)}</Descriptions.Item>
-                <Descriptions.Item label="Address"><HomeOutlined /> {employee.currentAddress}</Descriptions.Item>
-                <Descriptions.Item label="Emergency Contact">
-                  {employee.emergencyContactName} ({employee.emergencyContactRelation}) - {employee.emergencyContactNumber}
-                </Descriptions.Item>
-                <Descriptions.Item label="Bank Info"><BankOutlined /> {employee.bankName} - {employee.accountNumber}</Descriptions.Item>
-              </Descriptions>
+            {/* Details Section - Tabs for Mobile */}
+            <Col xs={24} sm={16}>
+              <Tabs
+                defaultActiveKey="1"
+                tabPosition={window.innerWidth < 600 ? 'top' : 'left'}
+                size="middle"
+                items={[
+                  {
+                    key: '1',
+                    label: (
+                      <span style={{ color: colors.primary }}>
+                        <InfoCircleOutlined /> Basic Info
+                      </span>
+                    ),
+                    children: (
+                      <Descriptions
+                        column={1}
+                        bordered
+                        size="small"
+                        labelStyle={{ fontWeight: '600', color: colors.primary }}
+                        contentStyle={{ color: '#333' }}
+                      >
+                        <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
+                        <Descriptions.Item label="Email">
+                          <MailOutlined style={{ color: colors.primary, marginRight: 6 }} />{' '}
+                          {employee.email}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Username">{employee.username}</Descriptions.Item>
+                        <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
+                        <Descriptions.Item label="Role">{employee.role}</Descriptions.Item>
+                      </Descriptions>
+                    ),
+                  },
+                  {
+                    key: '2',
+                    label: (
+                      <span style={{ color: colors.primary }}>
+                        <PhoneOutlined /> Contact
+                      </span>
+                    ),
+                    children: (
+                      <Descriptions
+                        column={1}
+                        bordered
+                        size="small"
+                        labelStyle={{ fontWeight: '600', color: colors.primary }}
+                        contentStyle={{ color: '#333' }}
+                      >
+                        <Descriptions.Item label="Phone">{employee.phone}</Descriptions.Item>
+                        <Descriptions.Item label="DOB">
+                          {employee.dateOfBirth?.substring(0, 10)}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Gender">{employee.gender}</Descriptions.Item>
+                        <Descriptions.Item label="National ID">{employee.nationalId}</Descriptions.Item>
+                      </Descriptions>
+                    ),
+                  },
+                  {
+                    key: '3',
+                    label: (
+                      <span style={{ color: colors.primary }}>
+                        <HomeOutlined /> Address
+                      </span>
+                    ),
+                    children: (
+                      <Descriptions
+                        column={1}
+                        bordered
+                        size="small"
+                        labelStyle={{ fontWeight: '600', color: colors.primary }}
+                        contentStyle={{ color: '#333' }}
+                      >
+                        <Descriptions.Item label="Employment Type">{employee.employmentType}</Descriptions.Item>
+                        <Descriptions.Item label="Start Date">
+                          {employee.startDate?.substring(0, 10)}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Current Address">{employee.currentAddress}</Descriptions.Item>
+                      </Descriptions>
+                    ),
+                  },
+                  {
+                    key: '4',
+                    label: (
+                      <span style={{ color: colors.primary }}>
+                        <IdcardOutlined /> Emergency Contact
+                      </span>
+                    ),
+                    children: (
+                      <Descriptions
+                        column={1}
+                        bordered
+                        size="small"
+                        labelStyle={{ fontWeight: '600', color: colors.primary }}
+                        contentStyle={{ color: '#333' }}
+                      >
+                        <Descriptions.Item label="Name">{employee.emergencyContactName}</Descriptions.Item>
+                        <Descriptions.Item label="Relation">{employee.emergencyContactRelation}</Descriptions.Item>
+                        <Descriptions.Item label="Phone">{employee.emergencyContactNumber}</Descriptions.Item>
+                      </Descriptions>
+                    ),
+                  },
+                  {
+                    key: '5',
+                    label: (
+                      <span style={{ color: colors.primary }}>
+                        <BankOutlined /> Bank Info
+                      </span>
+                    ),
+                    children: (
+                      <Descriptions
+                        column={1}
+                        bordered
+                        size="small"
+                        labelStyle={{ fontWeight: '600', color: colors.primary }}
+                        contentStyle={{ color: '#333' }}
+                      >
+                        <Descriptions.Item label="Bank Name">{employee.bankName}</Descriptions.Item>
+                        <Descriptions.Item label="Account Number">{employee.accountNumber}</Descriptions.Item>
+                      </Descriptions>
+                    ),
+                  },
+                ]}
+              />
             </Col>
           </Row>
-        </Card>
-      </div>
 
-      <Drawer
-        title="Edit Profile"
-        placement="right"
-        width={400}
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-      >
-        <Form layout="vertical" form={form} onFinish={handleUpdate}>
-          <Form.Item name="phone" label="Phone">
-            <Input />
-          </Form.Item>
-          <Form.Item name="dateOfBirth" label="Date of Birth">
-            <Input type="date" />
-          </Form.Item>
-          <Form.Item name="gender" label="Gender">
-            <Input />
-          </Form.Item>
-          <Form.Item name="nationalId" label="National ID">
-            <Input />
-          </Form.Item>
-          <Form.Item name="employmentType" label="Employment Type">
-            <Input />
-          </Form.Item>
-          <Form.Item name="startDate" label="Start Date">
-            <Input type="date" />
-          </Form.Item>
-          <Form.Item name="currentAddress" label="Current Address">
-            <Input.TextArea />
-          </Form.Item>
-          <Form.Item name="emergencyContactName" label="Emergency Contact Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="emergencyContactNumber" label="Emergency Contact Number">
-            <Input />
-          </Form.Item>
-          <Form.Item name="emergencyContactRelation" label="Emergency Contact Relation">
-            <Input />
-          </Form.Item>
-          <Form.Item name="bankName" label="Bank Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="accountNumber" label="Account Number">
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Save Changes
-            </Button>
-          </Form.Item>
-        </Form>
-      </Drawer>
+          {/* Floating Edit Button on Mobile */}
+          <Button
+            type="primary"
+            shape="circle"
+            icon={<EditOutlined />}
+            size="large"
+            className="fixed bottom-6 right-6 z-50 sm:hidden shadow-lg"
+            onClick={() => setDrawerVisible(true)}
+            aria-label="Edit Profile"
+            style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = colors.secondary)}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = colors.primary)}
+          />
+        </Card>
+
+        <Drawer
+          title="Edit Profile"
+          placement="right"
+          width={window.innerWidth < 500 ? '100%' : 400}
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+          bodyStyle={{ paddingBottom: 80, backgroundColor: colors.background }}
+          headerStyle={{ borderBottomColor: colors.primary, color: colors.primary }}
+        >
+          <Form layout="vertical" form={form} onFinish={handleUpdate}>
+            <Form.Item
+              name="phone"
+              label="Phone"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="dateOfBirth"
+              label="Date of Birth"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input type="date" />
+            </Form.Item>
+            <Form.Item
+              name="gender"
+              label="Gender"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="nationalId"
+              label="National ID"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="employmentType"
+              label="Employment Type"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="startDate"
+              label="Start Date"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input type="date" />
+            </Form.Item>
+            <Form.Item
+              name="currentAddress"
+              label="Current Address"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input.TextArea />
+            </Form.Item>
+            <Form.Item
+              name="emergencyContactName"
+              label="Emergency Contact Name"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="emergencyContactNumber"
+              label="Emergency Contact Number"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="emergencyContactRelation"
+              label="Emergency Contact Relation"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="bankName"
+              label="Bank Name"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name="accountNumber"
+              label="Account Number"
+              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                block
+                style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = colors.secondary)}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = colors.primary)}
+              >
+                Save Changes
+              </Button>
+            </Form.Item>
+          </Form>
+        </Drawer>
+      </div>
     </Layout>
   );
 };

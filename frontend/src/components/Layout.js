@@ -121,7 +121,7 @@ const handleMenuClick = (item) => {
             collapsible
             collapsed={collapsed}
             onCollapse={setCollapsed}
-            width={225}
+            width={200}
             collapsedWidth={80}
             style={{
               backgroundColor: "#fff",
@@ -219,9 +219,9 @@ const handleMenuClick = (item) => {
             style={{
               position: "fixed",
               top: 0,
-              left: !isMobile ? (collapsed ? 80 : 225) : 0,
+              left: !isMobile ? (collapsed ? 80 : 200) : 0,
               width: !isMobile
-                ? `calc(100% - ${collapsed ? 80 : 225}px)`
+                ? `calc(100% - ${collapsed ? 80 : 200}px)`
                 : "100%",
               height: "64px",
               backgroundColor: isMobile ? "#ffffff" : "#5e208e",
