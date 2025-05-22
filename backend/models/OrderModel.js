@@ -7,6 +7,7 @@ const itemSchema = new mongoose.Schema({
 });
 
 const orderSchema = new mongoose.Schema({
+  customerId: { type: String, },
   customerName: { type: String, required: true },
   Addressline1: { type: String, required: true },
   Addressline2: { type: String, required: true },
@@ -21,9 +22,10 @@ const orderSchema = new mongoose.Schema({
   note: { type: String },
   pickupPersonName: { type: String, required: true },
   pickupPersonPhone: { type: String, required: true },
+  actualdate: { type: Date, },
   status: { type: String, required: true, default: 'pending' },
   employee: { type: String },
-  items: [itemSchema], // ⬅️ Add this line
+  items: [itemSchema], 
   total: { type: Number },
   paymentStatus: {type: String, required: true, default: 'not paid'}
 }, {
