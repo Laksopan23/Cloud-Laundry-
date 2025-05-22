@@ -269,7 +269,7 @@ const handleMenuClick = (item) => {
           <Content
             style={{
               marginTop: 64,
-              padding: 24,
+              padding: 15,
             }}
           >
             <div

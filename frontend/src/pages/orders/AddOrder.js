@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Input, DatePicker, TimePicker, Button, Card, Typography, message } from 'antd';
+import { Input, DatePicker, TimePicker, Button, Typography, message } from 'antd';
 import { UserOutlined, ProfileOutlined, ShoppingCartOutlined, CarOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
-import AddItemModal from './models/AddItemsModel'; // adjust path as needed
+import AddItemModal from './models/AddItemsModel';
 
-// Note: Image imports are placeholders; update to correct images
 import Laundry from '../../images/laundry.png';
 import Curtains from '../../images/curtins.png';
 import Sofa from '../../images/sofa.png';
@@ -34,12 +32,10 @@ export default function LaundryForm() {
   });
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [itemDetails, setItemDetails] = useState({ customItems: [] }); // Custom items from modal
+  const [itemDetails, setItemDetails] = useState({ customItems: [] });
 
   const handleAddItem = (data) => {
-    setItemDetails(prevDetails => ({
-      customItems: data.customItems, // updating customItems
-    }));
+    setItemDetails({ customItems: data.customItems });
     message.success('Items added!');
   };
 
@@ -48,70 +44,40 @@ export default function LaundryForm() {
   };
 
   const handleSubmit = async () => {
-    console.log('handleSubmit triggered');
-    console.log('Form Data before validation:', formData);
-    console.log('Item Details:', itemDetails);
-
     const requiredFields = ['customerName', 'customerPhone', 'selectedService', 'date', 'time'];
 
-    // Check required fields presence (also verify date and time types)
-    const isValid = requiredFields.every((field) => {
-      const val = formData[field];
-      if (val === null || val === '') {
-        return false;
-      }
-      return true;
-    }) && itemDetails.customItems.length > 0;
+    const isValid = requiredFields.every((field) => formData[field]) && itemDetails.customItems.length > 0;
 
     if (!isValid) {
       message.error('Please fill all required fields and add at least one item.');
       return;
     }
 
-    // Validate expectedDeliveryDate > date if both are set
-    try {
-      if (
-        formData.expectedDeliveryDate &&
-        formData.date &&
-        formData.expectedDeliveryDate.isBefore(formData.date)
-      ) {
-        message.error('Expected delivery date must be after the order date.');
-        return;
-      }
-    } catch (error) {
-      console.error('Date comparison error:', error);
-      message.error('Invalid date values.');
+    if (
+      formData.expectedDeliveryDate &&
+      formData.date &&
+      formData.expectedDeliveryDate.isBefore(formData.date)
+    ) {
+      message.error('Expected delivery date must be after the order date.');
       return;
     }
 
     try {
-      // Map customItems to backend's expected items format
       const formattedItems = itemDetails.customItems.map((item) => ({
         itemName: item.items,
         quantity: item.qty,
         price: item.price,
       }));
 
-      console.log('Sending data to server:', {
+      await axios.post('http://localhost:5000/api/orders', {
         ...formData,
-        date: formData.date ? formData.date.toISOString() : null,
-        expectedDeliveryDate: formData.expectedDeliveryDate ? formData.expectedDeliveryDate.toISOString() : null,
-        time: formData.time ? formData.time.format('HH:mm') : null,
+        date: formData.date?.toISOString(),
+        expectedDeliveryDate: formData.expectedDeliveryDate?.toISOString(),
+        time: formData.time?.format('HH:mm'),
         items: formattedItems,
       });
 
-      const response = await axios.post('http://localhost:5000/api/orders', {
-        ...formData,
-        date: formData.date ? formData.date.toISOString() : null,
-        expectedDeliveryDate: formData.expectedDeliveryDate ? formData.expectedDeliveryDate.toISOString() : null,
-        time: formData.time ? formData.time.format('HH:mm') : null,
-        items: formattedItems, // Send only formatted items
-      });
-
-      console.log('Server response:', response.data);
-
       message.success('Order saved successfully!');
-      // Reset form and state
       setFormData({
         customerName: '',
         Addressline1: '',
@@ -130,9 +96,7 @@ export default function LaundryForm() {
       setSelectedService(null);
       setItemDetails({ customItems: [] });
     } catch (error) {
-      console.error('Submit error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to submit order';
-      message.error(errorMessage);
+      message.error(error.response?.data?.message || error.message || 'Failed to submit order');
     }
   };
 
@@ -145,66 +109,58 @@ export default function LaundryForm() {
 
   return (
     <Layout>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <div className="max-w-4xl mx-auto px-4">
         {/* Personal Details */}
-        <Card
-          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
-          <UserOutlined /> Personal Details</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
-        >
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
+        <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+          <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+            <UserOutlined /> Personal Details
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
               <Title level={5}>Customer Name</Title>
               <Input
                 placeholder="Customer Name"
                 value={formData.customerName}
                 onChange={(e) => handleChange('customerName', e.target.value)}
-                style={{ height: '32px' }} // Adjust height here
+                className="h-8"
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <Title level={5}>Address Line 1</Title>
               <Input
                 placeholder="Address Line 1"
                 value={formData.Addressline1}
                 onChange={(e) => handleChange('Addressline1', e.target.value)}
-                style={{ height: '32px' }} // Adjust height here
-
+                className="h-8"
               />
             </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
+            <div>
               <Title level={5}>Customer Phone</Title>
               <Input
                 placeholder="Customer Phone"
                 value={formData.customerPhone}
                 onChange={(e) => handleChange('customerPhone', e.target.value)}
-                style={{ height: '32px' }} // Adjust height here
+                className="h-8"
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <Title level={5}>Address Line 2</Title>
               <Input
                 placeholder="Address Line 2"
                 value={formData.Addressline2}
                 onChange={(e) => handleChange('Addressline2', e.target.value)}
-                style={{ height: '32px' }} // Adjust height here
+                className="h-8"
               />
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Service Type */}
-        <Card
-          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
-            <ProfileOutlined /> Service Type</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 20 }}>
+        <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+          <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+            <ProfileOutlined /> Service Type
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {services.map((service, index) => {
               const isSelected = selectedService === service.name;
               return (
@@ -214,83 +170,62 @@ export default function LaundryForm() {
                     setSelectedService(service.name);
                     handleChange('selectedService', service.name);
                   }}
-                  style={{
-                    width: 150,
-                    height: 150,
-                    border: isSelected ? '2px solid #6c2bd9' : '1px solid #ccc',
-                    borderRadius: 10,
-                    background: isSelected ? '#f3eaff' : '#fff',
-                    textAlign: 'center',
-                    padding: 10,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.border = '2px solid #6c2bd9'}
-                  onMouseLeave={e => e.currentTarget.style.border = isSelected ? '2px solid #6c2bd9' : '1px solid #ccc'}
+                  className={`rounded-lg border transition-all duration-300 flex flex-col justify-center items-center cursor-pointer p-3 text-center ${
+                    isSelected ? 'border-[#6c2bd9] bg-[#f3eaff]' : 'border-gray-300 bg-white'
+                  }`}
                 >
-                  <img src={service.img} alt={service.name} style={{ width: 75, height: 75, marginBottom: 10 }} />
-                  <div>{service.name}</div>
+                  <img src={service.img} alt={service.name} className="w-[75px] h-[75px] mb-2" />
+                  <div className="text-sm">{service.name}</div>
                 </div>
               );
             })}
           </div>
-        </Card>
+        </div>
 
         {/* Order Details */}
-        <Card
-          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
-          <ShoppingCartOutlined /> Order Details</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
-        >
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
+        <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+          <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+            <ShoppingCartOutlined /> Order Details
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
               <Title level={5}>Invoice Number</Title>
-              <Input style={{ height: '32px' }} placeholder="Auto-generated" value="Auto-generated" disabled />
+              <Input className="h-8" placeholder="Auto-generated" value="Auto-generated" disabled />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <Title level={5}>Date</Title>
               <DatePicker
                 placeholder="Date"
-                style={{ width: '100%' }}
+                className="w-full"
                 value={formData.date}
                 onChange={(date) => handleChange('date', date)}
               />
             </div>
-          </div>
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
+            <div>
               <Title level={5}>Expected Delivery Date</Title>
               <DatePicker
                 placeholder="Expected Delivery Date"
-                style={{ width: '100%' }}
+                className="w-full"
                 value={formData.expectedDeliveryDate}
                 onChange={(date) => handleChange('expectedDeliveryDate', date)}
               />
             </div>
-            <div style={{ flex: 1 }}>
+            <div>
               <Title level={5}>Time</Title>
               <TimePicker
                 placeholder="Time"
-                style={{ width: '100%' }}
+                className="w-full"
                 value={formData.time}
                 onChange={(time) => handleChange('time', time)}
               />
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
-            <Button
-              style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
-              onClick={() => setIsModalVisible(true)}
-            >
+          <div className="flex justify-center mt-5">
+            <Button className="bg-[#6c2bd9] text-white" onClick={() => setIsModalVisible(true)}>
               Add Items
             </Button>
           </div>
-        </Card>
+        </div>
 
         <AddItemModal
           visible={isModalVisible}
@@ -300,29 +235,27 @@ export default function LaundryForm() {
         />
 
         {/* Pickup Details */}
-        <Card
-          title={  <span style={{ fontSize: '18px', fontWeight: 'bold',color:'#6c2bd9' }}>
-          <CarOutlined /> Pickup Details</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9',padding:"20px" }}
-        >
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
+        <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+          <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+            <CarOutlined /> Pickup Details
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
               <Title level={5}>Pickup & Delivery Fee</Title>
               <Input
                 placeholder="Pickup & Delivery Fee"
                 value={formData.pickupFee}
                 onChange={(e) => handleChange('pickupFee', e.target.value)}
-                style={{ height: '32px' }}
+                className="h-8"
               />
-              <Title level={5}>Pickup & Delivery Discount</Title>
+              <Title level={5} className="mt-3">Pickup & Delivery Discount</Title>
               <Input
                 placeholder="Pickup & Delivery Discount"
                 value={formData.pickupDiscount}
                 onChange={(e) => handleChange('pickupDiscount', e.target.value)}
-                style={{ height: '32px' }}
+                className="h-8"
               />
-              <Title level={5}>Note</Title>
+              <Title level={5} className="mt-3">Note</Title>
               <TextArea
                 placeholder="Note"
                 rows={4}
@@ -330,36 +263,28 @@ export default function LaundryForm() {
                 onChange={(e) => handleChange('note', e.target.value)}
               />
             </div>
-            <div style={{ flex: 1 }}>
-              <Card
-                title={<span style={{ fontWeight: 'bold', color: '#6c2bd9' }}>Delivery Person</span>}
-                size="small"
-                style={{padding:"20px"}}
-              >
-                <Title level={5}>Pickup Person Name</Title>
-                <Input
-                  placeholder="Pickup Person Name"
-                  value={formData.pickupPersonName}
-                  onChange={(e) => handleChange('pickupPersonName', e.target.value)}
-                  style={{ height: '32px' }}
-                />
-                <Title level={5}>Pickup Person Phone</Title>
-                <Input
-                  placeholder="Pickup Person Phone"
-                  value={formData.pickupPersonPhone}
-                  onChange={(e) => handleChange('pickupPersonPhone', e.target.value)}
-                  style={{ height: '32px' }}
-                />
-              </Card>
+              <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5 ">
+                <div className="font-bold text-[#6c2bd9] mb-3">Delivery Person</div>
+              <Title level={5}>Pickup Person Name</Title>
+              <Input
+                placeholder="Pickup Person Name"
+                value={formData.pickupPersonName}
+                onChange={(e) => handleChange('pickupPersonName', e.target.value)}
+                className="h-8"
+              />
+              <Title level={5} className="mt-3">Pickup Person Phone</Title>
+              <Input
+                placeholder="Pickup Person Phone"
+                value={formData.pickupPersonPhone}
+                onChange={(e) => handleChange('pickupPersonPhone', e.target.value)}
+                className="h-8"
+              />
             </div>
           </div>
-        </Card>
+        </div>
 
-        <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <Button
-            style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
-            onClick={handleSubmit}
-          >
+        <div className="text-center mt-6">
+          <Button className="bg-[#6c2bd9] text-white" onClick={handleSubmit}>
             Save Order
           </Button>
         </div>
