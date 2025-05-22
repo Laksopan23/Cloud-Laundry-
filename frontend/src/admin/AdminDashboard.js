@@ -21,14 +21,13 @@ function Dashboard() {
     statusBreakdown: {},
   });
   const [username, setUsername] = useState('');
-  const [userRole, setUserRole] = useState(''); // New state for user role
-  const [totalRevenue, setTotalRevenue] = useState(0); // New state for total revenue
-  const [totalCustomers, setTotalCustomers] = useState(0); // New state for total customers
-
+  const [userRole, setUserRole] = useState('');
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalCustomers, setTotalCustomers] = useState(0);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
-    const storedUserRole = localStorage.getItem('role'); // Retrieve user role
+    const storedUserRole = localStorage.getItem('role');
     if (storedUsername) {
       setUsername(storedUsername);
       console.log('Logged in as:', storedUsername);
@@ -38,7 +37,6 @@ function Dashboard() {
       console.log('User role:', storedUserRole);
     }
 
-    // Fetch orders data
     fetch('http://localhost:5000/api/orders')
       .then((res) => res.json())
       .then((data) => {
@@ -49,9 +47,7 @@ function Dashboard() {
         console.error('Failed to fetch orders:', err);
       });
 
-    // Fetch total revenue and customers if user is admin
     if (storedUserRole === 'admin') {
-      // Fetch total revenue
       fetch('http://localhost:5000/api/revenue')
         .then((res) => res.json())
         .then((data) => {
@@ -61,7 +57,6 @@ function Dashboard() {
           console.error('Failed to fetch revenue:', err);
         });
 
-      // Fetch total customers
       fetch('http://localhost:5000/api/customers/count')
         .then((res) => res.json())
         .then((data) => {
@@ -109,93 +104,47 @@ function Dashboard() {
 
   return (
     <Layout>
-      <style>
-        {`
-          @media (min-width: 992px) {
-            .dashboard-container {
-              display: flex;
-              gap: 20px;
-              align-items: flex-start;
-            }
-            .left-panel {
-              width: 65%;
-            }
-            .right-panel {
-              width: 35%;
-            }
-            .stat-card-container {
-              flex-wrap: nowrap;
-              justify-content: space-between;
-            }
-            .stat-card {
-              width: 180px;
-            }
-          }
+      <div className="p-2">
+        <h2 className="font-bold text-center text-xl">Dashboard - Welcome, {username || 'Employee'}</h2>
 
-          @media (max-width: 991px) {
-            .stat-card-container {
-              flex-wrap: wrap;
-              justify-content: center;
-            }
-            .stat-card {
-              width: 48%;
-            }
-          }
-        `}
-      </style>
-
-      <div style={{ padding: 10 }}>
-        <h2 style={{ fontWeight: 'bold', textAlign: 'center' }}>
-          Dashboard - Welcome, {username || 'Employee'}
-        </h2>
-
-        <div className="dashboard-container">
+        <div className="flex flex-col lg:flex-row gap-5 items-start">
           {/* LEFT PANEL */}
-          <div className="left-panel">
-            <h3 style={{ fontWeight: 'bold', textAlign: 'Left', marginBottom: 20 }}>
-              Today's Orders
-            </h3>
+          <div className="w-full lg:w-[65%]">
+            <h3 className="font-bold text-left mb-5">Today's Orders</h3>
 
             {/* Stat Cards */}
-            <div
-              className="stat-card-container"
-              style={{
-                display: 'flex',
-                gap: 20,
-                marginBottom: 30,
-              }}
-            >
+            <div className="grid grid-cols-2 gap-5 mb-10 lg:flex lg:flex-nowrap lg:justify-between">
               <StatCard
                 icon={<FileTextOutlined />}
                 title="Total Orders"
                 value={analytics.totalOrders.toString()}
                 change="+5% from yesterday"
-                bgColor="#fff3da"
-                iconBg="#ff9966"
+                bgColor="bg-[#fff3da]"
+                iconBg="bg-[#ff9966]"
               />
               <StatCard
                 icon={<CheckCircleFilled />}
                 title="Completed Orders"
                 value={analytics.completedOrders.toString()}
                 change="+1.2% from yesterday"
-                bgColor="#e8fff0"
-                iconBg="#00c853"
+                bgColor="bg-[#e8fff0]"
+                iconBg="bg-[#00c853]"
               />
               <StatCard
                 icon={<CloseCircleOutlined />}
                 title="Cancelled Orders"
                 value={analytics.cancelledOrders.toString()}
                 change="0.5% from yesterday"
-                bgColor="#ffe6eb"
-                iconBg="#ff4d6d"
+                bgColor="bg-[#ffe6eb]"
+                iconBg="bg-[#ff4d6d]"
               />
               <StatCard
                 icon={<ClockCircleOutlined />}
                 title="Pending Orders"
                 value={analytics.pendingOrders.toString()}
                 change="0.3% from yesterday"
-                bgColor="#f3e8ff"
-                iconBg="#b388ff"
+                bgColor="bg-[#f3e8ff]"
+                iconBg="bg-[#b388ff]"
               />
               {userRole === 'admin' && (
                 <>
@@ -204,43 +153,33 @@ function Dashboard() {
                     title="Total Revenue"
                     value={`$${totalRevenue.toLocaleString()}`}
                     change="+3% from yesterday"
-                    bgColor="#e6f7ff"
-                    iconBg="#1890ff"
+                    bgColor="bg-[#e6f7ff]"
+                    iconBg="bg-[#1890ff]"
                   />
                   <StatCard
                     icon={<UserOutlined />}
                     title="Total Customers"
                     value={totalCustomers.toString()}
                     change="+2% from yesterday"
-                    bgColor="#f6ffed"
-                    iconBg="#52c41a"
+                    bgColor="bg-[#f6ffed]"
+                    iconBg="bg-[#52c41a]"
                   />
                 </>
               )}
             </div>
 
             {/* Top Services */}
-            <h3 style={{ fontWeight: 'bold', marginBottom: 20, marginLeft:"250px",marginTop:"75px" }}>
-              Top Services
-            </h3>
-            <div style={{  width:'580px'}}>
+            <h3 className="font-bold mb-5 mt-20 text-left lg:ml-[250px]">Top Services</h3>
+            <div className="w-full max-w-[580px]">
               {Object.entries(analytics.ordersPerService).map(([service, count], index) => (
-                <div key={index} style={{ marginBottom: 20 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontWeight: '500',
-                    }}
-                  >
+                <div key={index} className="mb-5">
+                  <div className="flex justify-between font-medium">
                     <span>{service}</span>
                     <span
+                      className="border px-2 py-0.5 rounded-full text-xs"
                       style={{
-                        border: `1px solid ${getColor(service)}`,
-                        padding: '2px 8px',
-                        borderRadius: 12,
+                        borderColor: getColor(service),
                         color: getColor(service),
-                        fontSize: 12,
                       }}
                     >
                       {count} orders
@@ -255,8 +194,6 @@ function Dashboard() {
               ))}
             </div>
           </div>
-
-
         </div>
       </div>
     </Layout>
@@ -265,35 +202,15 @@ function Dashboard() {
 
 function StatCard({ icon, title, value, change, bgColor, iconBg }) {
   return (
-    <div
-      className="stat-card"
-      style={{
-        backgroundColor: bgColor,
-        borderRadius: 15,
-        padding: 20,
-        textAlign: 'center',
-        flexShrink: 0,
-      }}
-    >
+    <div className={`stat-card ${bgColor} rounded-2xl p-5 text-center flex-grow min-w-[140px] max-w-[180px] lg:min-w-[185px] lg:max-w-[250px]`}>
       <div
-        style={{
-          backgroundColor: iconBg,
-          borderRadius: '50%',
-          width: 40,
-          height: 40,
-          margin: '0 auto 10px auto',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          fontSize: 18,
-        }}
+        className={`${iconBg} rounded-full w-10 h-10 mx-auto mb-2 flex items-center justify-center text-white text-lg`}
       >
         {icon}
       </div>
-      <div style={{ fontSize: 18, fontWeight: 'bold' }}>{value}</div>
-      <div style={{ color: '#555', marginBottom: 4 }}>{title}</div>
-      <div style={{ fontSize: 12, color: '#2962ff' }}>{change}</div>
+      <div className="text-lg font-bold">{value}</div>
+      <div className="text-gray-700 mb-1">{title}</div>
+      <div className="text-xs text-blue-600">{change}</div>
     </div>
   );
 }
