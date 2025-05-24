@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema({
   note: { type: String },
   pickupPersonName: { type: String, required: true },
   pickupPersonPhone: { type: String, required: true },
-  actualdate: { type: Date, },
+  actualDeliveryDate: { type: Date }, // rename from actualdate
   status: { type: String, required: true, default: 'pending' },
   employee: { type: String },
   items: [itemSchema], 
