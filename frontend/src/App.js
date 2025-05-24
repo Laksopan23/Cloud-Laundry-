@@ -17,7 +17,7 @@ import AdminDashboard from './admin/AdminDashboard';
 import AdminSignUp from './pages/Auth/Admin/sign';
 import AdminLogin from './pages/Auth/Admin/login';
 
-import Tail from './tail';
+
 
 
 function App() {
@@ -35,11 +35,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/pass" element={<ForgotPassword />} />
 
-        <Route path="/tail" element={<Tail />} />
-
-
-
-        {/* Protected routes */}
+     {/* Protected routes */}
         
         {/* Admin routes */}
         <Route
