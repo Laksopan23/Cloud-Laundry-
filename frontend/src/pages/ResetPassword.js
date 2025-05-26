@@ -58,12 +58,12 @@ const ResetPassword = ({ email, onBack }) => {
     setShowSuccess(true);
     
     try {
-      const response = await fetch("http://localhost:5000/api/email/reset-password", {
+      const response = await fetch("http://localhost:5000/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, newPassword: password }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
       
@@ -93,7 +93,7 @@ const ResetPassword = ({ email, onBack }) => {
       </div>
 
       <div className="form-side">
-        <div className="form-container">
+        <div className="form-container" style={{ marginTop: '140px' }}>
           <img src="/cloud-logo-removebg-preview.png" alt="Cloud Laundry" className="logo" />
           <h2 className="title">Set a new password</h2>
           <p className="subtitle">Create a new password, Ensure it differ form previous one for security</p>
