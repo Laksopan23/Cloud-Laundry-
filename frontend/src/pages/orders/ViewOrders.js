@@ -8,14 +8,15 @@ import {
   Button,
   Space,
   Select,
-  Modal,
-  Descriptions, Divider
+  DatePicker,
+  Input, // Added Input from Ant Design
 } from 'antd';
-import { DownloadOutlined, EyeOutlined  } from '@ant-design/icons';
+import { DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
 import { generateInvoicePDF } from './Invoice/InvoicePDF';
+import OrderDetailsModal from './models/OrderDetailsModal';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -25,6 +26,8 @@ export default function AllOrders() {
   const [loading, setLoading] = useState(false);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [serviceFilter, setServiceFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const role = localStorage.getItem('role');
   const isAdmin = role === 'admin';
@@ -83,6 +86,23 @@ export default function AllOrders() {
     }
   };
 
+  const handleActualDeliveryChange = async (record, date) => {
+    try {
+      const formattedDate = date ? date.toISOString() : null;
+      await axios.put(`http://localhost:5000/api/orders/${record._id}`, {
+        actualDeliveryDate: formattedDate,
+      });
+      message.success('Actual delivery date updated');
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === record._id ? { ...order, actualDeliveryDate: formattedDate } : order
+        )
+      );
+    } catch (error) {
+      message.error('Failed to update actual delivery date');
+    }
+  };
+
   const colorMapStatus = {
     Pending: '#faad14',
     Completed: '#52c41a',
@@ -95,22 +115,56 @@ export default function AllOrders() {
     refunded: '#1890ff',
   };
 
+  const serviceOptions = [...new Set(orders.map((order) => order.selectedService))].filter(Boolean);
+
+  const filteredOrders = orders.filter((order) => {
+    const matchesService = serviceFilter ? order.selectedService === serviceFilter : true;
+    const matchesSearch =
+      searchTerm === '' ||
+      (order.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesService && matchesSearch;
+  });
+
   const columns = [
-    { title: 'Invoice #', dataIndex: 'invoiceNumber', key: 'invoiceNumber' },
-    { title: 'Customer', dataIndex: 'customerName', key: 'customerName' },
-    { title: 'Service', dataIndex: 'selectedService', key: 'selectedService' },
-    { title: 'Phone', dataIndex: 'customerPhone', key: 'customerPhone' },
+    { title: 'CID', dataIndex: 'cid', key: 'cid', render: (text) => text || '00000', width: 70 },
+    { title: 'Invoice #', dataIndex: 'invoiceNumber', key: 'invoiceNumber', width: 80 },
+    { title: 'Customer', dataIndex: 'customerName', key: 'customerName', width: 100 },
+    { title: 'Service', dataIndex: 'selectedService', key: 'selectedService', width: 120 },
+    { title: 'Phone', dataIndex: 'customerPhone', key: 'customerPhone', width: 100 },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
       render: (date) => dayjs(date).format('YYYY-MM-DD'),
+      width: 90,
     },
     {
       title: 'Expected Delivery',
       dataIndex: 'expectedDeliveryDate',
       key: 'expectedDeliveryDate',
       render: (date) => dayjs(date).format('YYYY-MM-DD'),
+      width: 110,
+    },
+    {
+      title: 'Actual Delivery',
+      dataIndex: 'actualDeliveryDate',
+      key: 'actualDeliveryDate',
+      render: (date, record) => {
+        const canEdit = record.paymentStatus === 'paid' && record.status === 'Completed';
+        return !isAdmin && canEdit ? (
+          <DatePicker
+            value={date ? dayjs(date) : null}
+            onChange={(value) => handleActualDeliveryChange(record, value)}
+            format="YYYY-MM-DD"
+            allowClear={false}
+            disabled={!!date}
+          />
+        ) : (
+          <span>{date ? dayjs(date).format('YYYY-MM-DD') : 'N/A'}</span>
+        );
+      },
+      width: 150,
     },
     {
       title: 'Status',
@@ -122,7 +176,7 @@ export default function AllOrders() {
             value={status}
             onChange={(value) => handleStatusChange(record, value)}
             style={{
-              width: 130,
+              width: 100,
               color: colorMapStatus[status],
               borderColor: colorMapStatus[status],
             }}
@@ -137,13 +191,14 @@ export default function AllOrders() {
               color: colorMapStatus[status],
               borderColor: colorMapStatus[status],
               borderRadius: 4,
-              padding: '0 10px',
+              padding: '0 8px',
             }}
             disabled
           >
             {status}
           </Button>
         ),
+      width: 110,
     },
     {
       title: 'Payment',
@@ -155,7 +210,7 @@ export default function AllOrders() {
             value={status}
             onChange={(value) => handlePaymentChange(record, value)}
             style={{
-              width: 130,
+              width: 100,
               color: colorMapPayment[status],
               borderColor: colorMapPayment[status],
             }}
@@ -170,288 +225,165 @@ export default function AllOrders() {
               color: colorMapPayment[status],
               borderColor: colorMapPayment[status],
               borderRadius: 4,
-              padding: '0 10px',
+              padding: '0 8px',
             }}
             disabled
           >
             {status}
           </Button>
         ),
+      width: 110,
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
-        <Space>
-          <Button onClick={() => handleView(record)}><EyeOutlined /></Button>
-          <Button onClick={() => handleDownload(record)}><DownloadOutlined/></Button>
+        <Space size="small">
+          <Button onClick={() => handleView(record)}>
+            <EyeOutlined />
+          </Button>
+          <Button onClick={() => handleDownload(record)}>
+            <DownloadOutlined />
+          </Button>
         </Space>
       ),
+      width: 80,
     },
   ];
 
+  // Mobile view rendering for orders
+  const renderMobileOrders = () => {
+    return filteredOrders.map((order) => (
+      <Card
+        key={order._id}
+        style={{
+          marginBottom: 16,
+          borderRadius: 8,
+          border: '1px solid #d9d9d9',
+        }}
+      >
+        <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
+          Invoice #{order.invoiceNumber}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div>
+            <strong>Customer:</strong> {order.customerName}
+          </div>
+          <div>
+            <strong>Phone:</strong> {order.customerPhone}
+          </div>
+          <div>
+            <strong>Service:</strong> {order.selectedService}
+          </div>
+          <div>
+            <strong>Date:</strong> {dayjs(order.date).format('YYYY-MM-DD')}
+          </div>
+          <div>
+            <strong>Delivery:</strong> {dayjs(order.expectedDeliveryDate).format('YYYY-MM-DD')}
+          </div>
+          <div>
+            <strong>Status:</strong>{' '}
+            <span style={{ color: colorMapStatus[order.status] }}>{order.status}</span>
+          </div>
+          <div>
+            <strong>Actual Delivery:</strong>{' '}
+            {!isAdmin && order.paymentStatus === 'paid' && order.status === 'Completed' ? (
+              <DatePicker
+                value={order.actualDeliveryDate ? dayjs(order.actualDeliveryDate) : null}
+                onChange={(value) => handleActualDeliveryChange(order, value)}
+                format="YYYY-MM-DD"
+                allowClear={false}
+                disabled={!!order.actualDeliveryDate}
+                size="small"
+              />
+            ) : (
+              <span>{order.actualDeliveryDate ? dayjs(order.actualDeliveryDate).format('YYYY-MM-DD') : 'N/A'}</span>
+            )}
+          </div>
+
+          <div>
+            <strong>Payment:</strong>{' '}
+            <span style={{ color: colorMapPayment[order.paymentStatus] }}>{order.paymentStatus}</span>
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginTop: 16,
+          }}
+        >
+          <Button onClick={() => handleView(order)}>View Details</Button>
+          <Button
+            onClick={() => handleDownload(order)}
+            style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
+          >
+            Download
+          </Button>
+        </div>
+      </Card>
+    ));
+  };
+
   return (
     <Layout>
-        <style>
-          {`
-            .mobile-cards {
-              display: none;
-            }
-
-            @media (max-width: 767px) {
-              .desktop-table {
-                display: none;
-              }
-
-              .mobile-cards {
-                display: block;
-                width: 100%;
-              }
-
-              .mobile-cards .ant-card {
-                width: 100%;
-                margin: 0 auto 16px;
-                padding: 0;
-              }
-
-              .mobile-cards .ant-card-body {
-                padding: 10px;
-                font-size: 9px;
-              }
-
-              .mobile-cards .ant-card-body p {
-                font-size: 9px;
-                margin-bottom: 6px;
-              }
-
-              .mobile-cards strong {
-                font-size: 9px;
-              }
-
-              .mobile-cards,
-              .mobile-cards .ant-btn {
-                width: 100% !important;
-                font-size: 9px !important;
-              }
-              .mobile-cards .ant-select {
-                width: 100% !important;
-                font-size: 6px !important;
-              }
-
-              .mobile-cards .ant-select .ant-select-selector {
-                font-size: 8px !important;
-                height: 22px !important;
-                padding: 0 4px !important;
-              }
-
-              .mobile-cards .ant-select .ant-select-selection-item {
-                font-size: 8px !important;
-                line-height: 14px !important;
-              }
-
-              .mobile-cards .ant-select .ant-select-arrow {
-                font-size: 8px !important;
-              }
-            }
-          `}
-        </style>
-      <div style={{ maxWidth: 1500, margin: '0 auto' }}>
+      <div className="max-w-[1500px] mx-auto">
         <Card
           title={<Title level={4}>All Orders</Title>}
-          style={{ borderTop: '5px solid #6c2bd9' }}
+          className="border-t-[5px] border-[#6c2bd9] rounded-md"
+          loading={loading}
         >
-          {loading ? (
-            <div style={{ textAlign: 'center' }}>
-              <Spin size="large" />
-            </div>
-          ) : (
-            <>
-              <div className="desktop-table">
-                <Table
-                  dataSource={orders}
-                  columns={columns}
-                  rowKey="_id"
-                  pagination={{ pageSize: 10 }}
-                />
-              </div>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row', // changed from column to row
+            gap: 16,
+            marginBottom: 16,
+            alignItems: 'center', // vertically center the inputs
+            justifyContent: 'flex-start', // align to start or space-between if you want them spaced out
+          }}
+          className="" // removed md:flex-row since we enforce row always
+        >
+          <Input
+            placeholder="Search by customer or invoice #"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: '100%', maxWidth: 300 }}
+            allowClear
+          />
+          <Select
+            placeholder="Filter by service"
+            allowClear
+            onChange={(value) => setServiceFilter(value)}
+            style={{ width: '100%', maxWidth: 200 }}
+            value={serviceFilter || undefined}
+          >
+            {serviceOptions.map((service) => (
+              <Option key={service} value={service}>
+                {service}
+              </Option>
+            ))}
+          </Select>
+        </div>
 
-              <div className="mobile-cards">
-                {orders.map((order) => (
-                  <Card
-                    key={order._id}
-                    style={{ marginBottom: 16 }}
-                    title={`Invoice #${order.invoiceNumber}`}
-                  >
-                    <p><strong>Customer:</strong> {order.customerName}</p>
-                    <p><strong>Phone:</strong> {order.customerPhone}</p>
-                    <p><strong>Service:</strong> {order.selectedService}</p>
-                    <p><strong>Date:</strong> {dayjs(order.date).format('YYYY-MM-DD')}</p>
-                    <p><strong>Delivery:</strong> {dayjs(order.expectedDeliveryDate).format('YYYY-MM-DD')}</p>
-                    <p>
-                      <strong>Status:</strong>{' '}
-                      {isAdmin ? (
-                        <Select
-                          value={order.status}
-                          onChange={(value) => handleStatusChange(order, value)}
-                          size="small"
-                          style={{ width: '100%' }}
-                        >
-                          <Option value="Pending">Pending</Option>
-                          <Option value="Completed">Completed</Option>
-                          <Option value="Cancelled">Cancelled</Option>
-                        </Select>
-                      ) : (
-                        <span>{order.status}</span>
-                      )}
-                    </p>
-                    <p>
-                      <strong>Payment:</strong>{' '}
-                      {isAdmin ? (
-                        <Select
-                          value={order.paymentStatus}
-                          onChange={(value) => handlePaymentChange(order, value)}
-                          size="small"
-                          style={{ width: '100%' }}
-                        >
-                          <Option value="not paid">Not Paid</Option>
-                          <Option value="paid">Paid</Option>
-                          <Option value="refunded">Refunded</Option>
-                        </Select>
-                      ) : (
-                        <span>{order.paymentStatus}</span>
-                      )}
-                    </p>
-                    <Button
-                      style={{ marginTop: 8 }}
-                      block
-                      onClick={() => handleView(order)}
-                    >
-                      View Details
-                    </Button>
-                    <Button
-                      style={{ marginTop: 8, backgroundColor:'#5e208e', color:'white' }}
-                      block
-                      onClick={() => handleDownload(order)}
-                    >
-                      Download
-                    </Button>
-                  </Card>
-                ))}
-              </div>
-            </>
-          )}
+          <div className="hidden md:block">
+            <Table
+              dataSource={filteredOrders}
+              columns={columns}
+              rowKey="_id"
+              pagination={{ pageSize: 10 }}
+              scroll={{ x: 'max-content' }}
+              size='small'
+            />
+          </div>
+          <div className="md:hidden">{renderMobileOrders()}</div>
         </Card>
 
-<Modal
-  title={
-    <div style={{ color: '#5e208e' }}>
-      Order Details - {selectedOrder?.invoiceNumber}
-    </div>
-  }
-  open={viewModalVisible}
-  onCancel={() => setViewModalVisible(false)}
-  footer={[
-    <Button key="close" onClick={() => setViewModalVisible(false)}>
-      Close
-    </Button>,
-  ]}
-  bodyStyle={{ backgroundColor: '#f0f2f5' }}
-    width={800} // Add this line to increase width
-
->
-  {selectedOrder && (
-    <div>
-      <Descriptions
-        column={1}
-        bordered
-        size="small"
-        labelStyle={{ backgroundColor: '#d4beff', color: '#5e208e', fontWeight: 600 }}
-        contentStyle={{ backgroundColor: '#fff' }}
-      >
-        <Descriptions.Item label="Customer Name">
-          {selectedOrder.customerName}
-        </Descriptions.Item>
-        <Descriptions.Item label="Phone">
-          {selectedOrder.customerPhone}
-        </Descriptions.Item>
-        <Descriptions.Item label="Service">
-          {selectedOrder.selectedService}
-        </Descriptions.Item>
-        <Descriptions.Item label="Date">
-          {dayjs(selectedOrder.date).format('YYYY-MM-DD')}
-        </Descriptions.Item>
-        <Descriptions.Item label="Delivery Date">
-          {dayjs(selectedOrder.expectedDeliveryDate).format('YYYY-MM-DD')}
-        </Descriptions.Item>
-        <Descriptions.Item label="Time">
-          {selectedOrder.time}
-        </Descriptions.Item>
-        <Descriptions.Item label="Pickup Fee">
-          Rs.{selectedOrder.pickupFee}
-        </Descriptions.Item>
-        <Descriptions.Item label="Pickup Discount">
-          Rs.{selectedOrder.pickupDiscount}
-        </Descriptions.Item>
-        <Descriptions.Item label="Status">
-          {selectedOrder.status}
-        </Descriptions.Item>
-        <Descriptions.Item label="Payment Status">
-          {selectedOrder.paymentStatus}
-        </Descriptions.Item>
-        <Descriptions.Item label="Address Line 1">
-          {selectedOrder.Addressline1}
-        </Descriptions.Item>
-        <Descriptions.Item label="Address Line 2">
-          {selectedOrder.Addressline2}
-        </Descriptions.Item>
-        <Descriptions.Item label="Pickup Person Name">
-          {selectedOrder.pickupPersonName}
-        </Descriptions.Item>
-        <Descriptions.Item label="Pickup Person Phone">
-          {selectedOrder.pickupPersonPhone}
-        </Descriptions.Item>
-        <Descriptions.Item label="Employee">
-          {selectedOrder.employee || 'N/A'}
-        </Descriptions.Item>
-        <Descriptions.Item label="Note">
-          {selectedOrder.note || 'None'}
-        </Descriptions.Item>
-      </Descriptions>
-
-      <Divider style={{ borderColor: '#5e208e' }}>Items</Divider>
-
-      {selectedOrder.items?.length > 0 ? (
-        <Table
-          dataSource={selectedOrder.items}
-          rowKey={(item, index) => index}
-          pagination={false}
-          size="small"
-          bordered
-          style={{ marginTop: 16 }}
-          columns={[
-            { title: 'Item Name', dataIndex: 'itemName', key: 'itemName' },
-            { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
-            { title: 'Unit Price ', dataIndex: 'price', key: 'price' },
-            {
-              title: 'Total Price',
-              key: 'totalPrice',
-               render: (_, record) => `Rs.${record.quantity * record.price}`,
-             },          
-          ]}
+        <OrderDetailsModal
+          visible={viewModalVisible}
+          onClose={() => setViewModalVisible(false)}
+          order={selectedOrder}
         />
-      ) : (
-        <p style={{ marginTop: 16 }}>No items found.</p>
-      )}
-
-      <Divider style={{ borderColor: '#5e208e' }} />
-      <p style={{ textAlign: 'right', fontWeight: 600, color: '#5e208e' }}>
-        Total: Rs.{selectedOrder.total}
-      </p>
-    </div>
-  )}
-</Modal>
-
-
       </div>
     </Layout>
   );

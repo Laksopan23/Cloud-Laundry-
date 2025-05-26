@@ -68,7 +68,7 @@ exports.getOrders = async (req, res) => {
 };
 
 
-
+/*
 // Update Order Fields (Status & Payment Status)
 exports.updateOrder = async (req, res) => {
   try {
@@ -77,6 +77,32 @@ exports.updateOrder = async (req, res) => {
 
     if (req.body.status) updateFields.status = req.body.status;
     if (req.body.paymentStatus) updateFields.paymentStatus = req.body.paymentStatus;
+
+    const order = await Order.findByIdAndUpdate(id, updateFields, { new: true });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update order', error });
+  }
+};
+
+*/
+
+// Update Order Fields (Status, Payment Status, Actual Delivery Date)
+exports.updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateFields = {};
+
+    if (req.body.status) updateFields.status = req.body.status;
+    if (req.body.paymentStatus) updateFields.paymentStatus = req.body.paymentStatus;
+    if (req.body.actualDeliveryDate !== undefined) {
+      updateFields.actualDeliveryDate = req.body.actualDeliveryDate;
+    }
 
     const order = await Order.findByIdAndUpdate(id, updateFields, { new: true });
 

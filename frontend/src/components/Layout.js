@@ -121,7 +121,7 @@ const handleMenuClick = (item) => {
             collapsible
             collapsed={collapsed}
             onCollapse={setCollapsed}
-            width={225}
+            width={200}
             collapsedWidth={80}
             style={{
               backgroundColor: "#fff",
@@ -176,42 +176,65 @@ const handleMenuClick = (item) => {
         )}
 
         {isMobile && (
-          <Drawer
-            title="Menu"
-            placement="left"
-            onClose={() => setShowDrawer(false)}
-            open={showDrawer}
-            bodyStyle={{ padding: 0 }}
+         <Drawer
+          title="Menu"
+          placement="left"
+          onClose={() => setShowDrawer(false)}
+          open={showDrawer}
+          bodyStyle={{ padding: 0 }}
+        >
+          {/* Navigation Menu */}
+          <Menu
+            theme="light"
+            mode="inline"
+            selectedKeys={[window.location.pathname]}
+            onClick={(item) => {
+              handleMenuClick(item);
+              setShowDrawer(false);
+            }}
+            style={{ borderRight: 0 }}
           >
-            <Menu
-              theme="light"
-              mode="inline"
-              selectedKeys={[window.location.pathname]}
-              onClick={(item) => {
-                handleMenuClick(item);
-                setShowDrawer(false);
-              }}
-              style={{ borderRight: 0 }}
-            >
-              {menuItems.map(({ key, icon, label }) => (
-                <Menu.Item
-                  key={key}
-                  icon={icon}
-                  style={menuItemStyle}
-                  onMouseEnter={(e) => {
-                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
-                    e.currentTarget.style.backgroundColor = shoutableHoverColor;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
-                    e.currentTarget.style.backgroundColor = "transparent";
-                  }}
-                >
-                  {label}
-                </Menu.Item>
-              ))}
-            </Menu>
-          </Drawer>
+            {menuItems.map(({ key, icon, label }) => (
+              <Menu.Item
+                key={key}
+                icon={icon}
+                style={menuItemStyle}
+                onMouseEnter={(e) => {
+                  if (!e?.currentTarget?.style) return;
+                  e.currentTarget.style.backgroundColor = shoutableHoverColor;
+                }}
+                onMouseLeave={(e) => {
+                  if (!e?.currentTarget?.style) return;
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }}
+              >
+                {label}
+              </Menu.Item>
+            ))}
+          </Menu>
+
+          {/* Divider and Profile/Logout */}
+          <Menu
+            theme="light"
+            mode="inline"
+            style={{ borderTop: "1px solid #ddd" }}
+            onClick={({ key }) => {
+              handleHeaderClick(key);
+              setShowDrawer(false);
+            }}
+          >
+            {headerIteam.map(({ key, icon, text }) => (
+              <Menu.Item
+                key={key}
+                icon={icon}
+                style={menuItemStyle}
+              >
+                {text}
+              </Menu.Item>
+            ))}
+          </Menu>
+        </Drawer>
+
         )}
 
         <Layout style={{ marginLeft: !isMobile ? (collapsed ? 80 : 225) : 0 }}>
@@ -219,9 +242,9 @@ const handleMenuClick = (item) => {
             style={{
               position: "fixed",
               top: 0,
-              left: !isMobile ? (collapsed ? 80 : 225) : 0,
+              left: !isMobile ? (collapsed ? 80 : 200) : 0,
               width: !isMobile
-                ? `calc(100% - ${collapsed ? 80 : 225}px)`
+                ? `calc(100% - ${collapsed ? 80 : 200}px)`
                 : "100%",
               height: "64px",
               backgroundColor: isMobile ? "#ffffff" : "#5e208e",
@@ -269,7 +292,7 @@ const handleMenuClick = (item) => {
           <Content
             style={{
               marginTop: 64,
-              padding: 24,
+              padding: 15,
             }}
           >
             <div
