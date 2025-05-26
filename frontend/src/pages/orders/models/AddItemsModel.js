@@ -155,12 +155,9 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
   };
 
   const handleFieldChange = (key, field, value) => {
-    setCustomItemsData((prev) => {
-      const newData = prev.map((item) =>
-        item.key === key ? { ...item, [field]: value } : item
-      );
-      return newData;
-    });
+    setCustomItemsData((prev) =>
+      prev.map((item) => (item.key === key ? { ...item, [field]: value } : item))
+    );
   };
 
   const handleSaveEdit = (key) => {
@@ -169,7 +166,10 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
       message.error('Please select a valid item, quantity, and price.');
       return;
     }
-    if (serviceOptions[selectedService] && !serviceOptions[selectedService].some((opt) => opt.value === item.items)) {
+    if (
+      serviceOptions[selectedService] &&
+      !serviceOptions[selectedService].some((opt) => opt.value === item.items)
+    ) {
       message.error('Please select an item from the dropdown.');
       return;
     }
@@ -209,20 +209,19 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
   };
 
   const handleClose = () => {
-    if (customItemsData.length > 0) {
-      Modal.confirm({
-        title: 'Discard unsaved changes?',
-        onOk: () => {
-          setCustomItemsData([]);
-          setEditingKey('');
-          onClose();
-        },
-        onCancel: () => {},
-      });
-    } else {
-      onClose();
-    }
-  };
+  setCustomItemsData([]);
+  setEditingKey('');
+  onClose();
+};
+
+
+  const handleDeleteRow = (key) => {
+  setCustomItemsData((prev) => prev.filter((item) => item.key !== key));
+  if (editingKey === key) {
+    setEditingKey('');
+  }
+};
+
 
   const columns = [
     {
@@ -316,32 +315,35 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
           `Rs. ${text}`
         ),
     },
-    {
-      title: 'Action',
-      key: 'action',
-      width: 100,
-      render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <Button type="link" onClick={() => handleSaveEdit(record.key)}>
-            Save
-          </Button>
+{
+  title: 'Action',
+  key: 'action',
+  width: 150,
+  render: (_, record) => {
+    const editable = isEditing(record);
+    return (
+      <div style={{ display: 'flex', gap: 8 }}>
+        {editable ? (
+          <Button type="link" onClick={() => handleSaveEdit(record.key)}>Save</Button>
         ) : (
-          <Button type="link" onClick={() => setEditingKey(record.key)}>
-            Edit
-          </Button>
-        );
-      },
-    },
+          <Button type="link" onClick={() => setEditingKey(record.key)}>Edit</Button>
+        )}
+        <Button type="link" danger onClick={() => handleDeleteRow(record.key)}>Delete</Button>
+      </div>
+    );
+  },
+}
+
   ];
 
   return (
     <Modal
       title="Add Item"
       open={visible}
-      onCancel={handleClose}
       footer={null}
       width={1200}
+      maskClosable={false}
+      closable={false}
     >
       <Table
         dataSource={customItemsData}
