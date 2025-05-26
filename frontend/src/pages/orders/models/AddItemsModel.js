@@ -155,12 +155,9 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
   };
 
   const handleFieldChange = (key, field, value) => {
-    setCustomItemsData((prev) => {
-      const newData = prev.map((item) =>
-        item.key === key ? { ...item, [field]: value } : item
-      );
-      return newData;
-    });
+    setCustomItemsData((prev) =>
+      prev.map((item) => (item.key === key ? { ...item, [field]: value } : item))
+    );
   };
 
   const handleSaveEdit = (key) => {
@@ -169,7 +166,10 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
       message.error('Please select a valid item, quantity, and price.');
       return;
     }
-    if (serviceOptions[selectedService] && !serviceOptions[selectedService].some((opt) => opt.value === item.items)) {
+    if (
+      serviceOptions[selectedService] &&
+      !serviceOptions[selectedService].some((opt) => opt.value === item.items)
+    ) {
       message.error('Please select an item from the dropdown.');
       return;
     }
@@ -209,18 +209,15 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
   };
 
   const handleClose = () => {
-    if (customItemsData.length > 0) {
-      Modal.confirm({
-        title: 'Discard unsaved changes?',
-        onOk: () => {
-          setCustomItemsData([]);
-          setEditingKey('');
-          onClose();
-        },
-        onCancel: () => {},
-      });
-    } else {
-      onClose();
+    setCustomItemsData([]);
+    setEditingKey('');
+    onClose();
+  };
+
+  const handleDeleteRow = (key) => {
+    setCustomItemsData((prev) => prev.filter((item) => item.key !== key));
+    if (editingKey === key) {
+      setEditingKey('');
     }
   };
 
@@ -319,17 +316,18 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     {
       title: 'Action',
       key: 'action',
-      width: 100,
+      width: 150,
       render: (_, record) => {
         const editable = isEditing(record);
-        return editable ? (
-          <Button type="link" onClick={() => handleSaveEdit(record.key)}>
-            Save
-          </Button>
-        ) : (
-          <Button type="link" onClick={() => setEditingKey(record.key)}>
-            Edit
-          </Button>
+        return (
+          <div style={{ display: 'flex', gap: 8 }}>
+            {editable ? (
+              <Button type="link" onClick={() => handleSaveEdit(record.key)}>Save</Button>
+            ) : (
+              <Button type="link" onClick={() => setEditingKey(record.key)}>Edit</Button>
+            )}
+            <Button type="link" danger onClick={() => handleDeleteRow(record.key)}>Delete</Button>
+          </div>
         );
       },
     },
@@ -339,27 +337,117 @@ export default function AddItemModal({ visible, onClose, onAddItem, selectedServ
     <Modal
       title="Add Item"
       open={visible}
-      onCancel={handleClose}
       footer={null}
       width={1200}
+      maskClosable={false}
+      closable={false}
     >
-      <Table
-        dataSource={customItemsData}
-        columns={columns}
-        pagination={false}
-        rowKey="key"
-        bordered
-      />
+      {/* Desktop Table View */}
+      <div className="hidden sm:block">
+        <Table
+          dataSource={customItemsData}
+          columns={columns}
+          pagination={false}
+          rowKey="key"
+          bordered
+        />
+      </div>
 
-      <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between' }}>
+      {/* Mobile Card View */}
+      <div className="block sm:hidden space-y-4">
+        {customItemsData.map((record) => (
+          <div key={record.key} className="p-4 border rounded-xl shadow-sm">
+            <div className="mb-2 font-semibold text-lg">
+              {isEditing(record) ? (
+                <Select
+                  className="w-full"
+                  value={record.items}
+                  placeholder="Select item"
+                  onChange={(value) => {
+                    const selected = (serviceOptions[selectedService] || []).find(
+                      (opt) => opt.value === value
+                    );
+                    handleFieldChange(record.key, 'items', value);
+                    handleFieldChange(record.key, 'description', selected?.description || '');
+                    handleFieldChange(record.key, 'price', selected?.price || 0);
+                  }}
+                >
+                  {(serviceOptions[selectedService] || []).map((opt) => (
+                    <Option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </Option>
+                  ))}
+                </Select>
+              ) : (
+                record.items || 'N/A'
+              )}
+            </div>
+            <div className="mb-2">
+              <span className="block font-medium">Description:</span>
+              {isEditing(record) ? (
+                <Input
+                  value={record.description}
+                  onChange={(e) => handleFieldChange(record.key, 'description', e.target.value)}
+                />
+              ) : (
+                record.description
+              )}
+            </div>
+            <div className="mb-2 flex justify-between gap-4">
+              <div className="w-1/2">
+                <span className="block font-medium">Qty:</span>
+                {isEditing(record) ? (
+                  <InputNumber
+                    min={1}
+                    value={record.qty}
+                    onChange={(value) => handleFieldChange(record.key, 'qty', value)}
+                    className="w-full"
+                  />
+                ) : (
+                  record.qty
+                )}
+              </div>
+              <div className="w-1/2">
+                <span className="block font-medium">Price:</span>
+                {isEditing(record) ? (
+                  <InputNumber
+                    min={0}
+                    value={record.price}
+                    formatter={(val) => `Rs. ${val}`}
+                    parser={(val) => val.replace('Rs. ', '')}
+                    onChange={(value) => handleFieldChange(record.key, 'price', value)}
+                    className="w-full"
+                  />
+                ) : (
+                  `Rs. ${record.price}`
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-2">
+              {isEditing(record) ? (
+                <Button size="small" type="primary" onClick={() => handleSaveEdit(record.key)}>
+                  Save
+                </Button>
+              ) : (
+                <Button size="small" onClick={() => setEditingKey(record.key)}>
+                  Edit
+                </Button>
+              )}
+              <Button size="small" danger onClick={() => handleDeleteRow(record.key)}>
+                Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="mt-4 flex flex-col sm:flex-row justify-between gap-4">
         <Button type="dashed" onClick={handleAddRow}>
           Add Row
         </Button>
-
-        <div>
-          <Button onClick={handleClose} style={{ marginRight: 8 }}>
-            Cancel
-          </Button>
+        <div className="flex justify-end gap-2">
+          <Button onClick={handleClose}>Cancel</Button>
           <Button type="primary" onClick={handleSaveAll}>
             Save All
           </Button>
