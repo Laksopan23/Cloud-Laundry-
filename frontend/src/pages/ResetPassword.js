@@ -58,12 +58,12 @@ const ResetPassword = ({ email, onBack }) => {
     setShowSuccess(true);
     
     try {
-      const response = await fetch("http://localhost:5000/reset-password", {
+      const response = await fetch("http://localhost:5000/api/email/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, newPassword: password }),
       });
       const data = await response.json();
       
