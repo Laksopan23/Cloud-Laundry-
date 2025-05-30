@@ -1,3 +1,4 @@
+// Paste this full code into your ProfilePage.jsx or equivalent file
 import React, { useEffect, useState } from 'react';
 import {
   Card,
@@ -47,7 +48,6 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const username = localStorage.getItem('username');
-
     const fetchEmployee = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/api/employees/profile/${username}`);
@@ -60,7 +60,6 @@ const ProfilePage = () => {
         setLoading(false);
       }
     };
-
     if (username) fetchEmployee();
     else {
       setError('No username found in local storage');
@@ -87,37 +86,37 @@ const ProfilePage = () => {
       const imageUrl = URL.createObjectURL(info.file.originFileObj);
       setPhotoUrl(imageUrl);
       message.success('Photo uploaded!');
-      // Optionally send to backend here if needed
     }
   };
 
-  if (loading)
-    return (
-      <Spin size="large" className="block mx-auto mt-40" style={{ color: colors.primary }} />
-    );
-  if (error)
+  if (loading) {
+    return <Spin size="large" className="block mx-auto mt-40" style={{ color: colors.primary }} />;
+  }
+
+  if (error) {
     return (
       <Alert
         message={error}
         type="error"
-        className="m-5"
+        className="m-5 text-xs sm:text-sm"
         style={{ backgroundColor: colors.secondary, borderColor: colors.primary }}
       />
     );
+  }
 
   return (
     <Layout>
       <div
-        className="max-w-6xl mx-auto p-4 sm:p-10"
+        className="max-w-6xl mx-auto p-4 sm:p-10 text-xs sm:text-sm"
         style={{ backgroundColor: colors.background, minHeight: '100vh', borderRadius: 12 }}
       >
         <Card
           className="rounded-2xl shadow-2xl transition-transform hover:scale-[1.02]"
-          bodyStyle={{ padding: 30 }}
+          bodyStyle={{ padding: 20 }}
           style={{ borderColor: colors.primary }}
           title={
             <span
-              className="text-xl font-semibold flex items-center gap-2"
+              className="text-base sm:text-lg font-semibold flex items-center gap-2"
               style={{ color: colors.primary }}
             >
               <UserOutlined style={{ color: colors.primary }} /> Employee Profile
@@ -133,17 +132,17 @@ const ProfilePage = () => {
               className="hidden sm:inline-flex"
               aria-label="Edit Profile"
               style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = colors.secondary)}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = colors.primary)}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.secondary)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
             />
           }
         >
-          <Row gutter={[32, 32]} justify="center" align="middle">
+          <Row gutter={[24, 24]} justify="center" align="middle">
             {/* Avatar Section */}
             <Col xs={24} sm={8} className="flex justify-center relative">
               <div className="relative group">
                 <Avatar
-                  size={140}
+                  size={120}
                   src={photoUrl}
                   className="border-4 shadow-lg"
                   alt="Profile Photo"
@@ -162,17 +161,18 @@ const ProfilePage = () => {
               </div>
             </Col>
 
-            {/* Details Section - Tabs for Mobile */}
+            {/* Details Tabs Section */}
             <Col xs={24} sm={16}>
               <Tabs
                 defaultActiveKey="1"
-                tabPosition={window.innerWidth < 600 ? 'top' : 'left'}
-                size="middle"
+                tabPosition={window.innerWidth < 640 ? 'top' : 'left'}
+                size="small"
+                tabBarGutter={10}
                 items={[
                   {
                     key: '1',
                     label: (
-                      <span style={{ color: colors.primary }}>
+                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
                         <InfoCircleOutlined /> Basic Info
                       </span>
                     ),
@@ -181,13 +181,12 @@ const ProfilePage = () => {
                         column={1}
                         bordered
                         size="small"
-                        labelStyle={{ fontWeight: '600', color: colors.primary }}
-                        contentStyle={{ color: '#333' }}
+                        labelStyle={{ fontWeight: 600, color: colors.primary }}
+                        contentStyle={{ fontSize: '0.75rem' }}
                       >
                         <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
                         <Descriptions.Item label="Email">
-                          <MailOutlined style={{ color: colors.primary, marginRight: 6 }} />{' '}
-                          {employee.email}
+                          <MailOutlined style={{ marginRight: 6 }} /> {employee.email}
                         </Descriptions.Item>
                         <Descriptions.Item label="Username">{employee.username}</Descriptions.Item>
                         <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
@@ -198,7 +197,7 @@ const ProfilePage = () => {
                   {
                     key: '2',
                     label: (
-                      <span style={{ color: colors.primary }}>
+                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
                         <PhoneOutlined /> Contact
                       </span>
                     ),
@@ -207,8 +206,8 @@ const ProfilePage = () => {
                         column={1}
                         bordered
                         size="small"
-                        labelStyle={{ fontWeight: '600', color: colors.primary }}
-                        contentStyle={{ color: '#333' }}
+                        labelStyle={{ fontWeight: 600, color: colors.primary }}
+                        contentStyle={{ fontSize: '0.75rem' }}
                       >
                         <Descriptions.Item label="Phone">{employee.phone}</Descriptions.Item>
                         <Descriptions.Item label="DOB">
@@ -222,7 +221,7 @@ const ProfilePage = () => {
                   {
                     key: '3',
                     label: (
-                      <span style={{ color: colors.primary }}>
+                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
                         <HomeOutlined /> Address
                       </span>
                     ),
@@ -231,8 +230,8 @@ const ProfilePage = () => {
                         column={1}
                         bordered
                         size="small"
-                        labelStyle={{ fontWeight: '600', color: colors.primary }}
-                        contentStyle={{ color: '#333' }}
+                        labelStyle={{ fontWeight: 600, color: colors.primary }}
+                        contentStyle={{ fontSize: '0.75rem' }}
                       >
                         <Descriptions.Item label="Employment Type">{employee.employmentType}</Descriptions.Item>
                         <Descriptions.Item label="Start Date">
@@ -245,7 +244,7 @@ const ProfilePage = () => {
                   {
                     key: '4',
                     label: (
-                      <span style={{ color: colors.primary }}>
+                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
                         <IdcardOutlined /> Emergency Contact
                       </span>
                     ),
@@ -254,8 +253,8 @@ const ProfilePage = () => {
                         column={1}
                         bordered
                         size="small"
-                        labelStyle={{ fontWeight: '600', color: colors.primary }}
-                        contentStyle={{ color: '#333' }}
+                        labelStyle={{ fontWeight: 600, color: colors.primary }}
+                        contentStyle={{ fontSize: '0.75rem' }}
                       >
                         <Descriptions.Item label="Name">{employee.emergencyContactName}</Descriptions.Item>
                         <Descriptions.Item label="Relation">{employee.emergencyContactRelation}</Descriptions.Item>
@@ -266,7 +265,7 @@ const ProfilePage = () => {
                   {
                     key: '5',
                     label: (
-                      <span style={{ color: colors.primary }}>
+                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
                         <BankOutlined /> Bank Info
                       </span>
                     ),
@@ -275,8 +274,8 @@ const ProfilePage = () => {
                         column={1}
                         bordered
                         size="small"
-                        labelStyle={{ fontWeight: '600', color: colors.primary }}
-                        contentStyle={{ color: '#333' }}
+                        labelStyle={{ fontWeight: 600, color: colors.primary }}
+                        contentStyle={{ fontSize: '0.75rem' }}
                       >
                         <Descriptions.Item label="Bank Name">{employee.bankName}</Descriptions.Item>
                         <Descriptions.Item label="Account Number">{employee.accountNumber}</Descriptions.Item>
@@ -298,8 +297,8 @@ const ProfilePage = () => {
             onClick={() => setDrawerVisible(true)}
             aria-label="Edit Profile"
             style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = colors.secondary)}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = colors.primary)}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.secondary)}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
           />
         </Card>
 
@@ -313,98 +312,42 @@ const ProfilePage = () => {
           headerStyle={{ borderBottomColor: colors.primary, color: colors.primary }}
         >
           <Form layout="vertical" form={form} onFinish={handleUpdate}>
-            <Form.Item
-              name="phone"
-              label="Phone"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="dateOfBirth"
-              label="Date of Birth"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input type="date" />
-            </Form.Item>
-            <Form.Item
-              name="gender"
-              label="Gender"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="nationalId"
-              label="National ID"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="employmentType"
-              label="Employment Type"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="startDate"
-              label="Start Date"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input type="date" />
-            </Form.Item>
-            <Form.Item
-              name="currentAddress"
-              label="Current Address"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input.TextArea />
-            </Form.Item>
-            <Form.Item
-              name="emergencyContactName"
-              label="Emergency Contact Name"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="emergencyContactNumber"
-              label="Emergency Contact Number"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="emergencyContactRelation"
-              label="Emergency Contact Relation"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="bankName"
-              label="Bank Name"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              name="accountNumber"
-              label="Account Number"
-              labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
-            >
-              <Input />
-            </Form.Item>
+            {[
+              ['phone', 'Phone'],
+              ['dateOfBirth', 'Date of Birth', 'date'],
+              ['gender', 'Gender'],
+              ['nationalId', 'National ID'],
+              ['employmentType', 'Employment Type'],
+              ['startDate', 'Start Date', 'date'],
+              ['currentAddress', 'Current Address', 'textarea'],
+              ['emergencyContactName', 'Emergency Contact Name'],
+              ['emergencyContactNumber', 'Emergency Contact Number'],
+              ['emergencyContactRelation', 'Emergency Contact Relation'],
+              ['bankName', 'Bank Name'],
+              ['accountNumber', 'Account Number'],
+            ].map(([name, label, type]) => (
+              <Form.Item
+                key={name}
+                name={name}
+                label={label}
+                labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+              >
+                {type === 'textarea' ? (
+                  <Input.TextArea size="small" />
+                ) : (
+                  <Input type={type === 'date' ? 'date' : 'text'} size="small" />
+                )}
+              </Form.Item>
+            ))}
+
             <Form.Item>
               <Button
                 type="primary"
                 htmlType="submit"
                 block
                 style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = colors.secondary)}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = colors.primary)}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.secondary)}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
               >
                 Save Changes
               </Button>
