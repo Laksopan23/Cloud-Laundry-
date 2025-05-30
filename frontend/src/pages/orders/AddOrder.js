@@ -7,6 +7,7 @@ import {
   Typography,
   message,
   Form,
+  Modal,
 } from 'antd';
 import {
   UserOutlined,
@@ -31,56 +32,63 @@ export default function LaundryForm() {
   const [selectedService, setSelectedService] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [itemDetails, setItemDetails] = useState({ customItems: [] });
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
   const handleAddItem = (data) => {
     setItemDetails({ customItems: data.customItems });
     message.success('Items added!');
   };
 
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
+const handleSubmit = async () => {
+  try {
+    const values = await form.validateFields();
 
-      if (itemDetails.customItems.length === 0) {
-        message.error('Please add at least one item.');
-        return;
-      }
-
-      if (
-        values.expectedDeliveryDate &&
-        values.date &&
-        values.expectedDeliveryDate.isBefore(values.date)
-      ) {
-        message.error('Expected delivery date must be after the order date.');
-        return;
-      }
-
-      const formattedItems = itemDetails.customItems.map((item) => ({
-        itemName: item.items,
-        quantity: item.qty,
-        price: item.price,
-      }));
-
-      await axios.post('http://localhost:5000/api/orders', {
-        ...values,
-        date: values.date?.toISOString(),
-        expectedDeliveryDate: values.expectedDeliveryDate?.toISOString(),
-        time: values.time?.format('HH:mm'),
-        items: formattedItems,
-      });
-
-      message.success('Order saved successfully!');
-      form.resetFields();
-      setSelectedService(null);
-      setItemDetails({ customItems: [] });
-    } catch (error) {
-      if (error.name !== 'ValidationError') {
-        message.error(
-          error.response?.data?.message || error.message || 'Failed to submit order'
-        );
-      }
+    if (itemDetails.customItems.length === 0) {
+      message.error('Please add at least one item.');
+      return;
     }
-  };
+
+    if (
+      values.expectedDeliveryDate &&
+      values.date &&
+      values.expectedDeliveryDate.isBefore(values.date)
+    ) {
+      message.error('Expected delivery date must be after the order date.');
+      return;
+    }
+
+    const formattedItems = itemDetails.customItems.map((item) => ({
+      itemName: item.items,
+      quantity: item.qty,
+      price: item.price,
+    }));
+
+    await axios.post('http://localhost:5000/api/orders', {
+      ...values,
+      date: values.date?.toISOString(),
+      expectedDeliveryDate: values.expectedDeliveryDate?.toISOString(),
+      time: values.time?.format('HH:mm'),
+      items: formattedItems,
+    });
+
+    console.log('Order submitted successfully');
+
+    // Show success modal
+    setIsSuccessModalVisible(true);
+
+    form.resetFields();
+    setSelectedService(null);
+    setItemDetails({ customItems: [] });
+  } catch (error) {
+    console.error('Submission error:', error);
+    if (error.name !== 'ValidationError') {
+      message.error(
+        error.response?.data?.message || error.message || 'Failed to submit order'
+      );
+    }
+  }
+};
+
 
   const services = [
     { name: 'Laundry', img: Laundry },
@@ -232,11 +240,7 @@ export default function LaundryForm() {
                 >
                   <Input placeholder="Pickup & Delivery Discount" className="h-8" />
                 </Form.Item>
-                <Form.Item
-                  label="Note"
-                  name="note"
-                  
-                >
+                <Form.Item label="Note" name="note">
                   <TextArea placeholder="Note" rows={4} />
                 </Form.Item>
               </div>
@@ -267,6 +271,29 @@ export default function LaundryForm() {
           </div>
         </Form>
       </div>
+        <Modal
+          open={isSuccessModalVisible}
+          onOk={() => setIsSuccessModalVisible(false)}
+          onCancel={() => setIsSuccessModalVisible(false)}
+          centered
+          footer={[
+            <Button key="ok" type="primary" className="bg-[#6c2bd9]" onClick={() => setIsSuccessModalVisible(false)}>
+              OK
+            </Button>,
+          ]}
+          closable={false}
+        >
+          <div className="text-center">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/845/845646.png"
+              alt="Success"
+              className="w-16 h-16 mx-auto mb-4"
+            />
+            <Title level={4} className="text-[#6c2bd9]">Order Submitted Successfully!</Title>
+          </div>
+        </Modal>
+
+
     </Layout>
   );
 }
