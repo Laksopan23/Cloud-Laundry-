@@ -1,77 +1,80 @@
+const Employee = require('../models/empUser');
 const Email = require('../models/Email');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 
-// In-memory store for OTPs
-const otpStore = new Map();
+// Configure nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 // Generate OTP
 function generateOTP() {
-  return Math.floor(10000 + Math.random() * 90000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+// Send OTP email
+async function sendOTPEmail(email, otp) {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Password Reset OTP',
+    text: `Your OTP is: ${otp}. It will expire in 60 seconds.`
+  };
+  await transporter.sendMail(mailOptions);
+}
+
+// Forgot Password
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
+  const user = await Employee.findOne({ email });
+  if (!user) return res.status(404).json({ message: "No employee found with this email." });
 
-  try {
-    const newEmail = new Email({ email });
-    await newEmail.save();
+  const otp = generateOTP();
+  await Email.create({ email, otp }); // will auto-expire in 60s
 
-    const otp = generateOTP();
-    otpStore.set(email, {
-      otp,
-      timestamp: Date.now(),
-      attempts: 0
-    });
-
-    console.log(`📧 Email stored: ${email}, OTP: ${otp}`);
-    res.status(200).json({ message: "OTP sent to email!" });
-  } catch (error) {
-    console.error('❌ Error:', error);
-    res.status(500).json({ message: "Something went wrong." });
-  }
+  await sendOTPEmail(email, otp);
+  res.status(200).json({ message: "OTP sent to email!" });
 };
 
-exports.verifyOTP = (req, res) => {
-  const { email, otp } = req.body;
-  const storedData = otpStore.get(email);
-
-  if (!storedData) {
-    return res.status(400).json({ message: "OTP expired or not found. Please request a new one." });
-  }
-
-  if (Date.now() - storedData.timestamp > 10 * 60 * 1000) {
-    otpStore.delete(email);
-    return res.status(400).json({ message: "OTP expired. Please request a new one." });
-  }
-
-  if (storedData.otp === otp) {
-    otpStore.delete(email);
-    res.status(200).json({ message: "OTP verified successfully!" });
-  } else {
-    storedData.attempts += 1;
-    if (storedData.attempts >= 3) {
-      otpStore.delete(email);
-      res.status(400).json({ message: "Too many failed attempts. Please request a new OTP." });
-    } else {
-      res.status(400).json({ message: "Invalid OTP. Please try again." });
-    }
-  }
-};
-
+// Resend OTP
 exports.resendOTP = async (req, res) => {
   const { email } = req.body;
+  const user = await Employee.findOne({ email });
+  if (!user) return res.status(404).json({ message: "No employee found with this email." });
 
-  try {
-    const otp = generateOTP();
-    otpStore.set(email, {
-      otp,
-      timestamp: Date.now(),
-      attempts: 0
-    });
+  const otp = generateOTP();
+  await Email.create({ email, otp }); // new doc, old will expire
 
-    console.log(`📧 Resent OTP: ${otp} to ${email}`);
-    res.status(200).json({ message: "New OTP sent successfully!" });
-  } catch (error) {
-    console.error('❌ Error resending OTP:', error);
-    res.status(500).json({ message: "Failed to resend OTP." });
-  }
+  await sendOTPEmail(email, otp);
+  res.status(200).json({ message: "New OTP sent!" });
+};
+
+// Verify OTP
+exports.verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+  const record = await Email.findOne({ email, otp, used: false });
+  if (!record) return res.status(400).json({ message: "Invalid or expired OTP." });
+
+  // Mark as used
+  record.used = true;
+  await record.save();
+
+  res.status(200).json({ message: "OTP verified!" });
+};
+
+// Reset Password
+exports.resetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+  const user = await Employee.findOne({ email });
+  if (!user) return res.status(404).json({ message: "Employee not found." });
+
+  user.password = await bcrypt.hash(newPassword, 12);
+  await user.save();
+
+  res.status(200).json({ message: "Password reset successful!" });
 };

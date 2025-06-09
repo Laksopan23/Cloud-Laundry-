@@ -29,15 +29,33 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: 'Items are required and must be a non-empty array' });
     }
 
+    // Generate unique invoice number
     const invoiceNumber = await getUniqueInvoiceNumber();
-    const order = new Order({ ...req.body, invoiceNumber });
 
+    // Calculate total
+    const total = req.body.items.reduce((acc, item) => {
+      const itemTotal = (item.price || 0) * (item.quantity || 0);
+      return acc + itemTotal;
+    }, 0);
+
+    // Prepare order data with calculated total and invoice number
+    const orderData = {
+      ...req.body,
+      invoiceNumber,
+      total
+    };
+
+    const order = new Order(orderData);
     await order.save();
+
     res.status(201).json(order);
+
   } catch (error) {
+    console.error('Error creating order:', error);
     res.status(500).json({ message: 'Failed to create order', error });
   }
 };
+
 
 // Get All Orders
 exports.getOrders = async (req, res) => {
@@ -46,5 +64,54 @@ exports.getOrders = async (req, res) => {
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch orders', error });
+  }
+};
+
+
+/*
+// Update Order Fields (Status & Payment Status)
+exports.updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateFields = {};
+
+    if (req.body.status) updateFields.status = req.body.status;
+    if (req.body.paymentStatus) updateFields.paymentStatus = req.body.paymentStatus;
+
+    const order = await Order.findByIdAndUpdate(id, updateFields, { new: true });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update order', error });
+  }
+};
+
+*/
+
+// Update Order Fields (Status, Payment Status, Actual Delivery Date)
+exports.updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateFields = {};
+
+    if (req.body.status) updateFields.status = req.body.status;
+    if (req.body.paymentStatus) updateFields.paymentStatus = req.body.paymentStatus;
+    if (req.body.actualDeliveryDate !== undefined) {
+      updateFields.actualDeliveryDate = req.body.actualDeliveryDate;
+    }
+
+    const order = await Order.findByIdAndUpdate(id, updateFields, { new: true });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update order', error });
   }
 };

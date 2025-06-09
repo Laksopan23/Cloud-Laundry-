@@ -1,308 +1,299 @@
-// LaundryForm.js
 import React, { useState } from 'react';
-import { Input, DatePicker, TimePicker, Button, Card, Typography, message } from 'antd';
-import { UserOutlined, ProfileOutlined, ShoppingCartOutlined, CarOutlined } from '@ant-design/icons';
+import {
+  Input,
+  DatePicker,
+  TimePicker,
+  Button,
+  Typography,
+  message,
+  Form,
+  Modal,
+} from 'antd';
+import {
+  UserOutlined,
+  ProfileOutlined,
+  ShoppingCartOutlined,
+  CarOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
-import dayjs from 'dayjs';
 import Layout from '../../components/Layout';
-import AddItemModal from './models/AddItemsModel'; // adjust path as needed
+import AddItemModal from './models/AddItemsModel';
 
-// Note: Image imports are placeholders; update to correct images
-import Laundry from '../../images/4.png';
-import Curtains from '../../images/4.png';
-import Sofa from '../../images/4.png';
-import House from '../../images/4.png';
+import Laundry from '../../images/laundry.png';
+import Curtains from '../../images/curtins.png';
+import Sofa from '../../images/sofa.png';
+import House from '../../images/house.png';
 
 const { TextArea } = Input;
 const { Title } = Typography;
 
 export default function LaundryForm() {
+  const [form] = Form.useForm();
   const [selectedService, setSelectedService] = useState(null);
-  const [formData, setFormData] = useState({
-    customerName: '',
-    customerAddress1: '',
-    customerAddress2: '',
-    customerPhone: '',
-    selectedService: '',
-    date: null,
-    expectedDeliveryDate: null,
-    time: null,
-    pickupFee: '',
-    pickupDiscount: '',
-    note: '',
-    pickupPersonName: '',
-    pickupPersonPhone: '',
-  });
-
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [itemDetails, setItemDetails] = useState({ customItems: [] }); // Custom items from modal
+  const [itemDetails, setItemDetails] = useState({ customItems: [] });
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
 
   const handleAddItem = (data) => {
-    setItemDetails(prevDetails => ({
-      customItems: data.customItems, // updating customItems
-    }));
+    setItemDetails({ customItems: data.customItems });
     message.success('Items added!');
   };
 
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+const handleSubmit = async () => {
+  try {
+    const values = await form.validateFields();
 
-  const handleSubmit = async () => {
-    try {
-      // Map customItems to backend's expected items format
-      const formattedItems = itemDetails.customItems.map((item) => ({
-        itemName: item.items,
-        quantity: item.qty,
-        price: item.price,
-      }));
-
-      const response = await axios.post('http://localhost:5000/api/orders', {
-        ...formData,
-        date: formData.date ? formData.date.toISOString() : null,
-        expectedDeliveryDate: formData.expectedDeliveryDate ? formData.expectedDeliveryDate.toISOString() : null,
-        time: formData.time ? formData.time.format('HH:mm') : null,
-        items: formattedItems, // Send only formatted items
-      });
-
-      message.success('Order saved successfully!');
-      // Reset form and state
-      setFormData({
-        customerName: '',
-        customerAddress1: '',
-        customerAddress2: '',
-        customerPhone: '',
-        selectedService: '',
-        date: null,
-        expectedDeliveryDate: null,
-        time: null,
-        pickupFee: '',
-        pickupDiscount: '',
-        note: '',
-        pickupPersonName: '',
-        pickupPersonPhone: '',
-      });
-      setSelectedService(null);
-      setItemDetails({ customItems: [] });
-    } catch (error) {
-      console.error(error);
-      const errorMessage = error.response?.data?.message || 'Failed to submit order';
-      message.error(errorMessage);
+    if (itemDetails.customItems.length === 0) {
+      message.error('Please add at least one item.');
+      return;
     }
-  };
+
+    if (
+      values.expectedDeliveryDate &&
+      values.date &&
+      values.expectedDeliveryDate.isBefore(values.date)
+    ) {
+      message.error('Expected delivery date must be after the order date.');
+      return;
+    }
+
+    const formattedItems = itemDetails.customItems.map((item) => ({
+      itemName: item.items,
+      quantity: item.qty,
+      price: item.price,
+    }));
+
+    await axios.post('http://localhost:5000/api/orders', {
+      ...values,
+      date: values.date?.toISOString(),
+      expectedDeliveryDate: values.expectedDeliveryDate?.toISOString(),
+      time: values.time?.format('HH:mm'),
+      items: formattedItems,
+    });
+
+    console.log('Order submitted successfully');
+
+    // Show success modal
+    setIsSuccessModalVisible(true);
+
+    form.resetFields();
+    setSelectedService(null);
+    setItemDetails({ customItems: [] });
+  } catch (error) {
+    console.error('Submission error:', error);
+    if (error.name !== 'ValidationError') {
+      message.error(
+        error.response?.data?.message || error.message || 'Failed to submit order'
+      );
+    }
+  }
+};
+
 
   const services = [
     { name: 'Laundry', img: Laundry },
     { name: 'Curtains Cleaning', img: Curtains },
     { name: 'Sofa, Carpet & Interior Cleaning', img: Sofa },
-    { name: 'House Deep Cleaning', img: House }
+    { name: 'Domestic Cleaning', img: House },
   ];
 
   return (
     <Layout>
-      <div style={{ maxWidth: 900, margin: '0 auto' }}>
-        {/* Personal Details */}
-        <Card
-          title={<span><UserOutlined /> Personal Details</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
-        >
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Customer Name</Title>
-              <Input
-                placeholder="Customer Name"
-                value={formData.customerName}
-                onChange={(e) => handleChange('customerName', e.target.value)}
-              />
+      <div className="max-w-4xl mx-auto px-4">
+        <Form layout="vertical" form={form}>
+          {/* Personal Details */}
+          <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+            <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+              <UserOutlined /> Personal Details
             </div>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Customer Address 1</Title>
-              <Input
-                placeholder="Customer Address 1"
-                value={formData.customerAddress1}
-                onChange={(e) => handleChange('customerAddress1', e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Customer Phone</Title>
-              <Input
-                placeholder="Customer Phone"
-                value={formData.customerPhone}
-                onChange={(e) => handleChange('customerPhone', e.target.value)}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Customer Address 2</Title>
-              <Input
-                placeholder="Customer Address 2"
-                value={formData.customerAddress2}
-                onChange={(e) => handleChange('customerAddress2', e.target.value)}
-              />
-            </div>
-          </div>
-        </Card>
-
-        {/* Service Type */}
-        <Card
-          title={<span><ProfileOutlined /> Service Type</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: 20 }}>
-            {services.map((service, index) => {
-              const isSelected = selectedService === service.name;
-              return (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setSelectedService(service.name);
-                    handleChange('selectedService', service.name);
-                  }}
-                  style={{
-                    width: 150,
-                    height: 150,
-                    border: isSelected ? '2px solid #6c2bd9' : '1px solid #ccc',
-                    borderRadius: 10,
-                    background: isSelected ? '#f3eaff' : '#fff',
-                    textAlign: 'center',
-                    padding: 10,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.border = '2px solid #6c2bd9'}
-                  onMouseLeave={e => e.currentTarget.style.border = isSelected ? '2px solid #6c2bd9' : '1px solid #ccc'}
-                >
-                  <img src={service.img} alt={service.name} style={{ width: 60, height: 60, marginBottom: 10 }} />
-                  <div>{service.name}</div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        {/* Order Details */}
-        <Card
-          title={<span><ShoppingCartOutlined /> Order Details</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
-        >
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Invoice Number</Title>
-              <Input placeholder="Auto-generated" value="Auto-generated" disabled />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Date</Title>
-              <DatePicker
-                placeholder="Date"
-                style={{ width: '100%' }}
-                value={formData.date}
-                onChange={(date) => handleChange('date', date)}
-              />
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Expected Delivery Date</Title>
-              <DatePicker
-                placeholder="Expected Delivery Date"
-                style={{ width: '100%' }}
-                value={formData.expectedDeliveryDate}
-                onChange={(date) => handleChange('expectedDeliveryDate', date)}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Time</Title>
-              <TimePicker
-                placeholder="Time"
-                style={{ width: '100%' }}
-                value={formData.time}
-                onChange={(time) => handleChange('time', time)}
-              />
-            </div>
-          </div>
-          <Button
-            style={{ marginTop: 20, backgroundColor: '#6c2bd9', color: '#fff' }}
-            onClick={() => setIsModalVisible(true)}
-          >
-            Add Items
-          </Button>
-        </Card>
-
-        <AddItemModal
-          visible={isModalVisible}
-          onClose={() => setIsModalVisible(false)}
-          onAddItem={handleAddItem}
-          width={800}
-        />
-
-        {/* Pickup Details */}
-        <Card
-          title={<span><CarOutlined /> Pickup Details</span>}
-          size="small"
-          style={{ marginTop: 20, borderTop: '5px solid #6c2bd9' }}
-        >
-          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            <div style={{ flex: 1 }}>
-              <Title level={5}>Pickup & Delivery Fee</Title>
-              <Input
-                placeholder="Pickup & Delivery Fee"
-                value={formData.pickupFee}
-                onChange={(e) => handleChange('pickupFee', e.target.value)}
-              />
-              <Title level={5}>Pickup & Delivery Discount</Title>
-              <Input
-                placeholder="Pickup & Delivery Discount"
-                value={formData.pickupDiscount}
-                onChange={(e) => handleChange('pickupDiscount', e.target.value)}
-              />
-              <Title level={5}>Note</Title>
-              <TextArea
-                placeholder="Note"
-                rows={4}
-                value={formData.note}
-                onChange={(e) => handleChange('note', e.target.value)}
-              />
-            </div>
-            <div style={{ flex: 1 }}>
-              <Card
-                title={<span style={{ fontWeight: 'bold', color: '#6c2bd9' }}>Delivery Person</span>}
-                size="small"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Form.Item
+                label="Customer Name"
+                name="customerName"
+                rules={[{ required: true, message: 'Customer name is required' }]}
               >
-                <Title level={5}>Pickup Person Name</Title>
-                <Input
-                  placeholder="Pickup Person Name"
-                  value={formData.pickupPersonName}
-                  onChange={(e) => handleChange('pickupPersonName', e.target.value)}
-                />
-                <Title level={5}>Pickup Person Phone</Title>
-                <Input
-                  placeholder="Pickup Person Phone"
-                  value={formData.pickupPersonPhone}
-                  onChange={(e) => handleChange('pickupPersonPhone', e.target.value)}
-                />
-              </Card>
+                <Input placeholder="Customer Name" className="h-8" />
+              </Form.Item>
+              <Form.Item
+                label="Customer Phone"
+                name="customerPhone"
+                rules={[{ required: true, message: 'Customer phone is required' }]}
+              >
+                <Input placeholder="Customer Phone" className="h-8" />
+              </Form.Item>
+              <Form.Item
+                label="Address Line 1"
+                name="Addressline1"
+                rules={[{ required: true, message: 'Address Line 1 is required' }]}
+              >
+                <Input placeholder="Address Line 1" className="h-8" />
+              </Form.Item>
+              <Form.Item
+                label="Address Line 2"
+                name="Addressline2"
+                rules={[{ required: true, message: 'Address Line 2 is required' }]}
+              >
+                <Input placeholder="Address Line 2" className="h-8" />
+              </Form.Item>
             </div>
           </div>
-        </Card>
 
-        <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <Button
-            style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
-            onClick={handleSubmit}
+          {/* Service Type */}
+          <Form.Item
+            name="selectedService"
+            rules={[{ required: true, message: 'Please select a service' }]}
           >
-            Save
-          </Button>
-        </div>
+            <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+              <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+                <ProfileOutlined /> Service Type
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {services.map((service, index) => {
+                  const isSelected = selectedService === service.name;
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        setSelectedService(service.name);
+                        form.setFieldValue('selectedService', service.name);
+                      }}
+                      className={`rounded-lg border transition-all duration-300 flex flex-col justify-center items-center cursor-pointer p-3 text-center ${
+                        isSelected ? 'border-[#6c2bd9] bg-[#f3eaff]' : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      <img
+                        src={service.img}
+                        alt={service.name}
+                        className="w-[75px] h-[75px] mb-2"
+                      />
+                      <div className="text-sm">{service.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </Form.Item>
+
+          {/* Order Details */}
+          <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+            <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+              <ShoppingCartOutlined /> Order Details
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <Form.Item label="Invoice Number">
+                <Input className="h-8" placeholder="Auto-generated" value="Auto-generated" disabled />
+              </Form.Item>
+              <Form.Item
+                label="Date"
+                name="date"
+                rules={[{ required: true, message: 'Please select a date' }]}
+              >
+                <DatePicker placeholder="Date" className="w-full" />
+              </Form.Item>
+              <Form.Item
+                label="Expected Delivery Date"
+                name="expectedDeliveryDate"
+                rules={[{ required: true, message: 'Expected delivery date is required' }]}
+              >
+                <DatePicker placeholder="Expected Delivery Date" className="w-full" />
+              </Form.Item>
+              <Form.Item
+                label="Time"
+                name="time"
+                rules={[{ required: true, message: 'Please select a time' }]}
+              >
+                <TimePicker placeholder="Time" className="w-full" />
+              </Form.Item>
+            </div>
+            <div className="flex justify-center mt-5">
+              <Button className="bg-[#6c2bd9] text-white" onClick={() => setIsModalVisible(true)}>
+                Add Items
+              </Button>
+            </div>
+          </div>
+
+          <AddItemModal
+            visible={isModalVisible}
+            onClose={() => setIsModalVisible(false)}
+            onAddItem={handleAddItem}
+            selectedService={selectedService}
+          />
+
+          {/* Pickup Details */}
+          <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+            <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
+              <CarOutlined /> Pickup Details
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <Form.Item
+                  label="Pickup & Delivery Fee"
+                  name="pickupFee"
+                  rules={[{ required: true, message: 'Pickup fee is required' }]}
+                >
+                  <Input placeholder="Pickup & Delivery Fee" className="h-8" />
+                </Form.Item>
+                <Form.Item
+                  label="Pickup & Delivery Discount"
+                  name="pickupDiscount"
+                  rules={[{ required: true, message: 'Pickup discount is required' }]}
+                >
+                  <Input placeholder="Pickup & Delivery Discount" className="h-8" />
+                </Form.Item>
+                <Form.Item label="Note" name="note">
+                  <TextArea placeholder="Note" rows={4} />
+                </Form.Item>
+              </div>
+              <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
+                <div className="font-bold text-[#6c2bd9] mb-3">Delivery Person</div>
+                <Form.Item
+                  label="Pickup Person Name"
+                  name="pickupPersonName"
+                  rules={[{ required: true, message: 'Pickup person name is required' }]}
+                >
+                  <Input placeholder="Pickup Person Name" className="h-8" />
+                </Form.Item>
+                <Form.Item
+                  label="Pickup Person Phone"
+                  name="pickupPersonPhone"
+                  rules={[{ required: true, message: 'Pickup person phone is required' }]}
+                >
+                  <Input placeholder="Pickup Person Phone" className="h-8" />
+                </Form.Item>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-6">
+            <Button className="bg-[#6c2bd9] text-white" onClick={handleSubmit}>
+              Save Order
+            </Button>
+          </div>
+        </Form>
       </div>
+        <Modal
+          open={isSuccessModalVisible}
+          onOk={() => setIsSuccessModalVisible(false)}
+          onCancel={() => setIsSuccessModalVisible(false)}
+          centered
+          footer={[
+            <Button key="ok" type="primary" className="bg-[#6c2bd9]" onClick={() => setIsSuccessModalVisible(false)}>
+              OK
+            </Button>,
+          ]}
+          closable={false}
+        >
+          <div className="text-center">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/845/845646.png"
+              alt="Success"
+              className="w-16 h-16 mx-auto mb-4"
+            />
+            <Title level={4} className="text-[#6c2bd9]">Order Submitted Successfully!</Title>
+          </div>
+        </Modal>
+
+
     </Layout>
   );
 }
