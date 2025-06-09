@@ -6,7 +6,7 @@ const PasswordResetSuccess = () => {
     // Navigate to login page or home page
     window.location.href = "/";
   };
-
+  
   return (
     <div className="main-container">
       <div className="image-side">
