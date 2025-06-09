@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import debounce from 'lodash.debounce'; // Optional: Use lodash.debounce
+import debounce from 'lodash.debounce';
 import '../../styles/Signup.css';
 import logo from '../../../assets/logo.png';
 import googleIcon from '../../../assets/google-icon.png';
@@ -15,6 +15,7 @@ const EmployeeSignup = () => {
     password: '',
     confirmPassword: '',
   });
+
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState({
@@ -22,9 +23,11 @@ const EmployeeSignup = () => {
     available: null,
     message: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const navigate = useNavigate();
 
-  // Debounced function to check username availability
   const checkUsername = useCallback(
     debounce(async (username) => {
       if (!username) {
@@ -49,17 +52,16 @@ const EmployeeSignup = () => {
           message: 'Error checking username',
         });
       }
-    }, 500), // 500ms debounce delay
+    }, 500),
     []
   );
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
     if (name === 'username') {
-      checkUsername(value); // Trigger username check
+      checkUsername(value);
     }
 
     if (name === 'password' || name === 'confirmPassword') {
@@ -156,22 +158,40 @@ const EmployeeSignup = () => {
             )}
 
             <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              onChange={handleChange}
-              required
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Password"
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
 
             <label>Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-              onChange={handleChange}
-              required
-            />
+            <div className="password-wrapper">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
 
             {!passwordMatch && formData.password && formData.confirmPassword && (
               <p style={{ color: 'red', fontSize: '14px', margin: '5px 0' }}>

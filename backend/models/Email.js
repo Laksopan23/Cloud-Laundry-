@@ -6,21 +6,22 @@ const emailSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    unique: true, // Ensure uniqueness at the schema level
   },
   otp: {
     type: String,
-    required: true
+    required: true, // OTP must always be present for these documents
   },
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 60
+    expires: 60, // OTP valid for 60 seconds
   },
   used: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 // Step 2: Export model to use in other files

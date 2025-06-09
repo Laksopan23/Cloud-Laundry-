@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import "./ForgotPassword.css";
-import OTPVerification from "./OTPVerification";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Email validation using regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
     setIsValidEmail(emailRegex.test(email));
   }, [email]);
 
@@ -17,10 +17,6 @@ const ForgotPassword = () => {
     e.preventDefault();
     if (!isValidEmail) return;
     
-    // Show OTP page immediately
-    setShowOTP(true);
-    
-    // Handle API call in the background
     try {
       const response = await fetch("http://localhost:5000/api/email/forgot-password", {
         method: "POST",
@@ -31,28 +27,24 @@ const ForgotPassword = () => {
       });
       const data = await response.json();
       
-      if (!response.ok) {
+      if (response.ok) {
+        alert("OTP sent to your email!");
+        setTimeout(() => {
+          navigate('/otp', { state: { email } });
+        }, 100);
+      } else {
         console.error("Error:", data.message);
+        alert(data.message || "Failed to send OTP.");
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
   const handleBack = () => {
-    if (showOTP) {
-      setShowOTP(false);
-    } else {
-      window.history.back();
-    }
+    window.history.back();
   };
-
-  if (showOTP) {
-    return <OTPVerification 
-      email={email} 
-      onBack={() => setShowOTP(false)}
-    />;
-  }
 
   return (
     <div className="main-container">
@@ -66,7 +58,7 @@ const ForgotPassword = () => {
       </div>
 
       <div className="form-side">
-        <div className="form-container">
+        <div className="form-container" style={{ marginTop: '140px' }}>
           <img src="/cloud-logo-removebg-preview.png" alt="Cloud Laundry" className="logo" />
           <h2 className="title">FORGOT PASSWORD</h2>
           <p className="subtitle">Please enter your email to reset the password</p>

@@ -4,9 +4,9 @@ import "./ForgotPassword.css";
 const PasswordResetSuccess = () => {
   const handleContinue = () => {
     // Navigate to login page or home page
-    window.location.href = "/login";
+    window.location.href = "/";
   };
-
+  
   return (
     <div className="main-container">
       <div className="image-side">

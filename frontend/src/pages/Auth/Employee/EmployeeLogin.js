@@ -13,10 +13,15 @@ const EmployeeLogin = () => {
   });
 
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleLogin = async (e) => {
@@ -60,18 +65,27 @@ const EmployeeLogin = () => {
             />
 
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={credentials.password}
-              onChange={handleChange}
-              required
-            />
+            <div className="password-wrapper">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Enter your password"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
 
             <p className="forgot-password">
-              <Link to="/forgot-password">Forgot password?</Link>
+              <Link to="/pass">Forgot password?</Link>
             </p>
 
             <div className="checkbox">
