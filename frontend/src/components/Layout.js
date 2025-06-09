@@ -51,7 +51,7 @@ const shoutableHoverColor = "#d4beff";
 const App = ({ children }) => {
   const navigate = useNavigate();
   const logout = useLogout();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [isBackTopVisible, setIsBackTopVisible] = useState(false);
   const [username, setUsername] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -98,7 +98,7 @@ const handleMenuClick = (item) => {
 
 
   const menuItemStyle = {
-    margin: "6px 12px",
+    margin: "6px 0px",
     borderRadius: 6,
   };
 

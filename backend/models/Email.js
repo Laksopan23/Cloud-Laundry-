@@ -8,9 +8,18 @@ const emailSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
+  otp: {
+    type: String,
+    required: true
+  },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    expires: 60
+  },
+  used: {
+    type: Boolean,
+    default: false
   }
 });
 

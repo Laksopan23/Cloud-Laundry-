@@ -252,78 +252,106 @@ export default function AllOrders() {
   ];
 
   // Mobile view rendering for orders
-  const renderMobileOrders = () => {
-    return filteredOrders.map((order) => (
-      <Card
-        key={order._id}
+const renderMobileOrders = () => {
+  return filteredOrders.map((order) => (
+    <Card
+      key={order._id}
+      style={{
+        marginBottom: 16,
+        borderRadius: 8,
+        border: '1px solid #d9d9d9',
+      }}
+    >
+      <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
+        Invoice #{order.invoiceNumber}
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div>
+          <strong>Customer:</strong> {order.customerName}
+        </div>
+        <div>
+          <strong>Phone:</strong> {order.customerPhone}
+        </div>
+        <div>
+          <strong>Service:</strong> {order.selectedService}
+        </div>
+        <div>
+          <strong>Date:</strong> {dayjs(order.date).format('YYYY-MM-DD')}
+        </div>
+        <div>
+          <strong>Delivery:</strong> {dayjs(order.expectedDeliveryDate).format('YYYY-MM-DD')}
+        </div>
+        <div>
+          <strong>Status:</strong>{' '}
+          {isAdmin ? (
+            <Select
+              value={order.status}
+              onChange={(value) => handleStatusChange(order, value)}
+              style={{ width: 120 }}
+              size="small"
+            >
+              <Option value="Pending">Pending</Option>
+              <Option value="Completed">Completed</Option>
+              <Option value="Cancelled">Cancelled</Option>
+            </Select>
+          ) : (
+            <span style={{ color: colorMapStatus[order.status] }}>{order.status}</span>
+          )}
+        </div>
+        <div>
+          <strong>Actual Delivery:</strong>{' '}
+          {!isAdmin && order.paymentStatus === 'paid' && order.status === 'Completed' ? (
+            <DatePicker
+              value={order.actualDeliveryDate ? dayjs(order.actualDeliveryDate) : null}
+              onChange={(value) => handleActualDeliveryChange(order, value)}
+              format="YYYY-MM-DD"
+              allowClear={false}
+              disabled={!!order.actualDeliveryDate}
+              size="small"
+            />
+          ) : (
+            <span>
+              {order.actualDeliveryDate ? dayjs(order.actualDeliveryDate).format('YYYY-MM-DD') : 'N/A'}
+            </span>
+          )}
+        </div>
+        <div>
+          <strong>Payment:</strong>{' '}
+          {isAdmin ? (
+            <Select
+              value={order.paymentStatus}
+              onChange={(value) => handlePaymentChange(order, value)}
+              style={{ width: 120 }}
+              size="small"
+            >
+              <Option value="not paid">Not Paid</Option>
+              <Option value="paid">Paid</Option>
+              <Option value="refunded">Refunded</Option>
+            </Select>
+          ) : (
+            <span style={{ color: colorMapPayment[order.paymentStatus] }}>{order.paymentStatus}</span>
+          )}
+        </div>
+      </div>
+      <div
         style={{
-          marginBottom: 16,
-          borderRadius: 8,
-          border: '1px solid #d9d9d9',
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginTop: 16,
         }}
       >
-        <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 8 }}>
-          Invoice #{order.invoiceNumber}
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <div>
-            <strong>Customer:</strong> {order.customerName}
-          </div>
-          <div>
-            <strong>Phone:</strong> {order.customerPhone}
-          </div>
-          <div>
-            <strong>Service:</strong> {order.selectedService}
-          </div>
-          <div>
-            <strong>Date:</strong> {dayjs(order.date).format('YYYY-MM-DD')}
-          </div>
-          <div>
-            <strong>Delivery:</strong> {dayjs(order.expectedDeliveryDate).format('YYYY-MM-DD')}
-          </div>
-          <div>
-            <strong>Status:</strong>{' '}
-            <span style={{ color: colorMapStatus[order.status] }}>{order.status}</span>
-          </div>
-          <div>
-            <strong>Actual Delivery:</strong>{' '}
-            {!isAdmin && order.paymentStatus === 'paid' && order.status === 'Completed' ? (
-              <DatePicker
-                value={order.actualDeliveryDate ? dayjs(order.actualDeliveryDate) : null}
-                onChange={(value) => handleActualDeliveryChange(order, value)}
-                format="YYYY-MM-DD"
-                allowClear={false}
-                disabled={!!order.actualDeliveryDate}
-                size="small"
-              />
-            ) : (
-              <span>{order.actualDeliveryDate ? dayjs(order.actualDeliveryDate).format('YYYY-MM-DD') : 'N/A'}</span>
-            )}
-          </div>
-
-          <div>
-            <strong>Payment:</strong>{' '}
-            <span style={{ color: colorMapPayment[order.paymentStatus] }}>{order.paymentStatus}</span>
-          </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: 16,
-          }}
+        <Button onClick={() => handleView(order)}>View Details</Button>
+        <Button
+          onClick={() => handleDownload(order)}
+          style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
         >
-          <Button onClick={() => handleView(order)}>View Details</Button>
-          <Button
-            onClick={() => handleDownload(order)}
-            style={{ backgroundColor: '#6c2bd9', color: '#fff' }}
-          >
-            Download
-          </Button>
-        </div>
-      </Card>
-    ));
-  };
+          Download
+        </Button>
+      </div>
+    </Card>
+  ));
+};
+
 
   return (
     <Layout>
