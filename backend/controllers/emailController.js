@@ -1,7 +1,9 @@
-const Employee = require('../models/empUser');
+const { Employee } = require('../models/empUser');
 const Email = require('../models/Email');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
+
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
