@@ -44,7 +44,7 @@ const OTPVerification = ({ email, onBack }) => {
     setShowResetPassword(true);
     
     try {
-      const response = await fetch("http://localhost:5000/api/email/verify-otp", {
+      const response = await fetch("http://localhost:5000/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -67,7 +67,7 @@ const OTPVerification = ({ email, onBack }) => {
 
   const handleResendEmail = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/email/resend-otp", {
+      const response = await fetch("http://localhost:5000/resend-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

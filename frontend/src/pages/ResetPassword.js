@@ -93,7 +93,7 @@ const ResetPassword = ({ email, onBack }) => {
       </div>
 
       <div className="form-side">
-        <div className="form-container" style={{ marginTop: '140px' }}>
+        <div className="form-container">
           <img src="/cloud-logo-removebg-preview.png" alt="Cloud Laundry" className="logo" />
           <h2 className="title">Set a new password</h2>
           <p className="subtitle">Create a new password, Ensure it differ form previous one for security</p>
