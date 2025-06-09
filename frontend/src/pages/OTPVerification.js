@@ -1,36 +1,36 @@
 import React, { useState, useRef } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
 import "./OTPVerification.css";
-import ResetPassword from "./ResetPassword";
 
-const OTPVerification = ({ email, onBack }) => {
+const OTPVerification = () => {
   const [otp, setOtp] = useState(["", "", "", "", ""]);
-  const [showResetPassword, setShowResetPassword] = useState(false);
   const inputRefs = useRef([]);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { email } = location.state || {};
+
+  if (!email) {
+    navigate('/pass');
+    return null;
+  }
 
   const handleBack = () => {
-    if (showResetPassword) {
-      setShowResetPassword(false);
-    } else if (onBack) {
-      onBack();
-    }
+    navigate('/pass');
   };
 
   const handleChange = (index, value) => {
-    // Only allow numbers
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Move to next input if current input is filled
     if (value !== "" && index < 4) {
       inputRefs.current[index + 1].focus();
     }
   };
 
   const handleKeyDown = (index, e) => {
-    // Move to previous input on backspace if current input is empty
     if (e.key === "Backspace" && index > 0 && otp[index] === "") {
       inputRefs.current[index - 1].focus();
     }
@@ -40,11 +40,8 @@ const OTPVerification = ({ email, onBack }) => {
     e.preventDefault();
     if (!otp.every(digit => digit !== "")) return;
 
-    // Show password reset page immediately
-    setShowResetPassword(true);
-    
     try {
-      const response = await fetch("http://localhost:5000/verify-otp", {
+      const response = await fetch("http://localhost:5000/api/email/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,39 +52,41 @@ const OTPVerification = ({ email, onBack }) => {
         }),
       });
       
-      if (!response.ok) {
-        // Don't revert back to OTP page, just log the error
-        console.error("Error verifying OTP");
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate('/reset-password', { state: { email } });
+      } else {
+        console.error("Error verifying OTP:", data.message);
+        alert(data.message || "Invalid or expired OTP.");
       }
     } catch (error) {
-      // Don't revert back to OTP page, just log the error
       console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
   const handleResendEmail = async () => {
     try {
-      const response = await fetch("http://localhost:5000/resend-otp", {
+      const response = await fetch("http://localhost:5000/api/email/resend-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
       });
+      const data = await response.json();
       if (response.ok) {
-        console.log("OTP resent successfully");
+        alert("New OTP sent to your email.");
+      } else {
+        console.error("Error resending OTP:", data.message);
+        alert(data.message || "Failed to resend OTP.");
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("An error occurred while resending OTP. Please try again.");
     }
   };
-
-  if (showResetPassword) {
-    return <ResetPassword 
-      email={email} 
-      onBack={() => setShowResetPassword(false)}
-    />;
-  }
 
   return (
     <div className="main-container">
