@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 
 import Dashboard from './pages/common/Dashboard';
 import ForgotPassword from "./pages/forgotpassword";
+import OTPVerification from "./pages/OTPVerification";
+import ResetPassword from "./pages/ResetPassword";
+import PasswordResetSuccess from "./pages/PasswordResetSuccess";
 import Invoice from './pages/orders/AddOrder';
 import ViewOrders from './pages/orders/ViewOrders';
 
@@ -34,6 +37,9 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/pass" element={<ForgotPassword />} />
+        <Route path="/otp" element={<OTPVerification />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/reset-password-success" element={<PasswordResetSuccess />} />
 
      {/* Protected routes */}
         

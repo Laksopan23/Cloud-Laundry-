@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import "./ForgotPassword.css";
-import OTPVerification from "./OTPVerification";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isValidEmail, setIsValidEmail] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Email validation using regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
     setIsValidEmail(emailRegex.test(email));
   }, [email]);
 
@@ -17,12 +17,8 @@ const ForgotPassword = () => {
     e.preventDefault();
     if (!isValidEmail) return;
     
-    // Show OTP page immediately
-    setShowOTP(true);
-    
-    // Handle API call in the background
     try {
-      const response = await fetch("http://localhost:5000/forgot-password", {
+      const response = await fetch("http://localhost:5000/api/email/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -31,28 +27,24 @@ const ForgotPassword = () => {
       });
       const data = await response.json();
       
-      if (!response.ok) {
+      if (response.ok) {
+        alert("OTP sent to your email!");
+        setTimeout(() => {
+          navigate('/otp', { state: { email } });
+        }, 100);
+      } else {
         console.error("Error:", data.message);
+        alert(data.message || "Failed to send OTP.");
       }
     } catch (error) {
       console.error("Error:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
   const handleBack = () => {
-    if (showOTP) {
-      setShowOTP(false);
-    } else {
-      window.history.back();
-    }
+    window.history.back();
   };
-
-  if (showOTP) {
-    return <OTPVerification 
-      email={email} 
-      onBack={() => setShowOTP(false)}
-    />;
-  }
 
   return (
     <div className="main-container">

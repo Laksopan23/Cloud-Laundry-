@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
 import "./ForgotPassword.css";
-import PasswordResetSuccess from "./PasswordResetSuccess";
 
-const ResetPassword = ({ email, onBack }) => {
+const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -10,7 +10,14 @@ const ResetPassword = ({ email, onBack }) => {
   const [passwordStrength, setPasswordStrength] = useState("");
   const [isValid, setIsValid] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
-  const [showSuccess, setShowSuccess] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { email } = location.state || {};
+
+  if (!email) {
+    navigate('/pass');
+    return null;
+  }
 
   const validatePassword = (pass) => {
     if (pass.length < 6) {
@@ -54,37 +61,33 @@ const ResetPassword = ({ email, onBack }) => {
     e.preventDefault();
     if (!isValid || password !== confirmPassword) return;
 
-    // Show success page immediately
-    setShowSuccess(true);
-    
     try {
-      const response = await fetch("http://localhost:5000/reset-password", {
+      const response = await fetch("http://localhost:5000/api/email/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, newPassword: password }),
       });
       const data = await response.json();
       
-      if (!response.ok) {
+      if (response.ok) {
+        alert("Password reset successfully!");
+        navigate('/reset-password-success');
+      } else {
         console.error("Error:", data.message);
-        // Optionally handle error - but we'll keep showing success page
+        alert(data.message || "Failed to reset password.");
       }
     } catch (error) {
       console.error("Error:", error);
-      // Optionally handle error - but we'll keep showing success page
+      alert("An error occurred. Please try again.");
     }
   };
-
-  if (showSuccess) {
-    return <PasswordResetSuccess />;
-  }
 
   return (
     <div className="main-container">
       <div className="image-side">
-        <button onClick={onBack} className="back-button">
+        <button onClick={() => navigate(-1)} className="back-button">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 18L9 12L15 6" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
