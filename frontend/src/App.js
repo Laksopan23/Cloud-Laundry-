@@ -3,7 +3,7 @@ import Dashboard from './pages/Dashboard';
 import ForgotPassword from "./pages/forgotpassword";
 import Invoice from './pages/orders/AddOrder';
 import ViewOrders from './pages/orders/ViewOrders';
-import Signup from './pages/SignupInitial';
+import Signup from './pages/auth/SignupInitial';
 
 
 function App() {

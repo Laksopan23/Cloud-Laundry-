@@ -1,8 +1,8 @@
 import React from 'react';
-import './styles/Signup.css'; 
-import logo from '../assets/logo.png';
-import googleIcon from '../assets/google-icon.png';
-import boyCharacter from '../assets/boy-character.png';
+import '../styles/Signup.css'; // Import your CSS file for styling
+import logo from '../../assets/logo.png'; // Import your logo image
+import googleIcon from '../../assets/google-icon.png'; // Import your Google icon image
+import boyCharacter from '../../assets/boy-character.png'; //
 
 
 const Signup = () => {
