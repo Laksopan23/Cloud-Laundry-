@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
 
 const emailRoutes = require('./routes/emailRoutes');
 const orderRoutes = require('./routes/orderRoutes');
@@ -29,13 +28,6 @@ mongoose.connect(process.env.MONGO_URI, {
   console.error('❌ MongoDB connection error:', err);
 });
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 // Routes
 app.use('/api/email', emailRoutes);
@@ -44,20 +36,6 @@ app.use('/api/orders', orderRoutes);
 //mock
 app.use('/api/employees', employeeRoutes);
 app.use('/api/users', userRoutes);
-
-app.get('/test-email', async (req, res) => {
-  try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER, // send to yourself for testing
-      subject: 'Test Email',
-      text: 'This is a test email from Cloud Laundry backend.'
-    });
-    res.send('Email sent!');
-  } catch (err) {
-    res.status(500).send('Failed to send email: ' + err.message);
-  }
-});
 
 
 
