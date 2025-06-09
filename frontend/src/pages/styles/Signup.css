@@ -275,6 +275,36 @@ input[type="password"]:hover {
   color: #825ee4;
   text-decoration: underline;
 }
+/* Password visibility toggle wrapper */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 80px; /* room for toggle button */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #5e72e4;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+  color: #825ee4;
+}
+
+
 
 /* Image section styling */
 .image-section {
