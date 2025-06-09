@@ -85,7 +85,7 @@ const EmployeeLogin = () => {
             </div>
 
             <p className="forgot-password">
-              <Link to="/forgot-password">Forgot password?</Link>
+              <Link to="/pass">Forgot password?</Link>
             </p>
 
             <div className="checkbox">

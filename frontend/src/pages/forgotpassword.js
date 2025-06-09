@@ -66,7 +66,7 @@ const ForgotPassword = () => {
       </div>
 
       <div className="form-side">
-        <div className="form-container">
+        <div className="form-container" style={{ marginTop: '140px' }}>
           <img src="/cloud-logo-removebg-preview.png" alt="Cloud Laundry" className="logo" />
           <h2 className="title">FORGOT PASSWORD</h2>
           <p className="subtitle">Please enter your email to reset the password</p>
