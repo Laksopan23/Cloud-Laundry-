@@ -2,15 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
+//const nodemailer = require('nodemailer');
 
 const emailRoutes = require('./routes/emailRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-
-//mock
 const employeeRoutes = require('./routes/employeeRoutes');
 const userRoutes = require('./routes/userRoutes');
-
 
 
 dotenv.config();
@@ -33,12 +30,8 @@ mongoose.connect(process.env.MONGO_URI, {
 // Routes
 app.use('/api/email', emailRoutes);
 app.use('/api/orders', orderRoutes);
-
-//mock
 app.use('/api/employees', employeeRoutes);
 app.use('/api/users', userRoutes);
-
-
 
 
 
