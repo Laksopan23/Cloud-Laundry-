@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import "./OTPVerification.css";
 
 const OTPVerification = () => {
-  const [otp, setOtp] = useState(["", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +25,7 @@ const OTPVerification = () => {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (value !== "" && index < 4) {
+    if (value !== "" && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };

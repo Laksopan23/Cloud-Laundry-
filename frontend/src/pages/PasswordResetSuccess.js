@@ -14,7 +14,7 @@ const PasswordResetSuccess = () => {
       </div>
 
       <div className="form-side">
-        <div className="form-container success-container">
+        <div className="form-container success-container" style={{ marginTop: '70px' }}>
           <img src="/cloud-logo-removebg-preview.png" alt="Cloud Laundry" className="logo" />
           
           <div className="success-icon">
