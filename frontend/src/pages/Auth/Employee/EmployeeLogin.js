@@ -22,7 +22,10 @@ const EmployeeLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:5000/api/employees/login', credentials);
+      const res = await axios.post('http://localhost:5000/api/employees/login', credentials, {
+      withCredentials: true,
+    });
+
       const { username, role } = res.data;
 
       localStorage.setItem('username', username);
