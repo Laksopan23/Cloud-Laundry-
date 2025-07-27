@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import debounce from "lodash.debounce";
@@ -28,7 +28,7 @@ const EmployeeSignup = () => {
 
   const navigate = useNavigate();
 
-  const checkUsername = useCallback(
+  const debouncedCheckUsername = useRef(
     debounce(async (username) => {
       if (!username) {
         setUsernameStatus({ checking: false, available: null, message: "" });
@@ -41,7 +41,7 @@ const EmployeeSignup = () => {
           available: null,
           message: "Checking...",
         });
-        const res = await axios.get(
+        const { data } = await axios.get(
           "http://localhost:5000/api/employees/check-username",
           {
             params: { username },
@@ -49,8 +49,8 @@ const EmployeeSignup = () => {
         );
         setUsernameStatus({
           checking: false,
-          available: res.data.available,
-          message: res.data.message,
+          available: data.available,
+          message: data.message,
         });
       } catch (err) {
         setUsernameStatus({
@@ -59,16 +59,15 @@ const EmployeeSignup = () => {
           message: "Error checking username",
         });
       }
-    }, 500),
-    [],
-  );
+    }, 500)
+  ).current;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
     if (name === "username") {
-      checkUsername(value);
+      debouncedCheckUsername(value);
     }
 
     if (name === "password" || name === "confirmPassword") {
@@ -102,7 +101,7 @@ const EmployeeSignup = () => {
     }
 
     try {
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/employees/signup",
         {
           name: formData.name,
@@ -219,7 +218,7 @@ const EmployeeSignup = () => {
                 onChange={handleCheckboxChange}
               />
               <label>
-                I agree to the <a href="#">terms & policy</a>
+                I agree to the <a href="/terms-and-policy">terms & policy</a>
               </label>
             </div>
 

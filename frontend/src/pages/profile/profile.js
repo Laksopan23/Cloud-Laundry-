@@ -1,4 +1,3 @@
-// Paste this full code into your ProfilePage.jsx or equivalent file
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -29,8 +28,6 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import Layout from "../../components/Layout";
-
-const { TabPane } = Tabs;
 
 const colors = {
   primary: "#5e208e",

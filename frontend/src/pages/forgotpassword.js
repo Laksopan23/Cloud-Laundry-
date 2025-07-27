@@ -9,7 +9,7 @@ const ForgotPassword = () => {
 
   useEffect(() => {
     // Email validation using regex
-    const emailRegex = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+    const emailRegex = /^\w[\w.-]*@([\w-]+\.)+[\w-]{2,4}$/;
     setIsValidEmail(emailRegex.test(email));
   }, [email]);
 

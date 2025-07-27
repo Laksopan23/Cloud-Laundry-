@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Card, Progress, Calendar } from "antd";
+import { Progress } from "antd";
 import {
   FileTextOutlined,
   CheckCircleFilled,
@@ -11,7 +11,7 @@ import {
 import Layout from "../components/Layout";
 
 function Dashboard() {
-  const [ordersData, setOrdersData] = useState([]);
+  
   const [analytics, setAnalytics] = useState({
     totalOrders: 0,
     completedOrders: 0,
@@ -40,7 +40,6 @@ function Dashboard() {
     fetch("http://localhost:5000/api/orders")
       .then((res) => res.json())
       .then((data) => {
-        setOrdersData(data);
         calculateAnalytics(data);
       })
       .catch((err) => {

@@ -7,11 +7,11 @@ import {
   DollarOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Calendar } from "antd";
+import { Calendar } from "antd";
 import Layout from "../../components/Layout";
 
 function Dashboard() {
-  const [ordersData, setOrdersData] = useState([]);
+  
   const [analytics, setAnalytics] = useState({
     totalOrders: 0,
     completedOrders: 0,
@@ -41,7 +41,6 @@ function Dashboard() {
     fetch("http://localhost:5000/api/orders")
       .then((res) => res.json())
       .then((data) => {
-        setOrdersData(data);
         calculateAnalytics(data);
       })
       .catch((err) => console.error("Failed to fetch orders:", err));

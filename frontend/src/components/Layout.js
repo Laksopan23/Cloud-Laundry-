@@ -3,9 +3,6 @@ import {
   HomeOutlined,
   FileTextOutlined,
   ShoppingCartOutlined,
-  ClockCircleOutlined,
-  PlusSquareOutlined,
-  LayoutOutlined,
   TeamOutlined,
   UserSwitchOutlined,
   LogoutOutlined,
@@ -45,7 +42,6 @@ const App = ({ children }) => {
   const logout = useLogout();
   const [collapsed, setCollapsed] = useState(true);
   const [isBackTopVisible, setIsBackTopVisible] = useState(false);
-  const [username, setUsername] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [showDrawer, setShowDrawer] = useState(false);
 
@@ -53,9 +49,7 @@ const App = ({ children }) => {
   const isMobile = !screens.md;
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem("username");
     const storedUserRole = localStorage.getItem("role");
-    if (storedUsername) setUsername(storedUsername);
     if (storedUserRole) setUserRole(storedUserRole);
   }, []);
 
