@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Card, Progress, Calendar } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Button, Card, Progress, Calendar } from "antd";
 import {
   FileTextOutlined,
   CheckCircleFilled,
@@ -7,8 +7,8 @@ import {
   ClockCircleOutlined,
   DollarOutlined,
   UserOutlined,
-} from '@ant-design/icons';
-import Layout from '../components/Layout';
+} from "@ant-design/icons";
+import Layout from "../components/Layout";
 
 function Dashboard() {
   const [ordersData, setOrdersData] = useState([]);
@@ -20,50 +20,50 @@ function Dashboard() {
     ordersPerService: {},
     statusBreakdown: {},
   });
-  const [username, setUsername] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const [username, setUsername] = useState("");
+  const [userRole, setUserRole] = useState("");
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [totalCustomers, setTotalCustomers] = useState(0);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    const storedUserRole = localStorage.getItem('role');
+    const storedUsername = localStorage.getItem("username");
+    const storedUserRole = localStorage.getItem("role");
     if (storedUsername) {
       setUsername(storedUsername);
-      console.log('Logged in as:', storedUsername);
+      console.log("Logged in as:", storedUsername);
     }
     if (storedUserRole) {
       setUserRole(storedUserRole);
-      console.log('User role:', storedUserRole);
+      console.log("User role:", storedUserRole);
     }
 
-    fetch('http://localhost:5000/api/orders')
+    fetch("http://localhost:5000/api/orders")
       .then((res) => res.json())
       .then((data) => {
         setOrdersData(data);
         calculateAnalytics(data);
       })
       .catch((err) => {
-        console.error('Failed to fetch orders:', err);
+        console.error("Failed to fetch orders:", err);
       });
 
-    if (storedUserRole === 'admin') {
-      fetch('http://localhost:5000/api/revenue')
+    if (storedUserRole === "admin") {
+      fetch("http://localhost:5000/api/revenue")
         .then((res) => res.json())
         .then((data) => {
           setTotalRevenue(data.totalRevenue || 0);
         })
         .catch((err) => {
-          console.error('Failed to fetch revenue:', err);
+          console.error("Failed to fetch revenue:", err);
         });
 
-      fetch('http://localhost:5000/api/customers/count')
+      fetch("http://localhost:5000/api/customers/count")
         .then((res) => res.json())
         .then((data) => {
           setTotalCustomers(data.totalCustomers || 0);
         })
         .catch((err) => {
-          console.error('Failed to fetch customers:', err);
+          console.error("Failed to fetch customers:", err);
         });
     }
   }, []);
@@ -83,11 +83,11 @@ function Dashboard() {
       const status = order.status;
       statusBreakdown[status] = (statusBreakdown[status] || 0) + 1;
 
-      if (status.toLowerCase() === 'completed') {
+      if (status.toLowerCase() === "completed") {
         completedOrders += 1;
-      } else if (status.toLowerCase() === 'cancelled') {
+      } else if (status.toLowerCase() === "cancelled") {
         cancelledOrders += 1;
-      } else if (status.toLowerCase() === 'pending') {
+      } else if (status.toLowerCase() === "pending") {
         pendingOrders += 1;
       }
     });
@@ -105,7 +105,9 @@ function Dashboard() {
   return (
     <Layout>
       <div className="p-2">
-        <h2 className="font-bold text-center text-xl">Dashboard - Welcome, {username || 'Employee'}</h2>
+        <h2 className="font-bold text-center text-xl">
+          Dashboard - Welcome, {username || "Employee"}
+        </h2>
 
         <div className="flex flex-col lg:flex-row gap-5 items-start">
           {/* LEFT PANEL */}
@@ -146,7 +148,7 @@ function Dashboard() {
                 bgColor="bg-[#f3e8ff]"
                 iconBg="bg-[#b388ff]"
               />
-              {userRole === 'admin' && (
+              {userRole === "admin" && (
                 <>
                   <StatCard
                     icon={<DollarOutlined />}
@@ -169,29 +171,33 @@ function Dashboard() {
             </div>
 
             {/* Top Services */}
-            <h3 className="font-bold mb-5 mt-20 text-left lg:ml-[250px]">Top Services</h3>
+            <h3 className="font-bold mb-5 mt-20 text-left lg:ml-[250px]">
+              Top Services
+            </h3>
             <div className="w-full max-w-[580px]">
-              {Object.entries(analytics.ordersPerService).map(([service, count], index) => (
-                <div key={index} className="mb-5">
-                  <div className="flex justify-between font-medium">
-                    <span>{service}</span>
-                    <span
-                      className="border px-2 py-0.5 rounded-full text-xs"
-                      style={{
-                        borderColor: getColor(service),
-                        color: getColor(service),
-                      }}
-                    >
-                      {count} orders
-                    </span>
+              {Object.entries(analytics.ordersPerService).map(
+                ([service, count], index) => (
+                  <div key={index} className="mb-5">
+                    <div className="flex justify-between font-medium">
+                      <span>{service}</span>
+                      <span
+                        className="border px-2 py-0.5 rounded-full text-xs"
+                        style={{
+                          borderColor: getColor(service),
+                          color: getColor(service),
+                        }}
+                      >
+                        {count} orders
+                      </span>
+                    </div>
+                    <Progress
+                      percent={(count / analytics.totalOrders) * 100}
+                      strokeColor={getColor(service)}
+                      showInfo={false}
+                    />
                   </div>
-                  <Progress
-                    percent={(count / analytics.totalOrders) * 100}
-                    strokeColor={getColor(service)}
-                    showInfo={false}
-                  />
-                </div>
-              ))}
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -202,7 +208,9 @@ function Dashboard() {
 
 function StatCard({ icon, title, value, change, bgColor, iconBg }) {
   return (
-    <div className={`stat-card ${bgColor} rounded-2xl p-5 text-center flex-grow min-w-[140px] max-w-[180px] lg:min-w-[185px] lg:max-w-[250px]`}>
+    <div
+      className={`stat-card ${bgColor} rounded-2xl p-5 text-center flex-grow min-w-[140px] max-w-[180px] lg:min-w-[185px] lg:max-w-[250px]`}
+    >
       <div
         className={`${iconBg} rounded-full w-10 h-10 mx-auto mb-2 flex items-center justify-center text-white text-lg`}
       >
@@ -217,16 +225,16 @@ function StatCard({ icon, title, value, change, bgColor, iconBg }) {
 
 function getColor(name) {
   switch (name) {
-    case 'Laundry Services':
-      return '#1e88e5';
-    case 'Curtains Cleaning':
-      return '#00c853';
-    case 'Sofa/Carpet/Mattress Cleaning':
-      return '#b388ff';
-    case 'House Deep Cleaning':
-      return '#ff9100';
+    case "Laundry Services":
+      return "#1e88e5";
+    case "Curtains Cleaning":
+      return "#00c853";
+    case "Sofa/Carpet/Mattress Cleaning":
+      return "#b388ff";
+    case "House Deep Cleaning":
+      return "#ff9100";
     default:
-      return '#7c4dff';
+      return "#7c4dff";
   }
 }
 

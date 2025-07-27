@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import debounce from 'lodash.debounce';
-import '../../styles/Signup.css';
-import logo from '../../../assets/logo.png';
-import googleIcon from '../../../assets/google-icon.png';
-import boyCharacter from '../../../assets/boy-character.png';
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import debounce from "lodash.debounce";
+import "../../styles/Signup.css";
+import logo from "../../../assets/logo.png";
+import googleIcon from "../../../assets/google-icon.png";
+import boyCharacter from "../../../assets/boy-character.png";
 
 const EmployeeSignup = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    username: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const [passwordMatch, setPasswordMatch] = useState(true);
@@ -21,7 +21,7 @@ const EmployeeSignup = () => {
   const [usernameStatus, setUsernameStatus] = useState({
     checking: false,
     available: null,
-    message: '',
+    message: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,15 +31,22 @@ const EmployeeSignup = () => {
   const checkUsername = useCallback(
     debounce(async (username) => {
       if (!username) {
-        setUsernameStatus({ checking: false, available: null, message: '' });
+        setUsernameStatus({ checking: false, available: null, message: "" });
         return;
       }
 
       try {
-        setUsernameStatus({ checking: true, available: null, message: 'Checking...' });
-        const res = await axios.get('http://localhost:5000/api/employees/check-username', {
-          params: { username },
+        setUsernameStatus({
+          checking: true,
+          available: null,
+          message: "Checking...",
         });
+        const res = await axios.get(
+          "http://localhost:5000/api/employees/check-username",
+          {
+            params: { username },
+          },
+        );
         setUsernameStatus({
           checking: false,
           available: res.data.available,
@@ -49,25 +56,26 @@ const EmployeeSignup = () => {
         setUsernameStatus({
           checking: false,
           available: null,
-          message: 'Error checking username',
+          message: "Error checking username",
         });
       }
     }, 500),
-    []
+    [],
   );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-    if (name === 'username') {
+    if (name === "username") {
       checkUsername(value);
     }
 
-    if (name === 'password' || name === 'confirmPassword') {
-      const password = name === 'password' ? value : formData.password;
-      const confirmPassword = name === 'confirmPassword' ? value : formData.confirmPassword;
-      setPasswordMatch(password === confirmPassword && password !== '');
+    if (name === "password" || name === "confirmPassword") {
+      const password = name === "password" ? value : formData.password;
+      const confirmPassword =
+        name === "confirmPassword" ? value : formData.confirmPassword;
+      setPasswordMatch(password === confirmPassword && password !== "");
     }
   };
 
@@ -79,36 +87,39 @@ const EmployeeSignup = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      alert("Passwords do not match");
       return;
     }
 
     if (!agreedToTerms) {
-      alert('Please agree to the terms & policy');
+      alert("Please agree to the terms & policy");
       return;
     }
 
     if (usernameStatus.available === false) {
-      alert('Username is already taken');
+      alert("Username is already taken");
       return;
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/employees/signup', {
-        name: formData.name,
-        email: formData.email,
-        username: formData.username,
-        password: formData.password,
-      });
-      alert('Signup successful');
-      navigate('/');
+      const res = await axios.post(
+        "http://localhost:5000/api/employees/signup",
+        {
+          name: formData.name,
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        },
+      );
+      alert("Signup successful");
+      navigate("/");
     } catch (err) {
-      alert('Signup failed: ' + err.response.data.message);
+      alert("Signup failed: " + err.response.data.message);
     }
   };
 
   const handleGoogleSignup = () => {
-    alert('Google signup not implemented');
+    alert("Google signup not implemented");
   };
 
   return (
@@ -148,9 +159,9 @@ const EmployeeSignup = () => {
             {usernameStatus.message && (
               <p
                 style={{
-                  color: usernameStatus.available ? 'green' : 'red',
-                  fontSize: '14px',
-                  margin: '5px 0',
+                  color: usernameStatus.available ? "green" : "red",
+                  fontSize: "14px",
+                  margin: "5px 0",
                 }}
               >
                 {usernameStatus.message}
@@ -160,7 +171,7 @@ const EmployeeSignup = () => {
             <label>Password</label>
             <div className="password-wrapper">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
                 onChange={handleChange}
@@ -171,14 +182,14 @@ const EmployeeSignup = () => {
                 className="toggle-password"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
 
             <label>Confirm Password</label>
             <div className="password-wrapper">
               <input
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm Password"
                 onChange={handleChange}
@@ -189,15 +200,17 @@ const EmployeeSignup = () => {
                 className="toggle-password"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                {showConfirmPassword ? 'Hide' : 'Show'}
+                {showConfirmPassword ? "Hide" : "Show"}
               </button>
             </div>
 
-            {!passwordMatch && formData.password && formData.confirmPassword && (
-              <p style={{ color: 'red', fontSize: '14px', margin: '5px 0' }}>
-                Passwords do not match
-              </p>
-            )}
+            {!passwordMatch &&
+              formData.password &&
+              formData.confirmPassword && (
+                <p style={{ color: "red", fontSize: "14px", margin: "5px 0" }}>
+                  Passwords do not match
+                </p>
+              )}
 
             <div className="checkbox">
               <input
@@ -213,7 +226,11 @@ const EmployeeSignup = () => {
             <button
               type="submit"
               className="signup-btn"
-              disabled={!passwordMatch || !agreedToTerms || usernameStatus.available === false}
+              disabled={
+                !passwordMatch ||
+                !agreedToTerms ||
+                usernameStatus.available === false
+              }
             >
               SignUp
             </button>
@@ -224,7 +241,11 @@ const EmployeeSignup = () => {
               <hr />
             </div>
 
-            <button type="button" className="google-btn" onClick={handleGoogleSignup}>
+            <button
+              type="button"
+              className="google-btn"
+              onClick={handleGoogleSignup}
+            >
               <img src={googleIcon} alt="Google Icon" />
               Signup with Google
             </button>

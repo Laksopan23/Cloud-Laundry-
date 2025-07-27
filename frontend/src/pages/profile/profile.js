@@ -1,5 +1,5 @@
 // Paste this full code into your ProfilePage.jsx or equivalent file
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Spin,
@@ -15,7 +15,7 @@ import {
   Row,
   Col,
   Tabs,
-} from 'antd';
+} from "antd";
 import {
   EditOutlined,
   MailOutlined,
@@ -26,16 +26,16 @@ import {
   BankOutlined,
   UploadOutlined,
   InfoCircleOutlined,
-} from '@ant-design/icons';
-import axios from 'axios';
-import Layout from '../../components/Layout';
+} from "@ant-design/icons";
+import axios from "axios";
+import Layout from "../../components/Layout";
 
 const { TabPane } = Tabs;
 
 const colors = {
-  primary: '#5e208e',
-  secondary: '#d4beff',
-  background: '#f0f2f5',
+  primary: "#5e208e",
+  secondary: "#d4beff",
+  background: "#f0f2f5",
 };
 
 const ProfilePage = () => {
@@ -47,22 +47,24 @@ const ProfilePage = () => {
   const [photoUrl, setPhotoUrl] = useState(null);
 
   useEffect(() => {
-    const username = localStorage.getItem('username');
+    const username = localStorage.getItem("username");
     const fetchEmployee = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/employees/profile/${username}`);
+        const res = await axios.get(
+          `http://localhost:5000/api/employees/profile/${username}`,
+        );
         setEmployee(res.data);
         form.setFieldsValue(res.data);
         setPhotoUrl(res.data.photoUrl);
       } catch (err) {
-        setError(err.response?.data?.message || 'Error loading profile');
+        setError(err.response?.data?.message || "Error loading profile");
       } finally {
         setLoading(false);
       }
     };
     if (username) fetchEmployee();
     else {
-      setError('No username found in local storage');
+      setError("No username found in local storage");
       setLoading(false);
     }
   }, [form]);
@@ -71,26 +73,32 @@ const ProfilePage = () => {
     try {
       const res = await axios.put(
         `http://localhost:5000/api/employees/update/${employee.username}`,
-        values
+        values,
       );
-      message.success('Profile updated successfully!');
+      message.success("Profile updated successfully!");
       setEmployee(res.data.employee);
       setDrawerVisible(false);
     } catch (err) {
-      message.error(err.response?.data?.message || 'Update failed');
+      message.error(err.response?.data?.message || "Update failed");
     }
   };
 
   const handlePhotoUpload = (info) => {
-    if (info.file.status === 'done') {
+    if (info.file.status === "done") {
       const imageUrl = URL.createObjectURL(info.file.originFileObj);
       setPhotoUrl(imageUrl);
-      message.success('Photo uploaded!');
+      message.success("Photo uploaded!");
     }
   };
 
   if (loading) {
-    return <Spin size="large" className="block mx-auto mt-40" style={{ color: colors.primary }} />;
+    return (
+      <Spin
+        size="large"
+        className="block mx-auto mt-40"
+        style={{ color: colors.primary }}
+      />
+    );
   }
 
   if (error) {
@@ -99,7 +107,10 @@ const ProfilePage = () => {
         message={error}
         type="error"
         className="m-5 text-xs sm:text-sm"
-        style={{ backgroundColor: colors.secondary, borderColor: colors.primary }}
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.primary,
+        }}
       />
     );
   }
@@ -108,7 +119,11 @@ const ProfilePage = () => {
     <Layout>
       <div
         className="max-w-6xl mx-auto p-4 sm:p-10 text-xs sm:text-sm"
-        style={{ backgroundColor: colors.background, minHeight: '100vh', borderRadius: 12 }}
+        style={{
+          backgroundColor: colors.background,
+          minHeight: "100vh",
+          borderRadius: 12,
+        }}
       >
         <Card
           className="rounded-2xl shadow-2xl transition-transform hover:scale-[1.02]"
@@ -119,7 +134,8 @@ const ProfilePage = () => {
               className="text-base sm:text-lg font-semibold flex items-center gap-2"
               style={{ color: colors.primary }}
             >
-              <UserOutlined style={{ color: colors.primary }} /> Employee Profile
+              <UserOutlined style={{ color: colors.primary }} /> Employee
+              Profile
             </span>
           }
           extra={
@@ -131,9 +147,16 @@ const ProfilePage = () => {
               onClick={() => setDrawerVisible(true)}
               className="hidden sm:inline-flex"
               aria-label="Edit Profile"
-              style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.secondary)}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
+              style={{
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = colors.secondary)
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = colors.primary)
+              }
             />
           }
         >
@@ -150,10 +173,12 @@ const ProfilePage = () => {
                 />
                 <Upload
                   showUploadList={false}
-                  customRequest={({ file, onSuccess }) => setTimeout(() => onSuccess('ok'), 0)}
+                  customRequest={({ file, onSuccess }) =>
+                    setTimeout(() => onSuccess("ok"), 0)
+                  }
                   onChange={handlePhotoUpload}
                   className="absolute bottom-0 right-0 rounded-full p-2 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ backgroundColor: colors.primary, color: 'white' }}
+                  style={{ backgroundColor: colors.primary, color: "white" }}
                   aria-label="Upload Profile Photo"
                 >
                   <UploadOutlined />
@@ -165,14 +190,17 @@ const ProfilePage = () => {
             <Col xs={24} sm={16}>
               <Tabs
                 defaultActiveKey="1"
-                tabPosition={window.innerWidth < 640 ? 'top' : 'left'}
+                tabPosition={window.innerWidth < 640 ? "top" : "left"}
                 size="small"
                 tabBarGutter={10}
                 items={[
                   {
-                    key: '1',
+                    key: "1",
                     label: (
-                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
+                      <span
+                        className="text-xs sm:text-sm"
+                        style={{ color: colors.primary }}
+                      >
                         <InfoCircleOutlined /> Basic Info
                       </span>
                     ),
@@ -182,22 +210,34 @@ const ProfilePage = () => {
                         bordered
                         size="small"
                         labelStyle={{ fontWeight: 600, color: colors.primary }}
-                        contentStyle={{ fontSize: '0.75rem' }}
+                        contentStyle={{ fontSize: "0.75rem" }}
                       >
-                        <Descriptions.Item label="Name">{employee.name}</Descriptions.Item>
-                        <Descriptions.Item label="Email">
-                          <MailOutlined style={{ marginRight: 6 }} /> {employee.email}
+                        <Descriptions.Item label="Name">
+                          {employee.name}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Username">{employee.username}</Descriptions.Item>
-                        <Descriptions.Item label="Employee ID">{employee.employeeId}</Descriptions.Item>
-                        <Descriptions.Item label="Role">{employee.role}</Descriptions.Item>
+                        <Descriptions.Item label="Email">
+                          <MailOutlined style={{ marginRight: 6 }} />{" "}
+                          {employee.email}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Username">
+                          {employee.username}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Employee ID">
+                          {employee.employeeId}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Role">
+                          {employee.role}
+                        </Descriptions.Item>
                       </Descriptions>
                     ),
                   },
                   {
-                    key: '2',
+                    key: "2",
                     label: (
-                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
+                      <span
+                        className="text-xs sm:text-sm"
+                        style={{ color: colors.primary }}
+                      >
                         <PhoneOutlined /> Contact
                       </span>
                     ),
@@ -207,21 +247,30 @@ const ProfilePage = () => {
                         bordered
                         size="small"
                         labelStyle={{ fontWeight: 600, color: colors.primary }}
-                        contentStyle={{ fontSize: '0.75rem' }}
+                        contentStyle={{ fontSize: "0.75rem" }}
                       >
-                        <Descriptions.Item label="Phone">{employee.phone}</Descriptions.Item>
+                        <Descriptions.Item label="Phone">
+                          {employee.phone}
+                        </Descriptions.Item>
                         <Descriptions.Item label="DOB">
                           {employee.dateOfBirth?.substring(0, 10)}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Gender">{employee.gender}</Descriptions.Item>
-                        <Descriptions.Item label="National ID">{employee.nationalId}</Descriptions.Item>
+                        <Descriptions.Item label="Gender">
+                          {employee.gender}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="National ID">
+                          {employee.nationalId}
+                        </Descriptions.Item>
                       </Descriptions>
                     ),
                   },
                   {
-                    key: '3',
+                    key: "3",
                     label: (
-                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
+                      <span
+                        className="text-xs sm:text-sm"
+                        style={{ color: colors.primary }}
+                      >
                         <HomeOutlined /> Address
                       </span>
                     ),
@@ -231,20 +280,27 @@ const ProfilePage = () => {
                         bordered
                         size="small"
                         labelStyle={{ fontWeight: 600, color: colors.primary }}
-                        contentStyle={{ fontSize: '0.75rem' }}
+                        contentStyle={{ fontSize: "0.75rem" }}
                       >
-                        <Descriptions.Item label="Employment Type">{employee.employmentType}</Descriptions.Item>
+                        <Descriptions.Item label="Employment Type">
+                          {employee.employmentType}
+                        </Descriptions.Item>
                         <Descriptions.Item label="Start Date">
                           {employee.startDate?.substring(0, 10)}
                         </Descriptions.Item>
-                        <Descriptions.Item label="Current Address">{employee.currentAddress}</Descriptions.Item>
+                        <Descriptions.Item label="Current Address">
+                          {employee.currentAddress}
+                        </Descriptions.Item>
                       </Descriptions>
                     ),
                   },
                   {
-                    key: '4',
+                    key: "4",
                     label: (
-                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
+                      <span
+                        className="text-xs sm:text-sm"
+                        style={{ color: colors.primary }}
+                      >
                         <IdcardOutlined /> Emergency Contact
                       </span>
                     ),
@@ -254,18 +310,27 @@ const ProfilePage = () => {
                         bordered
                         size="small"
                         labelStyle={{ fontWeight: 600, color: colors.primary }}
-                        contentStyle={{ fontSize: '0.75rem' }}
+                        contentStyle={{ fontSize: "0.75rem" }}
                       >
-                        <Descriptions.Item label="Name">{employee.emergencyContactName}</Descriptions.Item>
-                        <Descriptions.Item label="Relation">{employee.emergencyContactRelation}</Descriptions.Item>
-                        <Descriptions.Item label="Phone">{employee.emergencyContactNumber}</Descriptions.Item>
+                        <Descriptions.Item label="Name">
+                          {employee.emergencyContactName}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Relation">
+                          {employee.emergencyContactRelation}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Phone">
+                          {employee.emergencyContactNumber}
+                        </Descriptions.Item>
                       </Descriptions>
                     ),
                   },
                   {
-                    key: '5',
+                    key: "5",
                     label: (
-                      <span className="text-xs sm:text-sm" style={{ color: colors.primary }}>
+                      <span
+                        className="text-xs sm:text-sm"
+                        style={{ color: colors.primary }}
+                      >
                         <BankOutlined /> Bank Info
                       </span>
                     ),
@@ -275,10 +340,14 @@ const ProfilePage = () => {
                         bordered
                         size="small"
                         labelStyle={{ fontWeight: 600, color: colors.primary }}
-                        contentStyle={{ fontSize: '0.75rem' }}
+                        contentStyle={{ fontSize: "0.75rem" }}
                       >
-                        <Descriptions.Item label="Bank Name">{employee.bankName}</Descriptions.Item>
-                        <Descriptions.Item label="Account Number">{employee.accountNumber}</Descriptions.Item>
+                        <Descriptions.Item label="Bank Name">
+                          {employee.bankName}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Account Number">
+                          {employee.accountNumber}
+                        </Descriptions.Item>
                       </Descriptions>
                     ),
                   },
@@ -296,46 +365,61 @@ const ProfilePage = () => {
             className="fixed bottom-6 right-6 z-50 sm:hidden shadow-lg"
             onClick={() => setDrawerVisible(true)}
             aria-label="Edit Profile"
-            style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.secondary)}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
+            style={{
+              backgroundColor: colors.primary,
+              borderColor: colors.primary,
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = colors.secondary)
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = colors.primary)
+            }
           />
         </Card>
 
         <Drawer
           title="Edit Profile"
           placement="right"
-          width={window.innerWidth < 500 ? '100%' : 400}
+          width={window.innerWidth < 500 ? "100%" : 400}
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
           bodyStyle={{ paddingBottom: 80, backgroundColor: colors.background }}
-          headerStyle={{ borderBottomColor: colors.primary, color: colors.primary }}
+          headerStyle={{
+            borderBottomColor: colors.primary,
+            color: colors.primary,
+          }}
         >
           <Form layout="vertical" form={form} onFinish={handleUpdate}>
             {[
-              ['phone', 'Phone'],
-              ['dateOfBirth', 'Date of Birth', 'date'],
-              ['gender', 'Gender'],
-              ['nationalId', 'National ID'],
-              ['employmentType', 'Employment Type'],
-              ['startDate', 'Start Date', 'date'],
-              ['currentAddress', 'Current Address', 'textarea'],
-              ['emergencyContactName', 'Emergency Contact Name'],
-              ['emergencyContactNumber', 'Emergency Contact Number'],
-              ['emergencyContactRelation', 'Emergency Contact Relation'],
-              ['bankName', 'Bank Name'],
-              ['accountNumber', 'Account Number'],
+              ["phone", "Phone"],
+              ["dateOfBirth", "Date of Birth", "date"],
+              ["gender", "Gender"],
+              ["nationalId", "National ID"],
+              ["employmentType", "Employment Type"],
+              ["startDate", "Start Date", "date"],
+              ["currentAddress", "Current Address", "textarea"],
+              ["emergencyContactName", "Emergency Contact Name"],
+              ["emergencyContactNumber", "Emergency Contact Number"],
+              ["emergencyContactRelation", "Emergency Contact Relation"],
+              ["bankName", "Bank Name"],
+              ["accountNumber", "Account Number"],
             ].map(([name, label, type]) => (
               <Form.Item
                 key={name}
                 name={name}
                 label={label}
-                labelCol={{ style: { color: colors.primary, fontWeight: '600' } }}
+                labelCol={{
+                  style: { color: colors.primary, fontWeight: "600" },
+                }}
               >
-                {type === 'textarea' ? (
+                {type === "textarea" ? (
                   <Input.TextArea size="small" />
                 ) : (
-                  <Input type={type === 'date' ? 'date' : 'text'} size="small" />
+                  <Input
+                    type={type === "date" ? "date" : "text"}
+                    size="small"
+                  />
                 )}
               </Form.Item>
             ))}
@@ -345,9 +429,16 @@ const ProfilePage = () => {
                 type="primary"
                 htmlType="submit"
                 block
-                style={{ backgroundColor: colors.primary, borderColor: colors.primary }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.secondary)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.primary)}
+                style={{
+                  backgroundColor: colors.primary,
+                  borderColor: colors.primary,
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = colors.secondary)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = colors.primary)
+                }
               >
                 Save Changes
               </Button>

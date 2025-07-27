@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Select, Typography, Alert } from 'antd';
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { Form, Input, Button, Select, Typography, Alert } from "antd";
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const UserSignup = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    username: '',
-    password: '',
-    role: 'admin',
-    adminSecret: '',
+    name: "",
+    email: "",
+    username: "",
+    password: "",
+    role: "admin",
+    adminSecret: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setError('');
+    setError("");
   };
 
   const handleRoleChange = (value) => {
     setFormData({ ...formData, role: value });
-    setError('');
+    setError("");
   };
 
   const handleSignup = async () => {
@@ -38,30 +38,61 @@ const UserSignup = () => {
         role: formData.role,
       };
 
-      const headers = formData.role === 'admin' ? { 'x-admin-secret': formData.adminSecret } : {};
+      const headers =
+        formData.role === "admin"
+          ? { "x-admin-secret": formData.adminSecret }
+          : {};
 
       const res = await axios.post(
         `http://localhost:5000/api/users/signup`,
         payload,
-        { headers }
+        { headers },
       );
 
       const { token, role } = res.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('username', formData.username);
-      localStorage.setItem('role', role);
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", formData.username);
+      localStorage.setItem("role", role);
 
-      navigate(role === 'admin' ? '/admin-dashboard' : '/employee-dashboard');
+      navigate(role === "admin" ? "/admin-dashboard" : "/employee-dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || 'Signup failed. Please try again.');
+      setError(
+        err.response?.data?.message || "Signup failed. Please try again.",
+      );
     }
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6' }}>
-      <div style={{ background: '#fff', padding: 24, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%', maxWidth: 700 }}>
-        <Title level={2} style={{ textAlign: 'center', marginBottom: 24 }}>User Signup</Title>
-        {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#f3f4f6",
+      }}
+    >
+      <div
+        style={{
+          background: "#fff",
+          padding: 24,
+          borderRadius: 8,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          width: "100%",
+          maxWidth: 700,
+        }}
+      >
+        <Title level={2} style={{ textAlign: "center", marginBottom: 24 }}>
+          User Signup
+        </Title>
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+          />
+        )}
         <Form layout="vertical" onFinish={handleSignup}>
           <Form.Item label="Name" required>
             <Input
@@ -102,7 +133,7 @@ const UserSignup = () => {
               <Option value="admin">Admin</Option>
             </Select>
           </Form.Item>
-          {formData.role === 'admin' && (
+          {formData.role === "admin" && (
             <Form.Item label="Admin Secret" required>
               <Input.Password
                 name="adminSecret"

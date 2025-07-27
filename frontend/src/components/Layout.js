@@ -11,14 +11,7 @@ import {
   LogoutOutlined,
   MenuOutlined,
 } from "@ant-design/icons";
-import {
-  Layout,
-  Menu,
-  Button,
-  FloatButton,
-  Grid,
-  Drawer,
-} from "antd";
+import { Layout, Menu, Button, FloatButton, Grid, Drawer } from "antd";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../pages/Auth/logout";
 import imageSrc from "../images/logo.png";
@@ -30,7 +23,6 @@ const SiderItems = [
   { key: "/", icon: <HomeOutlined />, label: "Dashboard" },
   { key: "/invoice", icon: <FileTextOutlined />, label: "Invoice" },
   { key: "/orders", icon: <ShoppingCartOutlined />, label: "Orders" },
-
 ];
 
 const adminItems = [
@@ -84,18 +76,17 @@ const App = ({ children }) => {
     else if (key === "2") logout();
   };
 
-const handleMenuClick = (item) => {
-  if (item.key === "/") {
-    if (userRole === "admin") {
-      navigate("/admin");
+  const handleMenuClick = (item) => {
+    if (item.key === "/") {
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dash");
+      }
     } else {
-      navigate("/dash");
+      navigate(item.key);
     }
-  } else {
-    navigate(item.key);
-  }
-};
-
+  };
 
   const menuItemStyle = {
     margin: "6px 0px",
@@ -157,11 +148,13 @@ const handleMenuClick = (item) => {
                       window.location.pathname === key ? "#fff" : "inherit",
                   }}
                   onMouseEnter={(e) => {
-                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
+                    if (!e || !e.currentTarget || !e.currentTarget.style)
+                      return;
                     e.currentTarget.style.backgroundColor = shoutableHoverColor;
                   }}
                   onMouseLeave={(e) => {
-                    if (!e || !e.currentTarget || !e.currentTarget.style) return;
+                    if (!e || !e.currentTarget || !e.currentTarget.style)
+                      return;
                     e.currentTarget.style.backgroundColor =
                       window.location.pathname === key
                         ? shoutableBgColor
@@ -176,65 +169,60 @@ const handleMenuClick = (item) => {
         )}
 
         {isMobile && (
-         <Drawer
-          title="Menu"
-          placement="left"
-          onClose={() => setShowDrawer(false)}
-          open={showDrawer}
-          bodyStyle={{ padding: 0 }}
-        >
-          {/* Navigation Menu */}
-          <Menu
-            theme="light"
-            mode="inline"
-            selectedKeys={[window.location.pathname]}
-            onClick={(item) => {
-              handleMenuClick(item);
-              setShowDrawer(false);
-            }}
-            style={{ borderRight: 0 }}
+          <Drawer
+            title="Menu"
+            placement="left"
+            onClose={() => setShowDrawer(false)}
+            open={showDrawer}
+            bodyStyle={{ padding: 0 }}
           >
-            {menuItems.map(({ key, icon, label }) => (
-              <Menu.Item
-                key={key}
-                icon={icon}
-                style={menuItemStyle}
-                onMouseEnter={(e) => {
-                  if (!e?.currentTarget?.style) return;
-                  e.currentTarget.style.backgroundColor = shoutableHoverColor;
-                }}
-                onMouseLeave={(e) => {
-                  if (!e?.currentTarget?.style) return;
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
-              >
-                {label}
-              </Menu.Item>
-            ))}
-          </Menu>
+            {/* Navigation Menu */}
+            <Menu
+              theme="light"
+              mode="inline"
+              selectedKeys={[window.location.pathname]}
+              onClick={(item) => {
+                handleMenuClick(item);
+                setShowDrawer(false);
+              }}
+              style={{ borderRight: 0 }}
+            >
+              {menuItems.map(({ key, icon, label }) => (
+                <Menu.Item
+                  key={key}
+                  icon={icon}
+                  style={menuItemStyle}
+                  onMouseEnter={(e) => {
+                    if (!e?.currentTarget?.style) return;
+                    e.currentTarget.style.backgroundColor = shoutableHoverColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!e?.currentTarget?.style) return;
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  {label}
+                </Menu.Item>
+              ))}
+            </Menu>
 
-          {/* Divider and Profile/Logout */}
-          <Menu
-            theme="light"
-            mode="inline"
-            style={{ borderTop: "1px solid #ddd" }}
-            onClick={({ key }) => {
-              handleHeaderClick(key);
-              setShowDrawer(false);
-            }}
-          >
-            {headerIteam.map(({ key, icon, text }) => (
-              <Menu.Item
-                key={key}
-                icon={icon}
-                style={menuItemStyle}
-              >
-                {text}
-              </Menu.Item>
-            ))}
-          </Menu>
-        </Drawer>
-
+            {/* Divider and Profile/Logout */}
+            <Menu
+              theme="light"
+              mode="inline"
+              style={{ borderTop: "1px solid #ddd" }}
+              onClick={({ key }) => {
+                handleHeaderClick(key);
+                setShowDrawer(false);
+              }}
+            >
+              {headerIteam.map(({ key, icon, text }) => (
+                <Menu.Item key={key} icon={icon} style={menuItemStyle}>
+                  {text}
+                </Menu.Item>
+              ))}
+            </Menu>
+          </Drawer>
         )}
 
         <Layout style={{ marginLeft: !isMobile ? (collapsed ? 80 : 225) : 0 }}>

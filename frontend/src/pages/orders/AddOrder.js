@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Input,
   DatePicker,
@@ -8,21 +8,21 @@ import {
   message,
   Form,
   Modal,
-} from 'antd';
+} from "antd";
 import {
   UserOutlined,
   ProfileOutlined,
   ShoppingCartOutlined,
   CarOutlined,
-} from '@ant-design/icons';
-import axios from 'axios';
-import Layout from '../../components/Layout';
-import AddItemModal from './models/AddItemsModel';
+} from "@ant-design/icons";
+import axios from "axios";
+import Layout from "../../components/Layout";
+import AddItemModal from "./models/AddItemsModel";
 
-import Laundry from '../../images/laundry.png';
-import Curtains from '../../images/curtins.png';
-import Sofa from '../../images/sofa.png';
-import House from '../../images/house.png';
+import Laundry from "../../images/laundry.png";
+import Curtains from "../../images/curtins.png";
+import Sofa from "../../images/sofa.png";
+import House from "../../images/house.png";
 
 const { TextArea } = Input;
 const { Title } = Typography;
@@ -36,65 +36,66 @@ export default function LaundryForm() {
 
   const handleAddItem = (data) => {
     setItemDetails({ customItems: data.customItems });
-    message.success('Items added!');
+    message.success("Items added!");
   };
 
-const handleSubmit = async () => {
-  try {
-    const values = await form.validateFields();
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
 
-    if (itemDetails.customItems.length === 0) {
-      message.error('Please add at least one item.');
-      return;
+      if (itemDetails.customItems.length === 0) {
+        message.error("Please add at least one item.");
+        return;
+      }
+
+      if (
+        values.expectedDeliveryDate &&
+        values.date &&
+        values.expectedDeliveryDate.isBefore(values.date)
+      ) {
+        message.error("Expected delivery date must be after the order date.");
+        return;
+      }
+
+      const formattedItems = itemDetails.customItems.map((item) => ({
+        itemName: item.items,
+        quantity: item.qty,
+        price: item.price,
+      }));
+
+      await axios.post("http://localhost:5000/api/orders", {
+        ...values,
+        date: values.date?.toISOString(),
+        expectedDeliveryDate: values.expectedDeliveryDate?.toISOString(),
+        time: values.time?.format("HH:mm"),
+        items: formattedItems,
+      });
+
+      console.log("Order submitted successfully");
+
+      // Show success modal
+      setIsSuccessModalVisible(true);
+
+      form.resetFields();
+      setSelectedService(null);
+      setItemDetails({ customItems: [] });
+    } catch (error) {
+      console.error("Submission error:", error);
+      if (error.name !== "ValidationError") {
+        message.error(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to submit order",
+        );
+      }
     }
-
-    if (
-      values.expectedDeliveryDate &&
-      values.date &&
-      values.expectedDeliveryDate.isBefore(values.date)
-    ) {
-      message.error('Expected delivery date must be after the order date.');
-      return;
-    }
-
-    const formattedItems = itemDetails.customItems.map((item) => ({
-      itemName: item.items,
-      quantity: item.qty,
-      price: item.price,
-    }));
-
-    await axios.post('http://localhost:5000/api/orders', {
-      ...values,
-      date: values.date?.toISOString(),
-      expectedDeliveryDate: values.expectedDeliveryDate?.toISOString(),
-      time: values.time?.format('HH:mm'),
-      items: formattedItems,
-    });
-
-    console.log('Order submitted successfully');
-
-    // Show success modal
-    setIsSuccessModalVisible(true);
-
-    form.resetFields();
-    setSelectedService(null);
-    setItemDetails({ customItems: [] });
-  } catch (error) {
-    console.error('Submission error:', error);
-    if (error.name !== 'ValidationError') {
-      message.error(
-        error.response?.data?.message || error.message || 'Failed to submit order'
-      );
-    }
-  }
-};
-
+  };
 
   const services = [
-    { name: 'Laundry', img: Laundry },
-    { name: 'Curtains Cleaning', img: Curtains },
-    { name: 'Sofa, Carpet & Interior Cleaning', img: Sofa },
-    { name: 'Domestic Cleaning', img: House },
+    { name: "Laundry", img: Laundry },
+    { name: "Curtains Cleaning", img: Curtains },
+    { name: "Sofa, Carpet & Interior Cleaning", img: Sofa },
+    { name: "Domestic Cleaning", img: House },
   ];
 
   return (
@@ -110,28 +111,36 @@ const handleSubmit = async () => {
               <Form.Item
                 label="Customer Name"
                 name="customerName"
-                rules={[{ required: true, message: 'Customer name is required' }]}
+                rules={[
+                  { required: true, message: "Customer name is required" },
+                ]}
               >
                 <Input placeholder="Customer Name" className="h-8" />
               </Form.Item>
               <Form.Item
                 label="Customer Phone"
                 name="customerPhone"
-                rules={[{ required: true, message: 'Customer phone is required' }]}
+                rules={[
+                  { required: true, message: "Customer phone is required" },
+                ]}
               >
                 <Input placeholder="Customer Phone" className="h-8" />
               </Form.Item>
               <Form.Item
                 label="Address Line 1"
                 name="Addressline1"
-                rules={[{ required: true, message: 'Address Line 1 is required' }]}
+                rules={[
+                  { required: true, message: "Address Line 1 is required" },
+                ]}
               >
                 <Input placeholder="Address Line 1" className="h-8" />
               </Form.Item>
               <Form.Item
                 label="Address Line 2"
                 name="Addressline2"
-                rules={[{ required: true, message: 'Address Line 2 is required' }]}
+                rules={[
+                  { required: true, message: "Address Line 2 is required" },
+                ]}
               >
                 <Input placeholder="Address Line 2" className="h-8" />
               </Form.Item>
@@ -141,7 +150,7 @@ const handleSubmit = async () => {
           {/* Service Type */}
           <Form.Item
             name="selectedService"
-            rules={[{ required: true, message: 'Please select a service' }]}
+            rules={[{ required: true, message: "Please select a service" }]}
           >
             <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
               <div className="text-[#6c2bd9] font-bold text-lg flex items-center gap-2 mb-4">
@@ -155,10 +164,12 @@ const handleSubmit = async () => {
                       key={index}
                       onClick={() => {
                         setSelectedService(service.name);
-                        form.setFieldValue('selectedService', service.name);
+                        form.setFieldValue("selectedService", service.name);
                       }}
                       className={`rounded-lg border transition-all duration-300 flex flex-col justify-center items-center cursor-pointer p-3 text-center ${
-                        isSelected ? 'border-[#6c2bd9] bg-[#f3eaff]' : 'border-gray-300 bg-white'
+                        isSelected
+                          ? "border-[#6c2bd9] bg-[#f3eaff]"
+                          : "border-gray-300 bg-white"
                       }`}
                     >
                       <img
@@ -181,32 +192,48 @@ const handleSubmit = async () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <Form.Item label="Invoice Number">
-                <Input className="h-8" placeholder="Auto-generated" value="Auto-generated" disabled />
+                <Input
+                  className="h-8"
+                  placeholder="Auto-generated"
+                  value="Auto-generated"
+                  disabled
+                />
               </Form.Item>
               <Form.Item
                 label="Date"
                 name="date"
-                rules={[{ required: true, message: 'Please select a date' }]}
+                rules={[{ required: true, message: "Please select a date" }]}
               >
                 <DatePicker placeholder="Date" className="w-full" />
               </Form.Item>
               <Form.Item
                 label="Expected Delivery Date"
                 name="expectedDeliveryDate"
-                rules={[{ required: true, message: 'Expected delivery date is required' }]}
+                rules={[
+                  {
+                    required: true,
+                    message: "Expected delivery date is required",
+                  },
+                ]}
               >
-                <DatePicker placeholder="Expected Delivery Date" className="w-full" />
+                <DatePicker
+                  placeholder="Expected Delivery Date"
+                  className="w-full"
+                />
               </Form.Item>
               <Form.Item
                 label="Time"
                 name="time"
-                rules={[{ required: true, message: 'Please select a time' }]}
+                rules={[{ required: true, message: "Please select a time" }]}
               >
                 <TimePicker placeholder="Time" className="w-full" />
               </Form.Item>
             </div>
             <div className="flex justify-center mt-5">
-              <Button className="bg-[#6c2bd9] text-white" onClick={() => setIsModalVisible(true)}>
+              <Button
+                className="bg-[#6c2bd9] text-white"
+                onClick={() => setIsModalVisible(true)}
+              >
                 Add Items
               </Button>
             </div>
@@ -229,34 +256,53 @@ const handleSubmit = async () => {
                 <Form.Item
                   label="Pickup & Delivery Fee"
                   name="pickupFee"
-                  rules={[{ required: true, message: 'Pickup fee is required' }]}
+                  rules={[
+                    { required: true, message: "Pickup fee is required" },
+                  ]}
                 >
                   <Input placeholder="Pickup & Delivery Fee" className="h-8" />
                 </Form.Item>
                 <Form.Item
                   label="Pickup & Delivery Discount"
                   name="pickupDiscount"
-                  rules={[{ required: true, message: 'Pickup discount is required' }]}
+                  rules={[
+                    { required: true, message: "Pickup discount is required" },
+                  ]}
                 >
-                  <Input placeholder="Pickup & Delivery Discount" className="h-8" />
+                  <Input
+                    placeholder="Pickup & Delivery Discount"
+                    className="h-8"
+                  />
                 </Form.Item>
                 <Form.Item label="Note" name="note">
                   <TextArea placeholder="Note" rows={4} />
                 </Form.Item>
               </div>
               <div className="bg-white shadow-md rounded-lg mt-5 border-t-4 border-[#6c2bd9] p-5">
-                <div className="font-bold text-[#6c2bd9] mb-3">Delivery Person</div>
+                <div className="font-bold text-[#6c2bd9] mb-3">
+                  Delivery Person
+                </div>
                 <Form.Item
                   label="Pickup Person Name"
                   name="pickupPersonName"
-                  rules={[{ required: true, message: 'Pickup person name is required' }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Pickup person name is required",
+                    },
+                  ]}
                 >
                   <Input placeholder="Pickup Person Name" className="h-8" />
                 </Form.Item>
                 <Form.Item
                   label="Pickup Person Phone"
                   name="pickupPersonPhone"
-                  rules={[{ required: true, message: 'Pickup person phone is required' }]}
+                  rules={[
+                    {
+                      required: true,
+                      message: "Pickup person phone is required",
+                    },
+                  ]}
                 >
                   <Input placeholder="Pickup Person Phone" className="h-8" />
                 </Form.Item>
@@ -271,29 +317,34 @@ const handleSubmit = async () => {
           </div>
         </Form>
       </div>
-        <Modal
-          open={isSuccessModalVisible}
-          onOk={() => setIsSuccessModalVisible(false)}
-          onCancel={() => setIsSuccessModalVisible(false)}
-          centered
-          footer={[
-            <Button key="ok" type="primary" className="bg-[#6c2bd9]" onClick={() => setIsSuccessModalVisible(false)}>
-              OK
-            </Button>,
-          ]}
-          closable={false}
-        >
-          <div className="text-center">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/845/845646.png"
-              alt="Success"
-              className="w-16 h-16 mx-auto mb-4"
-            />
-            <Title level={4} className="text-[#6c2bd9]">Order Submitted Successfully!</Title>
-          </div>
-        </Modal>
-
-
+      <Modal
+        open={isSuccessModalVisible}
+        onOk={() => setIsSuccessModalVisible(false)}
+        onCancel={() => setIsSuccessModalVisible(false)}
+        centered
+        footer={[
+          <Button
+            key="ok"
+            type="primary"
+            className="bg-[#6c2bd9]"
+            onClick={() => setIsSuccessModalVisible(false)}
+          >
+            OK
+          </Button>,
+        ]}
+        closable={false}
+      >
+        <div className="text-center">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/845/845646.png"
+            alt="Success"
+            className="w-16 h-16 mx-auto mb-4"
+          />
+          <Title level={4} className="text-[#6c2bd9]">
+            Order Submitted Successfully!
+          </Title>
+        </div>
+      </Modal>
     </Layout>
   );
 }

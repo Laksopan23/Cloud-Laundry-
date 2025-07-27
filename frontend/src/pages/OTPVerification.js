@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from "react-router-dom";
 import "./OTPVerification.css";
 
 const OTPVerification = () => {
@@ -10,12 +10,12 @@ const OTPVerification = () => {
   const { email } = location.state || {};
 
   if (!email) {
-    navigate('/pass');
+    navigate("/pass");
     return null;
   }
 
   const handleBack = () => {
-    navigate('/pass');
+    navigate("/pass");
   };
 
   const handleChange = (index, value) => {
@@ -38,24 +38,27 @@ const OTPVerification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!otp.every(digit => digit !== "")) return;
+    if (!otp.every((digit) => digit !== "")) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/email/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://localhost:5000/api/email/verify-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            otp: otp.join(""),
+          }),
         },
-        body: JSON.stringify({
-          email,
-          otp: otp.join("")
-        }),
-      });
-      
+      );
+
       const data = await response.json();
 
       if (response.ok) {
-        navigate('/reset-password', { state: { email } });
+        navigate("/reset-password", { state: { email } });
       } else {
         console.error("Error verifying OTP:", data.message);
         alert(data.message || "Invalid or expired OTP.");
@@ -68,13 +71,16 @@ const OTPVerification = () => {
 
   const handleResendEmail = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/email/resend-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://localhost:5000/api/email/resend-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
         },
-        body: JSON.stringify({ email }),
-      });
+      );
       const data = await response.json();
       if (response.ok) {
         alert("New OTP sent to your email.");
@@ -92,27 +98,47 @@ const OTPVerification = () => {
     <div className="main-container">
       <div className="image-side">
         <button onClick={handleBack} className="back-button">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 18L9 12L15 6" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M15 18L9 12L15 6"
+              stroke="#1A1A1A"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
-        <img src="/Frame 301.png" alt="Laundry Background" className="background-image" />
+        <img
+          src="/Frame 301.png"
+          alt="Laundry Background"
+          className="background-image"
+        />
       </div>
 
       <div className="form-side">
-        <div className="form-container" style={{ marginTop: '140px' }}>
-          <img src="/cloud-logo-removebg-preview.png" alt="Cloud Laundry" className="logo" />
+        <div className="form-container" style={{ marginTop: "140px" }}>
+          <img
+            src="/cloud-logo-removebg-preview.png"
+            alt="Cloud Laundry"
+            className="logo"
+          />
           <h2 className="title">Check your email</h2>
           <p className="subtitle">
             sent a reset link to {email} enter code mentioned in the email
           </p>
-          
+
           <form onSubmit={handleSubmit} className="form">
             <div className="otp-container">
               {otp.map((digit, index) => (
                 <input
                   key={index}
-                  ref={el => inputRefs.current[index] = el}
+                  ref={(el) => (inputRefs.current[index] = el)}
                   type="text"
                   maxLength={1}
                   value={digit}
@@ -123,11 +149,11 @@ const OTPVerification = () => {
                 />
               ))}
             </div>
-            
-            <button 
-              type="submit" 
-              className={`submit-button ${!otp.every(digit => digit !== "") ? 'disabled' : ''}`}
-              disabled={!otp.every(digit => digit !== "")}
+
+            <button
+              type="submit"
+              className={`submit-button ${!otp.every((digit) => digit !== "") ? "disabled" : ""}`}
+              disabled={!otp.every((digit) => digit !== "")}
             >
               Verify Code
             </button>
@@ -145,4 +171,4 @@ const OTPVerification = () => {
   );
 };
 
-export default OTPVerification; 
+export default OTPVerification;

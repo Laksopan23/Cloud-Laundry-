@@ -1,14 +1,14 @@
 /* Signup.css - Premium styling for Cloud Laundry signup page */
 
 /* Import fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 /* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 body {
@@ -58,7 +58,7 @@ body {
 }
 
 .title:after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -10px;
   left: 50%;
@@ -76,7 +76,9 @@ body {
   border-radius: 16px;
   background-color: #ffffff;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .form-box:hover {
@@ -170,7 +172,6 @@ input[type="password"]:hover {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(94, 114, 228, 0.25);
-
 }
 
 .signup-btn:hover {
@@ -207,7 +208,6 @@ input[type="password"]:hover {
 .signin-btn:active {
   transform: translateY(1px);
 }
-
 
 .or-separator {
   display: flex;
@@ -304,8 +304,6 @@ input[type="password"]:hover {
   color: #825ee4;
 }
 
-
-
 /* Image section styling */
 .image-section {
   flex: 1;
@@ -318,13 +316,17 @@ input[type="password"]:hover {
 }
 
 .image-section:before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(94, 114, 228, 0.05) 0%, transparent 60%);
+  background: radial-gradient(
+    circle,
+    rgba(94, 114, 228, 0.05) 0%,
+    transparent 60%
+  );
   animation: rotate 60s linear infinite;
 }
 
@@ -346,7 +348,8 @@ input[type="password"]:hover {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -359,18 +362,18 @@ input[type="password"]:hover {
   .container {
     flex-direction: column;
   }
-  
+
   .form-section {
     order: 2;
     padding: 2rem 1.5rem;
   }
-  
+
   .image-section {
     order: 1;
     min-height: 300px;
     padding: 2rem;
   }
-  
+
   .illustration {
     width: 60%;
     max-width: 300px;
@@ -381,15 +384,15 @@ input[type="password"]:hover {
   .title {
     font-size: 1.5rem;
   }
-  
+
   .form-box {
     padding: 1.5rem;
   }
-  
+
   .image-section {
     min-height: 250px;
   }
-  
+
   .illustration {
     width: 50%;
   }
@@ -399,19 +402,19 @@ input[type="password"]:hover {
   .form-section {
     padding: 1.5rem 1rem;
   }
-  
+
   .logo {
     width: 140px;
   }
-  
+
   .title {
     font-size: 1.3rem;
   }
-  
+
   .form-box {
     padding: 1.2rem;
   }
-  
+
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -420,7 +423,7 @@ input[type="password"]:hover {
     padding: 0.8rem;
     font-size: 0.9rem;
   }
-  
+
   .image-section {
     min-height: 200px;
   }

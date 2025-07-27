@@ -1,5 +1,5 @@
 /* Import base styles from ForgotPassword.css */
-@import './ForgotPassword.css';
+@import "./ForgotPassword.css";
 
 /* OTP specific styles */
 .otp-container {
@@ -14,19 +14,19 @@
 .otp-input {
   width: 54px;
   height: 54px;
-  border: 1px solid #E5E5E5;
+  border: 1px solid #e5e5e5;
   border-radius: 12px;
   font-size: 20px;
   font-weight: 500;
   text-align: center;
-  background-color: #F8F9FE;
+  background-color: #f8f9fe;
   transition: all 0.2s ease;
   padding: 0;
 }
 
 .otp-input:focus {
   outline: none;
-  border-color: #6B4EFF;
+  border-color: #6b4eff;
   background-color: white;
   box-shadow: 0 0 0 3px rgba(107, 78, 255, 0.1);
 }
@@ -41,7 +41,7 @@
 .resend-link {
   background: none;
   border: none;
-  color: #6B4EFF;
+  color: #6b4eff;
   font-weight: 500;
   cursor: pointer;
   padding: 0;
@@ -51,7 +51,7 @@
 }
 
 .resend-link:hover {
-  color: #5B3FEF;
+  color: #5b3fef;
   text-decoration: underline;
 }
 
@@ -116,4 +116,4 @@
   .resend-container {
     margin-top: 1rem;
   }
-} 
+}

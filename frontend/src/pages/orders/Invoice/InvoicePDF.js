@@ -1,11 +1,11 @@
-import html2pdf from 'html2pdf.js';
-import dayjs from 'dayjs';
-import logo from '../../../images/logo.png';
+import html2pdf from "html2pdf.js";
+import dayjs from "dayjs";
+import logo from "../../../images/logo.png";
 
-import laundry from '../../../images/laundry.png';
-import Curtains from '../../../images/curtins.png';
-import Sofa from '../../../images/sofa.png';
-import House from '../../../images/house.png';
+import laundry from "../../../images/laundry.png";
+import Curtains from "../../../images/curtins.png";
+import Sofa from "../../../images/sofa.png";
+import House from "../../../images/house.png";
 
 export const generateInvoicePDF = (record) => {
   const invoiceHTML = `
@@ -23,7 +23,7 @@ export const generateInvoicePDF = (record) => {
             <h1 style="color: #5628C3; margin: 0; font-size: 24px; font-weight: 700;">CLOUD LAUNDRY.LK</h1>
             <p style="margin: 0; font-size: 13px;">504 weliwita Rd, Malabe</p>
             <p style="margin: 0; font-size: 13px;">IN: ${record.invoiceNumber}</p>
-            <p style="margin: 0; font-size: 13px;">Date: ${dayjs().format('DD MMMM YYYY, hh:mm A')}</p>
+            <p style="margin: 0; font-size: 13px;">Date: ${dayjs().format("DD MMMM YYYY, hh:mm A")}</p>
           </div>
         </div>
 
@@ -35,7 +35,7 @@ export const generateInvoicePDF = (record) => {
           <div>
             <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px;">INVOICE TO</div>
             <div style="font-size: 14px; font-weight: 600; text-transform: uppercase;">${record.customerName}</div>
-            <div style="font-size: 13px;">${record.customerID || ''}</div>
+            <div style="font-size: 13px;">${record.customerID || ""}</div>
             <div style="font-size: 13px;">${record.customerPhone}</div>
             <div style="font-size: 13px;">${record.Addressline1}</div>
             <div style="font-size: 13px;">${record.Addressline2}</div>
@@ -43,16 +43,16 @@ export const generateInvoicePDF = (record) => {
             ${(() => {
               let serviceImage = null;
               switch (record.selectedService) {
-                case 'Curtains Cleaning':
+                case "Curtains Cleaning":
                   serviceImage = Curtains;
                   break;
-                case 'Sofa, Carpet & Interior Cleaning':
+                case "Sofa, Carpet & Interior Cleaning":
                   serviceImage = Sofa;
                   break;
-                case 'Domestic Cleaning':
+                case "Domestic Cleaning":
                   serviceImage = House;
                   break;
-                case 'Laundry':
+                case "Laundry":
                 default:
                   serviceImage = laundry;
               }
@@ -73,15 +73,19 @@ export const generateInvoicePDF = (record) => {
               </tr>
             </thead>
             <tbody>
-              ${record.items.map((item, index) => `
+              ${record.items
+                .map(
+                  (item, index) => `
                 <tr style="background: #fff; border-bottom: 1px solid #eee;">
                   <td style="padding: 10px 8px;">${index + 1}</td>
                   <td style="padding: 10px 8px; white-space: pre-line;">${item.itemName}</td>
-                  <td style="padding: 10px 8px;">${item.quantity || '-'}</td>
-                  <td style="padding: 10px 8px;">${item.price ? item.price.toFixed(2) : '-'}</td>
-                  <td style="padding: 10px 8px; text-align: right;">${item.price ? (item.price * (item.quantity || 1)).toFixed(2) : '-'}</td>
+                  <td style="padding: 10px 8px;">${item.quantity || "-"}</td>
+                  <td style="padding: 10px 8px;">${item.price ? item.price.toFixed(2) : "-"}</td>
+                  <td style="padding: 10px 8px; text-align: right;">${item.price ? (item.price * (item.quantity || 1)).toFixed(2) : "-"}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
@@ -93,7 +97,7 @@ export const generateInvoicePDF = (record) => {
             <div style="font-size: 15px;">Discount</div>
           </div>
           <div style="text-align: right;">
-            <div style="font-size: 15px; font-weight: 600;">${record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0).toFixed(2)}</div>
+            <div style="font-size: 15px; font-weight: 600;">${record.items.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0).toFixed(2)}</div>
             <div style="font-size: 15px;">-${Number(record.pickupDiscount).toFixed(2)}</div>
           </div>
         </div>
@@ -101,7 +105,7 @@ export const generateInvoicePDF = (record) => {
         <!-- Total Box -->
         <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
           <div style="background: #5628C3; color: #fff; border-radius: 24px; padding: 12px 32px; font-size: 20px; font-weight: 700;">
-            TOTAL : Rs ${(record.items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0) - Number(record.pickupDiscount)).toFixed(2)}
+            TOTAL : Rs ${(record.items.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0) - Number(record.pickupDiscount)).toFixed(2)}
           </div>
         </div>
 
@@ -155,9 +159,9 @@ export const generateInvoicePDF = (record) => {
   const opt = {
     margin: 0,
     filename: `invoice_${record.invoiceNumber}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
+    image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2 },
-    jsPDF: { unit: 'px', format: [794, 1122], orientation: 'portrait' }
+    jsPDF: { unit: "px", format: [794, 1122], orientation: "portrait" },
   };
 
   html2pdf().set(opt).from(invoiceHTML).save();

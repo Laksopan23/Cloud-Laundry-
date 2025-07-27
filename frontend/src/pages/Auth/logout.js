@@ -1,20 +1,20 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const useLogout = () => {
   const navigate = useNavigate();
 
   const logout = () => {
     // Clear localStorage items set during login
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('loggedInUserType');
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("loggedInUserType");
 
     // Show logout success message
-    alert('Logout successful');
+    alert("Logout successful");
 
     // Redirect to login page
-    navigate('/');
+    navigate("/");
   };
 
   return logout;
